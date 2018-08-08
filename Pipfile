@@ -1,0 +1,21 @@
+[[source]]
+url = "https://pypi.python.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+htmlmin = "*"
+jinja2 = "*"
+markdown = "*"
+python-dateutil = "*"
+python-slugify = "*"
+
+[dev-packages]
+mypy = "*"
+pytest = "*"
+
+[requires]
+python_version = "3.7"
+
+[pipenv]
+keep_outdated = true
