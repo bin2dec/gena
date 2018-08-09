@@ -10,6 +10,36 @@ LANG = 'en'
 RUNNER = 'gena.runners.FileRunner'
 
 
+FILE = 'gena.files.File'
+
+
+# JOBS
+# Chains of callable objects, which are called one by one before and after the file processing.
+# For example:
+# FINAL_JOBS = (
+#     ...
+#     {
+#         'job': 'gena.jobs.generate_file_from_template',
+#         'options': {
+#             'filename': 'articles.html',
+#         },
+#     },
+#     ...
+# )
+
+# Initial jobs are called before the file processing
+INITIAL_JOBS = ()
+
+# Final jobs are called after the file processing
+FINAL_JOBS = ()
+
+
+# See possible options http://jinja.pocoo.org/docs/api/#jinja2.Environment
+JINJA2_OPTIONS = {
+    'enable_async': True,
+}
+
+
 PROCESSING_RULES = ()
 
 
@@ -24,12 +54,6 @@ HTML_MINIFIER_PROCESSOR_OPTIONS = {
     'remove_comments': True,
     'remove_empty_space': True,
     'reduce_boolean_attributes': True,
-}
-
-
-# See possible options http://jinja.pocoo.org/docs/api/#jinja2.Environment
-JINJA2_PROCESSOR_OPTIONS = {
-    'enable_async': True,
 }
 
 

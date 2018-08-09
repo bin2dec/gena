@@ -270,7 +270,7 @@ class Jinja2Processor(TextProcessor):
         super().__init__(**kwargs)
 
         loader = jinja2.FileSystemLoader(searchpath=settings.TEMPLATE_DIRS)
-        environment = jinja2.Environment(loader=loader, **settings.JINJA2_PROCESSOR_OPTIONS)
+        environment = jinja2.Environment(loader=loader, **settings.JINJA2_OPTIONS)
         self.template = environment.get_template(template)
 
     def process(self, file: File) -> File:
