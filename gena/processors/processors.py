@@ -4,10 +4,12 @@ import jinja2
 import subprocess
 
 from abc import ABC, abstractmethod
+from collections import defaultdict
 from htmlmin import minify as html_minify
 from markdown import Markdown
 from typing import Callable, Iterable, Optional, Sequence, TypeVar, Union
 
+from gena.context import context
 from gena.files import File
 from gena.settings import settings
 
@@ -16,6 +18,7 @@ __all__ = (
     'ExternalProcessor',
     'FileMetaProcessor',
     'FileNameProcessor',
+    'GroupProcessor',
     'HTMLMinifierProcessor',
     'Jinja2Processor',
     'MarkdownProcessor',
@@ -203,6 +206,48 @@ class FileNameProcessor(Processor):
             file.path.name = self.name(file)
         else:
             file.path.name = self.name
+        return file
+
+
+class GroupProcessor(Processor):
+    """Create groups of files.
+
+    It can be useful in many cases for the final jobs like a job of generation of index file with, for instance, links
+    to your articles.
+    Let's look at the following rule:
+
+    PROCESSING_RULES = (
+        ...
+        {
+            'test': '*.md',
+            'processors': (
+                ...
+                {
+                    'processor': 'gena.processors.GroupProcessor',
+                    'options': {
+                        'name': 'articles',
+                    },
+                },
+                ...
+            ),
+        },
+        ...
+    )
+
+    According to this rule all our markdown files will be part of the group named `articles` (now globally accessible
+    via context.groups['articles']).
+    Next, we can use this bunch of the files in some final job to generate an article list.
+    Note that it's generally better to place GroupProcessor after SavingProcessor.
+    """
+
+    def __init__(self, *, name: str, **kwargs) -> None:
+        super().__init__(**kwargs)
+        if 'groups' not in context:
+            context.groups = defaultdict(list)
+        self.name = name
+
+    def process(self, file: File) -> File:
+        context.groups[self.name].append(file)
         return file
 
 
