@@ -64,6 +64,7 @@ class TextProcessor(Processor):
 class ExternalProcessor(Processor):
     """Run an external command.
 
+    The file contents are sent to stdin of the process. Then captured stdout is assigned back to the file contents.
     For example, we would like to compress our JavaScript files that aren't compressed yet:
 
     PROCESSING_RULES = (
@@ -234,7 +235,7 @@ class GroupProcessor(Processor):
         ...
     )
 
-    According to this rule all our markdown files will be part of the group named `articles` (now globally accessible
+    According to this rule, all our markdown files will be part of the group named `articles` (now globally accessible
     via context.groups['articles']).
     Next, we can use this bunch of the files in some final job to generate an article list.
     Note that it's generally better to place GroupProcessor after SavingProcessor.
@@ -254,7 +255,7 @@ class GroupProcessor(Processor):
 class HTMLMinifierProcessor(TextProcessor):
     """Minify HTML.
 
-    For example, we would like to minify contents of our files that have been processed by MarkdownProcessor:
+    For example, we would like to minify the contents of our files that have been processed by MarkdownProcessor:
 
     PROCESSING_RULES = (
         ...
@@ -284,9 +285,9 @@ class Jinja2Processor(TextProcessor):
     """Render Jinja2 templates.
 
     There are several variables available in templates:
-    the file contents
-    all meta variables of the file
-    all settings variables
+    - the file contents
+    - all meta variables of the file
+    - all settings variables
     For example, we would like to render our template named article.html:
 
     PROCESSING_RULES = (
@@ -361,7 +362,10 @@ class MarkdownProcessor(TextProcessor):
 
 
 class SavingProcessor(Processor):
-    """Save the file."""
+    """Save the file.
+
+    If rename_directory is True, then the file path will be changed to settings.DST_DIR before the saving.
+    """
 
     rename_directory = True
 
