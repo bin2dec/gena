@@ -272,12 +272,12 @@ class HTMLMinifierProcessor(TextProcessor):
         ...
     )
 
-    You can also customize the processing by using HTML_MINIFIER_PROCESSOR_OPTIONS in your settings.
+    You can also customize the processing by using HTML_MINIFIER_OPTIONS in your settings.
     """
 
     def process(self, file: File) -> File:
         file = super().process(file)
-        file.contents = html_minify(file.contents, **settings.HTML_MINIFIER_PROCESSOR_OPTIONS)
+        file.contents = html_minify(file.contents, **settings.HTML_MINIFIER_OPTIONS)
         return file
 
 

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import jinja2
 
+from htmlmin import minify as html_minify
 from typing import Iterable
 
 from gena import utils
@@ -26,7 +27,8 @@ def do_final_jobs():
     do_jobs(settings.FINAL_JOBS)
 
 
-def generate_file_from_template(filename: str = 'index.html', *, template: str = 'index.html') -> None:
+def generate_file_from_template(filename: str = 'index.html', *, template: str = 'index.html',
+                                minify: bool = False) -> None:
     j2_loader = jinja2.FileSystemLoader(searchpath=settings.TEMPLATE_DIRS)
     j2_environment = jinja2.Environment(loader=j2_loader, **settings.JINJA2_OPTIONS)
     j2_template = j2_environment.get_template(template)
@@ -35,4 +37,6 @@ def generate_file_from_template(filename: str = 'index.html', *, template: str =
     file = file_class(filename)
     file.path.directory = settings.DST_DIR
     file.contents = j2_template.render({**context, **settings})
+    if minify:
+        file.contents = html_minify(file.contents, **settings.HTML_MINIFIER_OPTIONS)
     file.save()
