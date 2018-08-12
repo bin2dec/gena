@@ -16,6 +16,8 @@ class FileRunner(object):
     def __init__(self, src):
         self._src = src
 
+        file_class = utils.import_attr(settings.FILE)
+
         self._processing_rules = []
         for rule in settings.PROCESSING_RULES:
             new_processors = []
@@ -26,7 +28,7 @@ class FileRunner(object):
             new_rule = {
                 'test': rule['test'],
                 'processors': new_processors,
-                'class': rule.get('class', File),
+                'class': rule.get('class', file_class),
                 'type': rule.get('type', FileType.TEXT),
             }
             self._processing_rules.append(new_rule)
