@@ -41,6 +41,10 @@ class Settings(UserDict):
         else:
             self.data[key] = value
 
+    def clear(self):
+        super().clear()
+        self.data = {k: v for k, v in getmembers(global_settings) if k.isupper()}
+
     def load_from_module(self, module):
         if not isinstance(module, ModuleType):
             module = import_module(module)
