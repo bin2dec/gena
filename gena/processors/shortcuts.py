@@ -1,9 +1,14 @@
+"""
+This module contains various shortcuts for creating processor rules more easily.
+"""
+
 from gena import utils
 from slugify import slugify
 
 
 __all__ = (
     'filename',
+    'group',
     'html_minifier',
     'markdown',
     'meta_date',
@@ -17,6 +22,15 @@ __all__ = (
 def filename(name):
     return {
         'processor': 'gena.processors.FileNameProcessor',
+        'options': {
+            'name': name,
+        },
+    }
+
+
+def group(name):
+    return {
+        'processor': 'gena.processors.GroupProcessor',
         'options': {
             'name': name,
         },

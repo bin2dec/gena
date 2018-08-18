@@ -4,10 +4,12 @@ import jinja2
 import subprocess
 
 from abc import ABC, abstractmethod
+from collections import defaultdict
 from htmlmin import minify as html_minify
 from markdown import Markdown
 from typing import Callable, Iterable, Optional, Sequence, TypeVar, Union
 
+from gena.context import context
 from gena.files import File
 from gena.settings import settings
 
@@ -16,6 +18,7 @@ __all__ = (
     'ExternalProcessor',
     'FileMetaProcessor',
     'FileNameProcessor',
+    'GroupProcessor',
     'HTMLMinifierProcessor',
     'Jinja2Processor',
     'MarkdownProcessor',
@@ -61,6 +64,7 @@ class TextProcessor(Processor):
 class ExternalProcessor(Processor):
     """Run an external command.
 
+    The file contents are sent to stdin of the process. Then captured stdout is assigned back to the file contents.
     For example, we would like to compress our JavaScript files that aren't compressed yet:
 
     PROCESSING_RULES = (
@@ -206,10 +210,52 @@ class FileNameProcessor(Processor):
         return file
 
 
+class GroupProcessor(Processor):
+    """Create groups of files.
+
+    It can be useful in many cases for the final jobs like a job of generation of index file with, for instance, links
+    to your articles.
+    Let's look at the following rule:
+
+    PROCESSING_RULES = (
+        ...
+        {
+            'test': '*.md',
+            'processors': (
+                ...
+                {
+                    'processor': 'gena.processors.GroupProcessor',
+                    'options': {
+                        'name': 'articles',
+                    },
+                },
+                ...
+            ),
+        },
+        ...
+    )
+
+    According to this rule, all our markdown files will be part of the group named `articles` (now globally accessible
+    via context.groups['articles']).
+    Next, we can use this bunch of the files in some final job to generate an article list.
+    Note that it's generally better to place GroupProcessor after SavingProcessor.
+    """
+
+    def __init__(self, *, name: str, **kwargs) -> None:
+        super().__init__(**kwargs)
+        if 'groups' not in context:
+            context.groups = defaultdict(list)
+        self.name = name
+
+    def process(self, file: File) -> File:
+        context.groups[self.name].append(file)
+        return file
+
+
 class HTMLMinifierProcessor(TextProcessor):
     """Minify HTML.
 
-    For example, we would like to minify contents of our files that have been processed by MarkdownProcessor:
+    For example, we would like to minify the contents of our files that have been processed by MarkdownProcessor:
 
     PROCESSING_RULES = (
         ...
@@ -226,12 +272,12 @@ class HTMLMinifierProcessor(TextProcessor):
         ...
     )
 
-    You can also customize the processing by using HTML_MINIFIER_PROCESSOR_OPTIONS in your settings.
+    You can also customize the processing by using HTML_MINIFIER_OPTIONS in your settings.
     """
 
     def process(self, file: File) -> File:
         file = super().process(file)
-        file.contents = html_minify(file.contents, **settings.HTML_MINIFIER_PROCESSOR_OPTIONS)
+        file.contents = html_minify(file.contents, **settings.HTML_MINIFIER_OPTIONS)
         return file
 
 
@@ -239,9 +285,9 @@ class Jinja2Processor(TextProcessor):
     """Render Jinja2 templates.
 
     There are several variables available in templates:
-    the file contents
-    all meta variables of the file
-    all settings variables
+    - the file contents
+    - all meta variables of the file
+    - all settings variables
     For example, we would like to render our template named article.html:
 
     PROCESSING_RULES = (
@@ -270,13 +316,13 @@ class Jinja2Processor(TextProcessor):
         super().__init__(**kwargs)
 
         loader = jinja2.FileSystemLoader(searchpath=settings.TEMPLATE_DIRS)
-        environment = jinja2.Environment(loader=loader, **settings.JINJA2_PROCESSOR_OPTIONS)
+        environment = jinja2.Environment(loader=loader, **settings.JINJA2_OPTIONS)
         self.template = environment.get_template(template)
 
     def process(self, file: File) -> File:
         file = super().process(file)
-        context = {'contents': file.contents, **file.meta, **settings}
-        file.contents = self.template.render(context)
+        variables = {'contents': file.contents, **file.meta, **settings}
+        file.contents = self.template.render(variables)
 
         return file
 
@@ -303,12 +349,12 @@ class MarkdownProcessor(TextProcessor):
     If you need to do that, you should use another processor (e.g. FileNameProcessor).
 
     You can also use some additional processing arguments and plugins. In order to do that, just add
-    MARKDOWN_PROCESSOR_OPTIONS to your settings file.
+    MARKDOWN_OPTIONS to your settings file.
     """
 
     def process(self, file: File) -> File:
         file = super().process(file)
-        md = Markdown(**settings.MARKDOWN_PROCESSOR_OPTIONS)
+        md = Markdown(**settings.MARKDOWN_OPTIONS)
         file.contents = md.convert(file.contents)
         meta = getattr(md, 'Meta', {})
         file.meta.update(meta)
@@ -316,7 +362,10 @@ class MarkdownProcessor(TextProcessor):
 
 
 class SavingProcessor(Processor):
-    """Save the file."""
+    """Save the file.
+
+    If rename_directory is True, then the file path will be changed to settings.DST_DIR before the saving.
+    """
 
     rename_directory = True
 

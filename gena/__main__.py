@@ -8,7 +8,7 @@ from gena.settings import settings
 def main():
     arg_parser = ArgumentParser()
     arg_parser.add_argument('src', nargs='?', default='src')
-    arg_parser.add_argument('-s', '--settings')
+    arg_parser.add_argument('-s', '--settings', default='settings.py')
     arg_parser.add_argument('-v', '--version', action='version', version=__version__)
     args = arg_parser.parse_args()
 

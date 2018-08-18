@@ -2,7 +2,8 @@ import fnmatch
 import os
 
 from gena import utils
-from gena.files import File, FileType
+from gena.files import FileType
+from gena.jobs import do_final_jobs, do_initial_jobs
 from gena.settings import settings
 
 
@@ -15,6 +16,8 @@ class FileRunner(object):
     def __init__(self, src):
         self._src = src
 
+        file_class = utils.import_attr(settings.FILE)
+
         self._processing_rules = []
         for rule in settings.PROCESSING_RULES:
             new_processors = []
@@ -25,7 +28,7 @@ class FileRunner(object):
             new_rule = {
                 'test': rule['test'],
                 'processors': new_processors,
-                'class': rule.get('class', File),
+                'class': rule.get('class', file_class),
                 'type': rule.get('type', FileType.TEXT),
             }
             self._processing_rules.append(new_rule)
@@ -41,9 +44,13 @@ class FileRunner(object):
                 return rule
 
     def run(self):
+        do_initial_jobs()
+
         for dirpath, filename in self._get_paths():
             rule = self._get_rule(filename)
             if rule:
                 file = rule['class'](dirpath, filename, file_type=rule['type'])
                 for processor in rule['processors']:
                     file = processor.process(file)
+
+        do_final_jobs()

@@ -1,0 +1,16 @@
+#!/usr/bin/env python
+
+from argparse import ArgumentParser, FileType
+from sys import stdin, stdout
+
+
+def main():
+    arg_parser = ArgumentParser()
+    arg_parser.add_argument('file', nargs='?', type=FileType(), default=stdin)
+    args = arg_parser.parse_args()
+    out = args.file.read().upper()
+    stdout.write(out)
+
+
+if __name__ == "__main__":
+    main()
