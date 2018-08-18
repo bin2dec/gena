@@ -3,7 +3,9 @@ import os
 
 from dataclasses import dataclass
 
+from gena.context import context as gena_context
 from gena.files import File, FileType
+from gena.settings import settings as gena_settings
 
 
 BASE_DIR = os.path.dirname(__file__)
@@ -11,10 +13,13 @@ DATA_DIR = os.path.join(BASE_DIR, 'data')
 
 
 @dataclass
-class SampleFilePath:
+class SampleArticlePath:
     directory: str = DATA_DIR
     basename: str = 'article'
     extension: str = '.md'
+
+    def __fspath__(self):
+        return self.path
 
     @property
     def name(self) -> str:
@@ -25,30 +30,40 @@ class SampleFilePath:
         return os.path.join(self.directory, self.name)
 
 
-@pytest.fixture(name='sample_file_path')
-def _sample_file_path():
-    return SampleFilePath()
+@pytest.fixture
+def sample_article_path():
+    return SampleArticlePath()
 
 
-@pytest.fixture(name='sample_binary_contents', scope='session')
-def _sample_binary_contents():
-    sample_file_path = SampleFilePath()
-    with open(sample_file_path.path, 'rb') as file:
+@pytest.fixture(scope='session')
+def sample_article_as_bytes():
+    with open(SampleArticlePath(), 'rb') as file:
         return file.read()
 
 
-@pytest.fixture(name='sample_text_contents', scope='session')
-def _sample_text_contents():
-    sample_file_path = SampleFilePath()
-    with open(sample_file_path.path, 'rt') as file:
+@pytest.fixture(scope='session')
+def sample_article_as_str():
+    with open(SampleArticlePath(), 'rt') as file:
         return file.read()
 
 
-@pytest.fixture(name='binary_file')
-def _binary_file(sample_file_path):
-    return File(sample_file_path.path, file_type=FileType.BINARY)
+@pytest.fixture
+def article_binary_file(sample_article_path):
+    return File(sample_article_path, file_type=FileType.BINARY)
 
 
-@pytest.fixture(name='text_file')
-def _text_file(sample_file_path):
-    return File(sample_file_path.path, file_type=FileType.TEXT)
+@pytest.fixture
+def article_text_file(sample_article_path):
+    return File(sample_article_path, file_type=FileType.TEXT)
+
+
+@pytest.fixture
+def context():
+    gena_context.clear()
+    return gena_context
+
+
+@pytest.fixture
+def settings():
+    gena_settings.clear()
+    return gena_settings
