@@ -48,18 +48,18 @@ JINJA2_OPTIONS = {
 }
 
 
+# See possible options https://python-markdown.github.io/reference/#markdown
+# See the list of built-in extensions https://python-markdown.github.io/extensions/
+MARKDOWN_OPTIONS = {
+    'extensions': ['markdown.extensions.meta'],
+    'output_format': 'html5',
+}
+
+
 PROCESSING_RULES = ()
 
 
 # See https://docs.python.org/3.7/library/subprocess.html#subprocess.run
 EXTERNAL_PROCESSOR = {
     'check': True,
-}
-
-
-# See possible options https://python-markdown.github.io/reference/#markdown
-# See the list of built-in extensions https://python-markdown.github.io/extensions/
-MARKDOWN_PROCESSOR_OPTIONS = {
-    'extensions': ['markdown.extensions.meta'],
-    'output_format': 'html5',
 }

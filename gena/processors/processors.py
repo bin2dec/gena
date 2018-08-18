@@ -349,12 +349,12 @@ class MarkdownProcessor(TextProcessor):
     If you need to do that, you should use another processor (e.g. FileNameProcessor).
 
     You can also use some additional processing arguments and plugins. In order to do that, just add
-    MARKDOWN_PROCESSOR_OPTIONS to your settings file.
+    MARKDOWN_OPTIONS to your settings file.
     """
 
     def process(self, file: File) -> File:
         file = super().process(file)
-        md = Markdown(**settings.MARKDOWN_PROCESSOR_OPTIONS)
+        md = Markdown(**settings.MARKDOWN_OPTIONS)
         file.contents = md.convert(file.contents)
         meta = getattr(md, 'Meta', {})
         file.meta.update(meta)
