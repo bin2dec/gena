@@ -17,17 +17,16 @@ def _settings():
 
 
 class TestFileNameProcessor:
-    def test_processing_when_name_is_string(self, sample_file_path, settings, text_file):
-        sample_file_path.extension = '.html'
-        processor = FileNameProcessor(settings=settings, name=sample_file_path.name)
-        text_file = processor.process(text_file)
-        assert text_file.path.name == sample_file_path.name
-        assert text_file.path.path == sample_file_path.path
+    def test_processing_when_name_is_string(self, article_text_file, sample_article_path):
+        sample_article_path.extension = '.html'
+        processor = FileNameProcessor(name=sample_article_path.name)
+        output_file = processor.process(article_text_file)
+        assert output_file.path.name == sample_article_path.name
+        assert output_file.path.path == sample_article_path.path
 
-    def test_processing_when_name_is_callable(self, sample_file_path, settings, text_file):
-        sample_file_path.extension = '.html'
-        processor = FileNameProcessor(settings=settings,
-                                      name=lambda file: f'{file.path.basename}{sample_file_path.extension}')
-        text_file = processor.process(text_file)
-        assert text_file.path.name == sample_file_path.name
-        assert text_file.path.path == sample_file_path.path
+    def test_processing_when_name_is_callable(self, article_text_file, sample_article_path):
+        sample_article_path.extension = '.html'
+        processor = FileNameProcessor(name=lambda file: f'{file.path.basename}{sample_article_path.extension}')
+        output_file = processor.process(article_text_file)
+        assert output_file.path.name == sample_article_path.name
+        assert output_file.path.path == sample_article_path.path
