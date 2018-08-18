@@ -2,7 +2,7 @@ import fnmatch
 import os
 
 from gena import utils
-from gena.files import File, FileType
+from gena.files import FileType
 from gena.jobs import do_final_jobs, do_initial_jobs
 from gena.settings import settings
 
