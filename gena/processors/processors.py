@@ -321,8 +321,8 @@ class Jinja2Processor(TextProcessor):
 
     def process(self, file: File) -> File:
         file = super().process(file)
-        context = {'contents': file.contents, **file.meta, **settings}
-        file.contents = self.template.render(context)
+        variables = {'contents': file.contents, **file.meta, **settings}
+        file.contents = self.template.render(variables)
 
         return file
 
