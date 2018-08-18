@@ -101,6 +101,10 @@ class TestBinaryFile:
         assert tmpfile.read_binary() == sample_article_as_bytes
         assert not article_binary_file.save()  # the file isn't changed since the last saving
 
+    def test_saving_file_when_contents_changed(self, article_binary_file):
+        article_binary_file.contents = b'test'
+        assert not article_binary_file.save()
+
     def test_saving_file_when_path_and_contents_changed(self, article_binary_file, tmpdir):
         tmpfile = tmpdir.join(article_binary_file.path.name)
         article_binary_file.path.path = tmpfile
@@ -137,6 +141,10 @@ class TestTextFile:
         assert article_text_file.save()
         assert tmpfile.read() == sample_article_as_str
         assert not article_text_file.save()  # the file isn't changed since the last saving
+
+    def test_saving_file_when_contents_changed(self, article_text_file):
+        article_text_file.contents = 'test'
+        assert not article_text_file.save()
 
     def test_saving_file_when_path_and_contents_changed(self, article_text_file, tmpdir):
         tmpfile = tmpdir.join(article_text_file.path.name)
