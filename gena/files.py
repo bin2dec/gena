@@ -3,6 +3,7 @@ from __future__ import annotations
 import os
 import shutil
 
+from abc import ABC, abstractmethod
 from collections import UserDict, UserList
 from enum import Enum
 from typing import Any, Iterable, Iterator, Union
@@ -12,17 +13,19 @@ from gena import utils
 
 __all__ = (
     'File',
+    'FileLike',
     'FileMeta',
     'FilePath',
+    'FilePathLike',
     'FileType',
 )
 
 
+AnyPath = Union[os.PathLike, str]
 FileContents = Union[None, bytes, str]
-PathLike = Union[os.PathLike, str]
 
 
-def join_paths(*paths: PathLike) -> str:
+def join_paths(*paths: AnyPath) -> str:
     """Join one or more path components. The result's type is always str."""
     path = os.path.join(*paths) if paths else ''
     if isinstance(path, bytes):
@@ -52,11 +55,67 @@ class FileMeta(UserDict):
         raise AttributeError(name)
 
 
-class FilePath(os.PathLike):
-    def __init__(self, path: PathLike, *paths: PathLike) -> None:
+class FilePathLike(os.PathLike):
+    @property
+    @abstractmethod
+    def basename(self) -> str:
+        pass
+
+    @basename.setter
+    @abstractmethod
+    def basename(self, basename: str) -> None:
+        pass
+
+    @property
+    @abstractmethod
+    def directory(self) -> str:
+        pass
+
+    @directory.setter
+    @abstractmethod
+    def directory(self, directory: str) -> None:
+        pass
+
+    @property
+    @abstractmethod
+    def extension(self) -> str:
+        pass
+
+    @extension.setter
+    @abstractmethod
+    def extension(self, extension: str) -> None:
+        pass
+
+    @property
+    @abstractmethod
+    def name(self) -> str:
+        pass
+
+    @name.setter
+    @abstractmethod
+    def name(self, name: str) -> None:
+        pass
+
+    @property
+    @abstractmethod
+    def path(self) -> str:
+        pass
+
+    @path.setter
+    @abstractmethod
+    def path(self, path: str) -> None:
+        pass
+
+    @abstractmethod
+    def copy(self) -> FilePath:
+        pass
+
+
+class FilePath(FilePathLike):
+    def __init__(self, path: AnyPath, *paths: AnyPath) -> None:
         self._path = join_paths(path, *paths)
 
-    def __add__(self, other: PathLike) -> FilePath:
+    def __add__(self, other: AnyPath) -> FilePath:
         return self.__class__(self._path, other)
 
     def __bytes__(self):
@@ -70,14 +129,14 @@ class FilePath(os.PathLike):
     def __fspath__(self) -> str:
         return self._path
 
-    def __iadd__(self, other: PathLike) -> FilePath:
+    def __iadd__(self, other: AnyPath) -> FilePath:
         self._path = join_paths(self._path, other)
         return self
 
     def __iter__(self) -> Iterator[str]:
         return iter(self._path)
 
-    def __radd__(self, other: PathLike) -> FilePath:
+    def __radd__(self, other: AnyPath) -> FilePath:
         return self.__class__(other, self._path)
 
     def __repr__(self, *args, **kwargs):
@@ -167,10 +226,44 @@ class FilePath(os.PathLike):
         return self.__class__(self)
 
 
-class File:
+class FileLike(ABC):
+    @property
+    @abstractmethod
+    def contents(self) -> FileContents:
+        pass
+
+    @contents.setter
+    @abstractmethod
+    def contents(self, contents: FileContents) -> None:
+        pass
+
+    @property
+    @abstractmethod
+    def meta(self) -> FileMeta:
+        pass
+
+    @property
+    @abstractmethod
+    def path(self) -> FilePathLike:
+        pass
+
+    @abstractmethod
+    def is_binary(self) -> bool:
+        pass
+
+    @abstractmethod
+    def is_text(self) -> bool:
+        pass
+
+    @abstractmethod
+    def save(self) -> bool:
+        pass
+
+
+class File(FileLike):
     _contents: FileContents = None
 
-    def __init__(self, path: PathLike, *paths: PathLike, file_type: FileType = FileType.TEXT) -> None:
+    def __init__(self, path: AnyPath, *paths: AnyPath, file_type: FileType = FileType.TEXT) -> None:
         self._path = FilePath(path, *paths)
         self._opath = self._path.copy()
         self._type = file_type
