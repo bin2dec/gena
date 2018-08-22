@@ -25,14 +25,6 @@ AnyPath = Union[os.PathLike, str]
 FileContents = Union[None, bytes, str]
 
 
-def join_paths(*paths: AnyPath) -> str:
-    """Join one or more path components. The result's type is always str."""
-    path = os.path.join(*paths) if paths else ''
-    if isinstance(path, bytes):
-        return os.fsdecode(path)
-    return path
-
-
 class FileType(Enum):
     BINARY = 'b'
     TEXT = 't'
@@ -113,7 +105,7 @@ class FilePathLike(os.PathLike):
 
 class FilePath(FilePathLike):
     def __init__(self, path: AnyPath, *paths: AnyPath) -> None:
-        self._path = join_paths(path, *paths)
+        self.join(path, *paths)  # init self._path
 
     def __add__(self, other: AnyPath) -> FilePath:
         return self.__class__(self._path, other)
@@ -130,7 +122,7 @@ class FilePath(FilePathLike):
         return self._path
 
     def __iadd__(self, other: AnyPath) -> FilePath:
-        self._path = join_paths(self._path, other)
+        self.join(self._path, other)
         return self
 
     def __iter__(self) -> Iterator[str]:
@@ -160,7 +152,7 @@ class FilePath(FilePathLike):
         basename = utils.fspath(basename)
         if os.sep in basename:
             raise ValueError('separators are not allowed in a file base name')
-        self._path = join_paths(self.directory, f'{basename}{self.extension}')
+        self.join(self.directory, f'{basename}{self.extension}')
 
     @property
     def directory(self) -> str:
@@ -174,7 +166,7 @@ class FilePath(FilePathLike):
 
     @directory.setter
     def directory(self, directory: str) -> None:
-        self._path = join_paths(directory, self.name)
+        self.join(directory, self.name)
 
     @property
     def extension(self) -> str:
@@ -195,7 +187,7 @@ class FilePath(FilePathLike):
             name = f'{self.basename}{extension}'
         else:
             name = f'{self.basename}.{extension}'
-        self._path = join_paths(self.directory, name)
+        self.join(self.directory, name)
 
     @property
     def name(self) -> str:
@@ -212,7 +204,7 @@ class FilePath(FilePathLike):
         name = utils.fspath(name)
         if os.sep in name:
             raise ValueError('separators are not allowed in a file name')
-        self._path = join_paths(self.directory, name)
+        self.join(self.directory, name)
 
     @property
     def path(self) -> str:
@@ -220,10 +212,17 @@ class FilePath(FilePathLike):
 
     @path.setter
     def path(self, path: str) -> None:
-        self._path = join_paths(path)
+        self.join(path)
 
     def copy(self) -> FilePath:
         return self.__class__(self)
+
+    def join(self, *paths: AnyPath) -> None:
+        """Join one or more path components and assign the result to self._path."""
+        path = os.path.join(*paths) if paths else ''
+        if isinstance(path, bytes):
+            return os.fsdecode(path)
+        self._path: str = path
 
 
 class FileLike(ABC):
