@@ -10,7 +10,7 @@ from markdown import Markdown
 from typing import Callable, Iterable, Optional, Sequence, TypeVar, Union
 
 from gena.context import context
-from gena.files import File
+from gena.files import FileLike
 from gena.settings import settings
 
 
@@ -28,7 +28,7 @@ __all__ = (
 
 
 T = TypeVar('T')
-FileCallable = Union[T, Callable[[File], T]]
+FileCallable = Union[T, Callable[[FileLike], T]]
 
 
 class Processor(ABC):
@@ -39,14 +39,14 @@ class Processor(ABC):
             setattr(self, key, value)
 
     @abstractmethod
-    def process(self, file: File) -> File:
+    def process(self, file: FileLike) -> FileLike:
         return file
 
 
 class BinaryProcessor(Processor):
     """Base class for all processors that work with binary files (when file contents are bytes)."""
 
-    def process(self, file: File) -> File:
+    def process(self, file: FileLike) -> FileLike:
         if not file.is_binary():
             raise TypeError(f'{self.__class__.__name__} supports binary files only')
         return file
@@ -55,7 +55,7 @@ class BinaryProcessor(Processor):
 class TextProcessor(Processor):
     """Base class for all processors that work with text files (when file contents are a string)."""
 
-    def process(self, file: File) -> File:
+    def process(self, file: FileLike) -> FileLike:
         if not file.is_text():
             raise TypeError(f'{self.__class__.__name__} supports text files only')
         return file
@@ -99,7 +99,7 @@ class ExternalProcessor(Processor):
         super().__init__(**kwargs)
         self.command = command
 
-    def process(self, file: File) -> File:
+    def process(self, file: FileLike) -> FileLike:
         output = subprocess.run(self.command,
                                 input=file.contents,
                                 shell=False,
@@ -156,7 +156,7 @@ class FileMetaProcessor(Processor):
         self.default = default
         self.skip_if_exists = skip_if_exists
 
-    def process(self, file: File) -> File:
+    def process(self, file: FileLike) -> FileLike:
         if self.key in file.meta and self.skip_if_exists:
             return file
 
@@ -202,7 +202,7 @@ class FileNameProcessor(Processor):
         super().__init__(**kwargs)
         self.name = name
 
-    def process(self, file: File) -> File:
+    def process(self, file: FileLike) -> FileLike:
         if callable(self.name):
             file.path.name = self.name(file)
         else:
@@ -247,7 +247,7 @@ class GroupProcessor(Processor):
             context.groups = defaultdict(list)
         self.name = name
 
-    def process(self, file: File) -> File:
+    def process(self, file: FileLike) -> FileLike:
         context.groups[self.name].append(file)
         return file
 
@@ -275,7 +275,7 @@ class HTMLMinifierProcessor(TextProcessor):
     You can also customize the processing by using HTML_MINIFIER_OPTIONS in your settings.
     """
 
-    def process(self, file: File) -> File:
+    def process(self, file: FileLike) -> FileLike:
         file = super().process(file)
         file.contents = html_minify(file.contents, **settings.HTML_MINIFIER_OPTIONS)
         return file
@@ -319,7 +319,7 @@ class Jinja2Processor(TextProcessor):
         environment = jinja2.Environment(loader=loader, **settings.JINJA2_OPTIONS)
         self.template = environment.get_template(template)
 
-    def process(self, file: File) -> File:
+    def process(self, file: FileLike) -> FileLike:
         file = super().process(file)
         variables = {'contents': file.contents, **file.meta, **settings}
         file.contents = self.template.render(variables)
@@ -352,7 +352,7 @@ class MarkdownProcessor(TextProcessor):
     MARKDOWN_OPTIONS to your settings file.
     """
 
-    def process(self, file: File) -> File:
+    def process(self, file: FileLike) -> FileLike:
         file = super().process(file)
         md = Markdown(**settings.MARKDOWN_OPTIONS)
         file.contents = md.convert(file.contents)
@@ -369,7 +369,7 @@ class SavingProcessor(Processor):
 
     rename_directory = True
 
-    def process(self, file: File) -> File:
+    def process(self, file: FileLike) -> FileLike:
         if self.rename_directory:
             file.path.directory = settings.DST_DIR
         file.save()
