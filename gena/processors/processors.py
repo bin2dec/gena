@@ -10,7 +10,7 @@ from markdown import Markdown
 from typing import Callable, Iterable, Optional, Sequence, TypeVar, Union
 
 from gena.context import context
-from gena.files import FileLike
+from gena.files import FileLike, FileType
 from gena.settings import settings
 
 
@@ -24,6 +24,7 @@ __all__ = (
     'MarkdownProcessor',
     'SavingProcessor',
     'TemplateProcessor',
+    'TypeProcessor',
 )
 
 
@@ -373,6 +374,16 @@ class SavingProcessor(Processor):
         if self.rename_directory:
             file.path.directory = settings.DST_DIR
         file.save()
+        return file
+
+
+class TypeProcessor(Processor):
+    """Change the file type."""
+
+    type = FileType.TEXT
+
+    def process(self, file: FileLike) -> FileLike:
+        file.type = self.type
         return file
 
 

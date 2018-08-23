@@ -4,7 +4,7 @@ import sys
 from gzip import compress
 from string import capwords
 
-from gena.files import File
+from gena.files import File, FileType
 from gena.processors.processors import *
 
 
@@ -147,3 +147,16 @@ class TestSavingProcessor:
         processor = SavingProcessor(rename_directory=False)
         processor.process(article_text_file)
         assert tmpfile.read() == sample_article_as_str
+
+
+class TestTypeProcessor:
+    def test_processing_binary_to_text(self, article_binary_file):
+        processor = TypeProcessor(type=FileType.TEXT)
+        output_file = processor.process(article_binary_file)
+        assert output_file.type == FileType.TEXT
+
+    def test_processing_text_to_binary(self, article_text_file):
+        processor = TypeProcessor(type=FileType.BINARY)
+        output_file = processor.process(article_text_file)
+        assert output_file.type == FileType.BINARY
+
