@@ -246,6 +246,16 @@ class FileLike(ABC):
     def path(self) -> FilePathLike:
         pass
 
+    @property
+    @abstractmethod
+    def type(self) -> FileType:
+        pass
+
+    @type.setter
+    @abstractmethod
+    def type(self, type_: FileType) -> None:
+        pass
+
     @abstractmethod
     def is_binary(self) -> bool:
         pass
@@ -260,16 +270,20 @@ class FileLike(ABC):
 
 
 class File(FileLike):
-    _contents: FileContents = None
+    encoding = 'utf-8'
 
-    def __init__(self, path: AnyPath, *paths: AnyPath, file_type: FileType = FileType.TEXT) -> None:
+    def __init__(self, path: AnyPath, *paths: AnyPath, **kwargs) -> None:
         self._path = FilePath(path, *paths)
         self._opath = self._path.copy()
-        self._type = file_type
+        self._contents: FileContents = None
         self._meta = FileMeta()
+        self._type = kwargs.pop('type', FileType.TEXT)
+
+        for key, value in kwargs.items():
+            setattr(self, key, value)
 
     def __repr__(self, *args, **kwargs):
-        return f'{self.__class__.__name__}({self._path.path!r}, file_type={self._type})'
+        return f'{self.__class__.__name__}({self._path.path!r}, type={self._type})'
 
     def __str__(self, *args, **kwargs) -> str:
         return self._path.path
@@ -285,7 +299,8 @@ class File(FileLike):
     @property
     def contents(self) -> FileContents:
         if self._contents is None:
-            with open(self._opath.path, f'r{self._type.value}') as file:
+            encoding = self.encoding if self.is_text() else None
+            with open(self._opath.path, f'r{self._type.value}', encoding=encoding) as file:
                 self._contents = file.read()
         return self._contents
 
@@ -310,6 +325,22 @@ class File(FileLike):
     def path(self) -> FilePath:
         return self._path
 
+    @property
+    def type(self) -> FileType:
+        return self._type
+
+    @type.setter
+    def type(self, type_: FileType) -> None:
+        if self._type is not type_:
+            if self._contents is not None:
+                if type_ is FileType.BINARY and isinstance(self._contents, str):
+                    self._contents = self._contents.encode(encoding=self.encoding)  # str -> bytes
+                elif type_ is FileType.TEXT and isinstance(self._contents, bytes):
+                    self._contents = self._contents.decode(encoding=self.encoding)  # bytes -> str
+                else:
+                    raise TypeError('unknown or not acceptable type')
+            self._type = type_
+
     def is_binary(self) -> bool:
         return self._type is FileType.BINARY
 
@@ -330,7 +361,8 @@ class File(FileLike):
             os.makedirs(self._path.directory)
 
         if self._contents is not None:
-            with open(self._path, f'w{self._type.value}') as file:
+            encoding = self.encoding if self.is_text() else None
+            with open(self._path, f'w{self._type.value}', encoding=encoding) as file:
                 file.write(self._contents)
             self._contents = None
         else:

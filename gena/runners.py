@@ -49,7 +49,7 @@ class FileRunner(object):
         for dirpath, filename in self._get_paths():
             rule = self._get_rule(filename)
             if rule:
-                file = rule['class'](dirpath, filename, file_type=rule['type'])
+                file = rule['class'](dirpath, filename, type=rule['type'])
                 for processor in rule['processors']:
                     file = processor.process(file)
 

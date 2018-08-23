@@ -1,7 +1,7 @@
 import pytest
 import os
 
-from gena.files import FilePath
+from gena.files import FilePath, FileType
 
 
 @pytest.fixture
@@ -88,6 +88,33 @@ class TestBinaryFile:
         with pytest.raises(TypeError):
             article_binary_file.contents = 'test'
 
+    def test_type_property_getter(self, article_binary_file):
+        assert article_binary_file.type == FileType.BINARY
+
+    def test_type_property_setter_with_same_type(self, article_binary_file):
+        article_binary_file.contents = b'test'
+        article_binary_file.type = FileType.BINARY
+        assert article_binary_file.type == FileType.BINARY
+        assert article_binary_file.contents == b'test'
+
+    def test_type_property_setter_with_same_type_when_contents_is_none(self, article_binary_file,
+                                                                       sample_article_as_bytes):
+        article_binary_file.type = FileType.BINARY
+        assert article_binary_file.type == FileType.BINARY
+        assert article_binary_file.contents == sample_article_as_bytes
+
+    def test_type_property_setter_with_text_type(self, article_binary_file):
+        article_binary_file.contents = b'test'
+        article_binary_file.type = FileType.TEXT
+        assert article_binary_file.type == FileType.TEXT
+        assert article_binary_file.contents == 'test'
+
+    def test_type_property_setter_with_text_type_when_contents_is_none(self, article_binary_file,
+                                                                       sample_article_as_str):
+        article_binary_file.type = FileType.TEXT
+        assert article_binary_file.type == FileType.TEXT
+        assert article_binary_file.contents == sample_article_as_str
+
     def test_is_binary_method(self, article_binary_file):
         assert article_binary_file.is_binary()
 
@@ -128,6 +155,33 @@ class TestTextFile:
     def test_contents_property_setter_with_bytes(self, article_text_file):
         with pytest.raises(TypeError):
             article_text_file.contents = b'test'
+
+    def test_type_property_getter(self, article_text_file):
+        assert article_text_file.type == FileType.TEXT
+
+    def test_type_property_setter_with_same_type(self, article_text_file):
+        article_text_file.contents = 'test'
+        article_text_file.type = FileType.TEXT
+        assert article_text_file.type == FileType.TEXT
+        assert article_text_file.contents == 'test'
+
+    def test_type_property_setter_with_same_type_when_contents_is_none(self, article_text_file,
+                                                                       sample_article_as_str):
+        article_text_file.type = FileType.TEXT
+        assert article_text_file.type == FileType.TEXT
+        assert article_text_file.contents == sample_article_as_str
+
+    def test_type_property_setter_with_binary_type(self, article_text_file):
+        article_text_file.contents = 'test'
+        article_text_file.type = FileType.BINARY
+        assert article_text_file.type == FileType.BINARY
+        assert article_text_file.contents == b'test'
+
+    def test_type_property_setter_with_binary_type_when_contents_is_none(self, article_text_file,
+                                                                         sample_article_as_bytes):
+        article_text_file.type = FileType.BINARY
+        assert article_text_file.type == FileType.BINARY
+        assert article_text_file.contents == sample_article_as_bytes
 
     def test_is_binary_method(self, article_text_file):
         assert not article_text_file.is_binary()
