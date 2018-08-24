@@ -7,6 +7,7 @@ from typing import Iterable
 
 from gena import utils
 from gena.context import context
+from gena.files import File
 from gena.settings import settings
 
 
@@ -33,8 +34,7 @@ def generate_file_from_template(filename: str = 'index.html', *, template: str =
     j2_environment = jinja2.Environment(loader=j2_loader, **settings.JINJA2_OPTIONS)
     j2_template = j2_environment.get_template(template)
 
-    file_class = utils.import_attr(settings.FILE)
-    file = file_class(filename)
+    file = File(filename)
     file.path.directory = settings.DST_DIR
     file.contents = j2_template.render({**context, **settings})
     if minify:

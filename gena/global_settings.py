@@ -10,7 +10,7 @@ LANG = 'en'
 RUNNER = 'gena.runners.FileRunner'
 
 
-FILE = 'gena.files.File'
+DEFAULT_FILE_FACTORY = 'gena.files.TextFileFactory'
 
 
 # JOBS

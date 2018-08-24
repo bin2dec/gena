@@ -1,8 +1,8 @@
-import fnmatch
 import os
 
+from fnmatch import fnmatch
+
 from gena import utils
-from gena.files import FileType
 from gena.jobs import do_final_jobs, do_initial_jobs
 from gena.settings import settings
 
@@ -16,7 +16,8 @@ class FileRunner(object):
     def __init__(self, src):
         self._src = src
 
-        file_class = utils.import_attr(settings.FILE)
+        default_file_factory = utils.import_attr(settings.DEFAULT_FILE_FACTORY)
+        default_file_factory = default_file_factory()
 
         self._processing_rules = []
         for rule in settings.PROCESSING_RULES:
@@ -25,11 +26,17 @@ class FileRunner(object):
                 new_processor = utils.import_attr(processor['processor'])
                 new_processor = new_processor(**processor.get('options', {}))
                 new_processors.append(new_processor)
+
+            if 'file_factory' in rule:
+                file_factory = utils.import_attr(rule['file_factory'])
+                file_factory = file_factory()
+            else:
+                file_factory = default_file_factory
+
             new_rule = {
                 'test': rule['test'],
                 'processors': new_processors,
-                'class': rule.get('class', file_class),
-                'type': rule.get('type', FileType.TEXT),
+                'file_factory': file_factory,
             }
             self._processing_rules.append(new_rule)
 
@@ -40,7 +47,7 @@ class FileRunner(object):
 
     def _get_rule(self, test):
         for rule in self._processing_rules:
-            if fnmatch.fnmatch(test, rule['test']):
+            if fnmatch(test, rule['test']):
                 return rule
 
     def run(self):
@@ -49,7 +56,7 @@ class FileRunner(object):
         for dirpath, filename in self._get_paths():
             rule = self._get_rule(filename)
             if rule:
-                file = rule['class'](dirpath, filename, type=rule['type'])
+                file = rule['file_factory'](dirpath, filename)
                 for processor in rule['processors']:
                     file = processor.process(file)
 

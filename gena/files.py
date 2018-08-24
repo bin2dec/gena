@@ -12,12 +12,15 @@ from gena import utils
 
 
 __all__ = (
+    'BinaryFileFactory',
     'File',
+    'FileFactory',
     'FileLike',
     'FileMeta',
     'FilePath',
     'FilePathLike',
     'FileType',
+    'TextFileFactory',
 )
 
 
@@ -371,3 +374,25 @@ class File(FileLike):
         self._opath = self._path.copy()
 
         return True
+
+
+class FileFactory(ABC):
+    @abstractmethod
+    def __call__(self, *args, **kwargs) -> FileLike:
+        pass
+
+
+class BinaryFileFactory(FileFactory):
+    """Factory for creating binary files."""
+
+    def __call__(self, *args, **kwargs) -> File:
+        kwargs['type'] = FileType.BINARY
+        return File(*args, **kwargs)
+
+
+class TextFileFactory(FileFactory):
+    """Factory for creating text files."""
+
+    def __call__(self, *args, **kwargs) -> File:
+        kwargs['type'] = FileType.TEXT
+        return File(*args, **kwargs)
