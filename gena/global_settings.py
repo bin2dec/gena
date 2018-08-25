@@ -13,6 +13,10 @@ RUNNER = 'gena.runners.FileRunner'
 DEFAULT_FILE_FACTORY = 'gena.files.TextFileFactory'
 
 
+# A default priority for processing tasks. A lower number means a higher priority.
+DEFAULT_PRIORITY = 100
+
+
 # JOBS
 # Chains of callable objects, which are called one by one before and after the file processing.
 # For example:

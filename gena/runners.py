@@ -1,3 +1,5 @@
+import heapq
+import itertools
 import os
 
 from fnmatch import fnmatch
@@ -12,7 +14,7 @@ __all__ = (
 )
 
 
-class FileRunner(object):
+class FileRunner:
     def __init__(self, src):
         self._src = src
 
@@ -37,6 +39,7 @@ class FileRunner(object):
                 'test': rule['test'],
                 'processors': new_processors,
                 'file_factory': file_factory,
+                'priority': rule.get('priority', settings.DEFAULT_PRIORITY)
             }
             self._processing_rules.append(new_rule)
 
@@ -50,14 +53,31 @@ class FileRunner(object):
             if fnmatch(test, rule['test']):
                 return rule
 
-    def run(self):
-        do_initial_jobs()
+    def _get_tasks(self):
+        counter = itertools.count()  # the counter is needed in situations when priorities are equal
+        queue = []
 
         for dirpath, filename in self._get_paths():
             rule = self._get_rule(filename)
             if rule:
                 file = rule['file_factory'](dirpath, filename)
-                for processor in rule['processors']:
-                    file = processor.process(file)
+                task = (file, rule['processors'])
+                entry = (rule['priority'], next(counter), task)
+                heapq.heappush(queue, entry)
+
+        if queue:
+            while True:
+                try:
+                    entry = heapq.heappop(queue)  # queue entry's indexes: 0 - priority, 1 - counter, 2 - task
+                    yield entry[2]
+                except IndexError:
+                    break
+
+    def run(self):
+        do_initial_jobs()
+
+        for file, processors in self._get_tasks():
+            for processor in processors:
+                file = processor.process(file)
 
         do_final_jobs()
