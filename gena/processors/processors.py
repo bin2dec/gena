@@ -322,7 +322,7 @@ class Jinja2Processor(TextProcessor):
 
     def process(self, file: FileLike) -> FileLike:
         file = super().process(file)
-        variables = {'contents': file.contents, **file.meta, **settings}
+        variables = {'context': context, 'contents': file.contents, **file.meta, **settings}
         file.contents = self.template.render(variables)
 
         return file
