@@ -143,6 +143,15 @@ class TestBinaryFile:
     def test_saving_file_when_nothing_changed(self, article_binary_file):
         assert not article_binary_file.save()
 
+    def test_saving_with_appending_to_existing_file(self, article_binary_file, tmpdir):
+        tmpfile = tmpdir.join(article_binary_file.path.name)
+        tmpfile.write_binary(b'test1')
+        article_binary_file.path.path = tmpfile
+        article_binary_file.contents = b'test2'
+        assert article_binary_file.save(append=True)
+        assert tmpfile.read_binary() == b'test1test2'
+        assert not article_binary_file.save()
+
 
 class TestTextFile:
     def test_contents_property_getter(self, article_text_file, sample_article_as_str):
@@ -209,4 +218,14 @@ class TestTextFile:
         assert not article_text_file.save()
 
     def test_saving_file_when_nothing_changed(self, article_text_file):
+        assert not article_text_file.save()
+
+    def test_saving_with_appending_to_existing_file(self, article_text_file, tmpdir):
+        tmpfile = tmpdir.join(article_text_file.path.name)
+        tmpfile.write_text('test1', encoding=article_text_file.encoding)
+        tmpfile.write('test1')
+        article_text_file.path.path = tmpfile
+        article_text_file.contents = 'test2'
+        assert article_text_file.save(append=True)
+        assert tmpfile.read_text(encoding=article_text_file.encoding) == 'test1test2'
         assert not article_text_file.save()

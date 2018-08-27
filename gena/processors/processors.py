@@ -365,15 +365,55 @@ class MarkdownProcessor(TextProcessor):
 class SavingProcessor(Processor):
     """Save the file.
 
-    If rename_directory is True, then the file path will be changed to settings.DST_DIR before the saving.
+    If `append` is True and there's already a file with the same name, then the contents are appended to
+    the end of this existing file.
+    If `rename_directory` is True, then the file path is changed to settings.DST_DIR before the saving.
+
+    A simple usage example:
+
+    PROCESSING_RULES = (
+        ...
+        {
+            'test': '*.css',
+            'processors': (
+                {'processor': 'gena.processors.SavingProcessor'},
+            ),
+        },
+        ...
+    )
+
+    An example of bundling:
+
+    PROCESSING_RULES = (
+        ...
+        {
+            'test': '*.css',
+            'processors': (
+                {
+                    'processor': 'gena.processors.FileNameProcessor',
+                    'options': {
+                        'name': 'bundle.css',
+                    },
+                },
+                {
+                    'processor': 'gena.processors.SavingProcessor',
+                    'options': {
+                        'append': True,
+                    },
+                },
+            ),
+        },
+        ...
+    )
     """
 
+    append = False
     rename_directory = True
 
     def process(self, file: FileLike) -> FileLike:
         if self.rename_directory:
             file.path.directory = settings.DST_DIR
-        file.save()
+        file.save(append=self.append)
         return file
 
 

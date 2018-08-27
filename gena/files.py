@@ -268,7 +268,7 @@ class FileLike(ABC):
         pass
 
     @abstractmethod
-    def save(self) -> bool:
+    def save(self, append=False) -> bool:
         pass
 
 
@@ -350,11 +350,14 @@ class File(FileLike):
     def is_text(self) -> bool:
         return self._type is FileType.TEXT
 
-    def save(self) -> bool:
-        """Commit changes by creating a new file.
+    def save(self, append=False) -> bool:
+        """Save the file.
 
-        It's not possible to rewrite an old file, you can only create a new one.
-        If file contents aren't changed, it will be a simple copy.
+        If `append` is False and the file contents aren't changed, it's a simple copy of the original file.
+        If `append` is True and there's already a file with the same name, then the contents are appended to
+        the end of this existing file.
+
+        Note that it's not possible to rewrite the original file using this method.
         """
 
         if self._path == self._opath:
@@ -363,10 +366,12 @@ class File(FileLike):
         if self._path.directory and not os.path.exists(self._path.directory):
             os.makedirs(self._path.directory)
 
-        if self._contents is not None:
+        if append or self._contents is not None:
+            mode = 'a' if append else 'w'
+            mode += self._type.value  # can be 'at', 'ab', 'wt', or 'wb'
             encoding = self.encoding if self.is_text() else None
-            with open(self._path, f'w{self._type.value}', encoding=encoding) as file:
-                file.write(self._contents)
+            with open(self._path, mode, encoding=encoding) as file:
+                file.write(self.contents)
             self._contents = None
         else:
             shutil.copy(self._opath.path, self._path.path)
