@@ -7,6 +7,7 @@ from abc import ABC, abstractmethod
 from collections import defaultdict
 from htmlmin import minify as html_minify
 from markdown import Markdown
+from sys import stdout
 from typing import Callable, Iterable, Optional, Sequence, TypeVar, Union
 
 from gena.context import context
@@ -23,6 +24,7 @@ __all__ = (
     'Jinja2Processor',
     'MarkdownProcessor',
     'SavingProcessor',
+    'StdoutProcessor',
     'TemplateProcessor',
     'TypeProcessor',
 )
@@ -414,6 +416,17 @@ class SavingProcessor(Processor):
         if self.rename_directory:
             file.path.directory = settings.DST_DIR
         file.save(append=self.append)
+        return file
+
+
+class StdoutProcessor(Processor):
+    """Write the file contents to `stdout`."""
+
+    def process(self, file: FileLike) -> FileLike:
+        if file.is_text():
+            stdout.write(file.contents)
+        else:
+            stdout.buffer.write(file.contents)
         return file
 
 
