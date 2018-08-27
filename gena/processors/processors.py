@@ -16,6 +16,7 @@ from gena.settings import settings
 
 
 __all__ = (
+    'BundleProcessor',
     'ExternalProcessor',
     'FileMetaProcessor',
     'FileNameProcessor',
@@ -61,6 +62,69 @@ class TextProcessor(Processor):
     def process(self, file: FileLike) -> FileLike:
         if not file.is_text():
             raise TypeError(f'{self.__class__.__name__} supports text files only')
+        return file
+
+
+class BundleProcessor(Processor):
+    """Bundle the file contents up.
+
+    It can be useful in situations when you need to include several files in another one
+    (for example, to inline all your CSS files in the index page).
+
+    An example:
+
+    1) In your settings file:
+    ...
+    PROCESSING_RULES = (
+        {
+            'test': '*.css',
+            'processors': (
+                {
+                    'processor': 'gena.processors.BundleProcessor',
+                    'options': {
+                        'name': 'css',
+                    },
+                },
+            ),
+            'priority': 10,  # set a higher priority for css files (a lower number means a higher priority)
+        },
+        {
+            'test': '*.md',
+            'processors': (
+                {'processor': 'gena.processors.MarkdownProcessor'},
+                {
+                    'processor': 'gena.processors.TemplateProcessor',
+                    'options': {
+                        'template': 'template.html',
+                    },
+                },
+                {'processor': 'gena.processors.StdoutProcessor'},
+            ),
+            'priority': 20,
+        },
+    )
+    ...
+
+    2) In template.html:
+    ...
+    <head>
+        ...
+        <style>{{ context.bundles.css }}</style>
+        ...
+    </head>
+    ...
+    """
+
+    section = 'bundles'
+
+    def __init__(self, *, name: str, **kwargs) -> None:
+        super().__init__(**kwargs)
+        if self.section not in context:
+            context[self.section] = defaultdict(str)
+        self.name = name
+
+    def process(self, file: FileLike) -> FileLike:
+        context[self.section][self.name] += file.contents
         return file
 
 
