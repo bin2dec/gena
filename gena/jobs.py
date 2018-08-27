@@ -1,8 +1,10 @@
 from __future__ import annotations
 
 import jinja2
+import os
 
 from htmlmin import minify as html_minify
+from shutil import rmtree
 from typing import Iterable
 
 from gena import utils
@@ -26,6 +28,26 @@ def do_initial_jobs():
 
 def do_final_jobs():
     do_jobs(settings.FINAL_JOBS)
+
+
+def clear_dst_dir() -> None:
+    """Remove the contents of the destination directory.
+
+    This job can be especially useful as an initial job. Just add these lines to your settings file:
+
+    INITIAL_JOBS = (
+        {'job': 'gena.jobs.clear_dst_dir'},
+    )
+
+    Now, before the file processing, your directory will be thoroughly cleaned up!
+    """
+
+    with os.scandir(settings.DST_DIR) as scandir:
+        for file in scandir:
+            if file.is_file():
+                os.remove(file)
+            else:
+                rmtree(file)
 
 
 def generate_file_from_template(filename: str = 'index.html', *, template: str = 'index.html',
