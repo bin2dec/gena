@@ -35,7 +35,7 @@ def main():
 
     args = arg_parser.parse_args()
 
-    if args.settings:
+    if args.settings and os.path.exists(args.settings):
         settings.load_from_module(args.settings)
 
     runner = utils.import_attr(settings.RUNNER)
