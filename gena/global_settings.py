@@ -10,7 +10,11 @@ LANG = 'en'
 RUNNER = 'gena.runners.FileRunner'
 
 
-FILE = 'gena.files.File'
+DEFAULT_FILE_FACTORY = 'gena.files.TextFileFactory'
+
+
+# A default priority for processing tasks. A lower number means a higher priority.
+DEFAULT_PRIORITY = 100
 
 
 # JOBS

@@ -49,12 +49,12 @@ def sample_article_as_str():
 
 @pytest.fixture
 def article_binary_file(sample_article_path):
-    return File(sample_article_path, file_type=FileType.BINARY)
+    return File(sample_article_path, type=FileType.BINARY)
 
 
 @pytest.fixture
 def article_text_file(sample_article_path):
-    return File(sample_article_path, file_type=FileType.TEXT)
+    return File(sample_article_path, type=FileType.TEXT)
 
 
 @pytest.fixture

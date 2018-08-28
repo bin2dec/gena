@@ -7,14 +7,16 @@ from abc import ABC, abstractmethod
 from collections import defaultdict
 from htmlmin import minify as html_minify
 from markdown import Markdown
+from sys import stdout
 from typing import Callable, Iterable, Optional, Sequence, TypeVar, Union
 
 from gena.context import context
-from gena.files import File
+from gena.files import FileLike, FileType
 from gena.settings import settings
 
 
 __all__ = (
+    'BundleProcessor',
     'ExternalProcessor',
     'FileMetaProcessor',
     'FileNameProcessor',
@@ -23,12 +25,14 @@ __all__ = (
     'Jinja2Processor',
     'MarkdownProcessor',
     'SavingProcessor',
+    'StdoutProcessor',
     'TemplateProcessor',
+    'TypeProcessor',
 )
 
 
 T = TypeVar('T')
-FileCallable = Union[T, Callable[[File], T]]
+FileCallable = Union[T, Callable[[FileLike], T]]
 
 
 class Processor(ABC):
@@ -39,14 +43,14 @@ class Processor(ABC):
             setattr(self, key, value)
 
     @abstractmethod
-    def process(self, file: File) -> File:
+    def process(self, file: FileLike) -> FileLike:
         return file
 
 
 class BinaryProcessor(Processor):
     """Base class for all processors that work with binary files (when file contents are bytes)."""
 
-    def process(self, file: File) -> File:
+    def process(self, file: FileLike) -> FileLike:
         if not file.is_binary():
             raise TypeError(f'{self.__class__.__name__} supports binary files only')
         return file
@@ -55,9 +59,72 @@ class BinaryProcessor(Processor):
 class TextProcessor(Processor):
     """Base class for all processors that work with text files (when file contents are a string)."""
 
-    def process(self, file: File) -> File:
+    def process(self, file: FileLike) -> FileLike:
         if not file.is_text():
             raise TypeError(f'{self.__class__.__name__} supports text files only')
+        return file
+
+
+class BundleProcessor(Processor):
+    """Bundle the file contents up.
+
+    It can be useful in situations when you need to include several files in another one
+    (for example, to inline all your CSS files in the index page).
+
+    An example:
+
+    1) In your settings file:
+    ...
+    PROCESSING_RULES = (
+        {
+            'test': '*.css',
+            'processors': (
+                {
+                    'processor': 'gena.processors.BundleProcessor',
+                    'options': {
+                        'name': 'css',
+                    },
+                },
+            ),
+            'priority': 10,  # set a higher priority for css files (a lower number means a higher priority)
+        },
+        {
+            'test': '*.md',
+            'processors': (
+                {'processor': 'gena.processors.MarkdownProcessor'},
+                {
+                    'processor': 'gena.processors.TemplateProcessor',
+                    'options': {
+                        'template': 'template.html',
+                    },
+                },
+                {'processor': 'gena.processors.StdoutProcessor'},
+            ),
+            'priority': 20,
+        },
+    )
+    ...
+
+    2) In template.html:
+    ...
+    <head>
+        ...
+        <style>{{ context.bundles.css }}</style>
+        ...
+    </head>
+    ...
+    """
+
+    section = 'bundles'
+
+    def __init__(self, *, name: str, **kwargs) -> None:
+        super().__init__(**kwargs)
+        if self.section not in context:
+            context[self.section] = defaultdict(str)
+        self.name = name
+
+    def process(self, file: FileLike) -> FileLike:
+        context[self.section][self.name] += file.contents
         return file
 
 
@@ -99,7 +166,7 @@ class ExternalProcessor(Processor):
         super().__init__(**kwargs)
         self.command = command
 
-    def process(self, file: File) -> File:
+    def process(self, file: FileLike) -> FileLike:
         output = subprocess.run(self.command,
                                 input=file.contents,
                                 shell=False,
@@ -156,7 +223,7 @@ class FileMetaProcessor(Processor):
         self.default = default
         self.skip_if_exists = skip_if_exists
 
-    def process(self, file: File) -> File:
+    def process(self, file: FileLike) -> FileLike:
         if self.key in file.meta and self.skip_if_exists:
             return file
 
@@ -202,7 +269,7 @@ class FileNameProcessor(Processor):
         super().__init__(**kwargs)
         self.name = name
 
-    def process(self, file: File) -> File:
+    def process(self, file: FileLike) -> FileLike:
         if callable(self.name):
             file.path.name = self.name(file)
         else:
@@ -247,7 +314,7 @@ class GroupProcessor(Processor):
             context.groups = defaultdict(list)
         self.name = name
 
-    def process(self, file: File) -> File:
+    def process(self, file: FileLike) -> FileLike:
         context.groups[self.name].append(file)
         return file
 
@@ -275,7 +342,7 @@ class HTMLMinifierProcessor(TextProcessor):
     You can also customize the processing by using HTML_MINIFIER_OPTIONS in your settings.
     """
 
-    def process(self, file: File) -> File:
+    def process(self, file: FileLike) -> FileLike:
         file = super().process(file)
         file.contents = html_minify(file.contents, **settings.HTML_MINIFIER_OPTIONS)
         return file
@@ -319,9 +386,9 @@ class Jinja2Processor(TextProcessor):
         environment = jinja2.Environment(loader=loader, **settings.JINJA2_OPTIONS)
         self.template = environment.get_template(template)
 
-    def process(self, file: File) -> File:
+    def process(self, file: FileLike) -> FileLike:
         file = super().process(file)
-        variables = {'contents': file.contents, **file.meta, **settings}
+        variables = {'context': context, 'contents': file.contents, **file.meta, **settings}
         file.contents = self.template.render(variables)
 
         return file
@@ -352,7 +419,7 @@ class MarkdownProcessor(TextProcessor):
     MARKDOWN_OPTIONS to your settings file.
     """
 
-    def process(self, file: File) -> File:
+    def process(self, file: FileLike) -> FileLike:
         file = super().process(file)
         md = Markdown(**settings.MARKDOWN_OPTIONS)
         file.contents = md.convert(file.contents)
@@ -364,15 +431,76 @@ class MarkdownProcessor(TextProcessor):
 class SavingProcessor(Processor):
     """Save the file.
 
-    If rename_directory is True, then the file path will be changed to settings.DST_DIR before the saving.
+    If `append` is True and there's already a file with the same name, then the contents are appended to
+    the end of this existing file.
+    If `rename_directory` is True, then the file path is changed to settings.DST_DIR before the saving.
+
+    A simple usage example:
+
+    PROCESSING_RULES = (
+        ...
+        {
+            'test': '*.css',
+            'processors': (
+                {'processor': 'gena.processors.SavingProcessor'},
+            ),
+        },
+        ...
+    )
+
+    An example of bundling:
+
+    PROCESSING_RULES = (
+        ...
+        {
+            'test': '*.css',
+            'processors': (
+                {
+                    'processor': 'gena.processors.FileNameProcessor',
+                    'options': {
+                        'name': 'bundle.css',
+                    },
+                },
+                {
+                    'processor': 'gena.processors.SavingProcessor',
+                    'options': {
+                        'append': True,
+                    },
+                },
+            ),
+        },
+        ...
+    )
     """
 
+    append = False
     rename_directory = True
 
-    def process(self, file: File) -> File:
+    def process(self, file: FileLike) -> FileLike:
         if self.rename_directory:
             file.path.directory = settings.DST_DIR
-        file.save()
+        file.save(append=self.append)
+        return file
+
+
+class StdoutProcessor(Processor):
+    """Write the file contents to `stdout`."""
+
+    def process(self, file: FileLike) -> FileLike:
+        if file.is_text():
+            stdout.write(file.contents)
+        else:
+            stdout.buffer.write(file.contents)
+        return file
+
+
+class TypeProcessor(Processor):
+    """Change the file type."""
+
+    type = FileType.TEXT
+
+    def process(self, file: FileLike) -> FileLike:
+        file.type = self.type
         return file
 
 

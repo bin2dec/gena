@@ -3,6 +3,7 @@ from __future__ import annotations
 import os
 import shutil
 
+from abc import ABC, abstractmethod
 from collections import UserDict, UserList
 from enum import Enum
 from typing import Any, Iterable, Iterator, Union
@@ -11,23 +12,20 @@ from gena import utils
 
 
 __all__ = (
+    'BinaryFileFactory',
     'File',
+    'FileFactory',
+    'FileLike',
     'FileMeta',
     'FilePath',
+    'FilePathLike',
     'FileType',
+    'TextFileFactory',
 )
 
 
+AnyPath = Union[os.PathLike, str]
 FileContents = Union[None, bytes, str]
-PathLike = Union[os.PathLike, str]
-
-
-def join_paths(*paths: PathLike) -> str:
-    """Join one or more path components. The result's type is always str."""
-    path = os.path.join(*paths) if paths else ''
-    if isinstance(path, bytes):
-        return os.fsdecode(path)
-    return path
 
 
 class FileType(Enum):
@@ -52,11 +50,67 @@ class FileMeta(UserDict):
         raise AttributeError(name)
 
 
-class FilePath(os.PathLike):
-    def __init__(self, path: PathLike, *paths: PathLike) -> None:
-        self._path = join_paths(path, *paths)
+class FilePathLike(os.PathLike):
+    @property
+    @abstractmethod
+    def basename(self) -> str:
+        pass
 
-    def __add__(self, other: PathLike) -> FilePath:
+    @basename.setter
+    @abstractmethod
+    def basename(self, basename: str) -> None:
+        pass
+
+    @property
+    @abstractmethod
+    def directory(self) -> str:
+        pass
+
+    @directory.setter
+    @abstractmethod
+    def directory(self, directory: str) -> None:
+        pass
+
+    @property
+    @abstractmethod
+    def extension(self) -> str:
+        pass
+
+    @extension.setter
+    @abstractmethod
+    def extension(self, extension: str) -> None:
+        pass
+
+    @property
+    @abstractmethod
+    def name(self) -> str:
+        pass
+
+    @name.setter
+    @abstractmethod
+    def name(self, name: str) -> None:
+        pass
+
+    @property
+    @abstractmethod
+    def path(self) -> str:
+        pass
+
+    @path.setter
+    @abstractmethod
+    def path(self, path: str) -> None:
+        pass
+
+    @abstractmethod
+    def copy(self) -> FilePath:
+        pass
+
+
+class FilePath(FilePathLike):
+    def __init__(self, path: AnyPath, *paths: AnyPath) -> None:
+        self.join(path, *paths)  # init self._path
+
+    def __add__(self, other: AnyPath) -> FilePath:
         return self.__class__(self._path, other)
 
     def __bytes__(self):
@@ -70,14 +124,14 @@ class FilePath(os.PathLike):
     def __fspath__(self) -> str:
         return self._path
 
-    def __iadd__(self, other: PathLike) -> FilePath:
-        self._path = join_paths(self._path, other)
+    def __iadd__(self, other: AnyPath) -> FilePath:
+        self.join(self._path, other)
         return self
 
     def __iter__(self) -> Iterator[str]:
         return iter(self._path)
 
-    def __radd__(self, other: PathLike) -> FilePath:
+    def __radd__(self, other: AnyPath) -> FilePath:
         return self.__class__(other, self._path)
 
     def __repr__(self, *args, **kwargs):
@@ -101,7 +155,7 @@ class FilePath(os.PathLike):
         basename = utils.fspath(basename)
         if os.sep in basename:
             raise ValueError('separators are not allowed in a file base name')
-        self._path = join_paths(self.directory, f'{basename}{self.extension}')
+        self.join(self.directory, f'{basename}{self.extension}')
 
     @property
     def directory(self) -> str:
@@ -115,7 +169,7 @@ class FilePath(os.PathLike):
 
     @directory.setter
     def directory(self, directory: str) -> None:
-        self._path = join_paths(directory, self.name)
+        self.join(directory, self.name)
 
     @property
     def extension(self) -> str:
@@ -136,7 +190,7 @@ class FilePath(os.PathLike):
             name = f'{self.basename}{extension}'
         else:
             name = f'{self.basename}.{extension}'
-        self._path = join_paths(self.directory, name)
+        self.join(self.directory, name)
 
     @property
     def name(self) -> str:
@@ -153,7 +207,7 @@ class FilePath(os.PathLike):
         name = utils.fspath(name)
         if os.sep in name:
             raise ValueError('separators are not allowed in a file name')
-        self._path = join_paths(self.directory, name)
+        self.join(self.directory, name)
 
     @property
     def path(self) -> str:
@@ -161,23 +215,78 @@ class FilePath(os.PathLike):
 
     @path.setter
     def path(self, path: str) -> None:
-        self._path = join_paths(path)
+        self.join(path)
 
     def copy(self) -> FilePath:
         return self.__class__(self)
 
+    def join(self, *paths: AnyPath) -> None:
+        """Join one or more path components and assign the result to self._path."""
+        path = os.path.join(*paths) if paths else ''
+        if isinstance(path, bytes):
+            return os.fsdecode(path)
+        self._path: str = path
 
-class File:
-    _contents: FileContents = None
 
-    def __init__(self, path: PathLike, *paths: PathLike, file_type: FileType = FileType.TEXT) -> None:
+class FileLike(ABC):
+    @property
+    @abstractmethod
+    def contents(self) -> FileContents:
+        pass
+
+    @contents.setter
+    @abstractmethod
+    def contents(self, contents: FileContents) -> None:
+        pass
+
+    @property
+    @abstractmethod
+    def meta(self) -> FileMeta:
+        pass
+
+    @property
+    @abstractmethod
+    def path(self) -> FilePathLike:
+        pass
+
+    @property
+    @abstractmethod
+    def type(self) -> FileType:
+        pass
+
+    @type.setter
+    @abstractmethod
+    def type(self, type_: FileType) -> None:
+        pass
+
+    @abstractmethod
+    def is_binary(self) -> bool:
+        pass
+
+    @abstractmethod
+    def is_text(self) -> bool:
+        pass
+
+    @abstractmethod
+    def save(self, append=False) -> bool:
+        pass
+
+
+class File(FileLike):
+    encoding = 'utf-8'
+
+    def __init__(self, path: AnyPath, *paths: AnyPath, **kwargs) -> None:
         self._path = FilePath(path, *paths)
         self._opath = self._path.copy()
-        self._type = file_type
+        self._contents: FileContents = None
         self._meta = FileMeta()
+        self._type = kwargs.pop('type', FileType.TEXT)
+
+        for key, value in kwargs.items():
+            setattr(self, key, value)
 
     def __repr__(self, *args, **kwargs):
-        return f'{self.__class__.__name__}({self._path.path!r}, file_type={self._type})'
+        return f'{self.__class__.__name__}({self._path.path!r}, type={self._type})'
 
     def __str__(self, *args, **kwargs) -> str:
         return self._path.path
@@ -193,7 +302,8 @@ class File:
     @property
     def contents(self) -> FileContents:
         if self._contents is None:
-            with open(self._opath.path, f'r{self._type.value}') as file:
+            encoding = self.encoding if self.is_text() else None
+            with open(self._opath.path, f'r{self._type.value}', encoding=encoding) as file:
                 self._contents = file.read()
         return self._contents
 
@@ -218,17 +328,36 @@ class File:
     def path(self) -> FilePath:
         return self._path
 
+    @property
+    def type(self) -> FileType:
+        return self._type
+
+    @type.setter
+    def type(self, type_: FileType) -> None:
+        if self._type is not type_:
+            if self._contents is not None:
+                if type_ is FileType.BINARY and isinstance(self._contents, str):
+                    self._contents = self._contents.encode(encoding=self.encoding)  # str -> bytes
+                elif type_ is FileType.TEXT and isinstance(self._contents, bytes):
+                    self._contents = self._contents.decode(encoding=self.encoding)  # bytes -> str
+                else:
+                    raise TypeError('unknown or not acceptable type')
+            self._type = type_
+
     def is_binary(self) -> bool:
         return self._type is FileType.BINARY
 
     def is_text(self) -> bool:
         return self._type is FileType.TEXT
 
-    def save(self) -> bool:
-        """Commit changes by creating a new file.
+    def save(self, append=False) -> bool:
+        """Save the file.
 
-        It's not possible to rewrite an old file, you can only create a new one.
-        If file contents aren't changed, it will be a simple copy.
+        If `append` is False and the file contents aren't changed, it's a simple copy of the original file.
+        If `append` is True and there's already a file with the same name, then the contents are appended to
+        the end of this existing file.
+
+        Note that it's not possible to rewrite the original file using this method.
         """
 
         if self._path == self._opath:
@@ -237,9 +366,12 @@ class File:
         if self._path.directory and not os.path.exists(self._path.directory):
             os.makedirs(self._path.directory)
 
-        if self._contents is not None:
-            with open(self._path, f'w{self._type.value}') as file:
-                file.write(self._contents)
+        if append or self._contents is not None:
+            mode = 'a' if append else 'w'
+            mode += self._type.value  # can be 'at', 'ab', 'wt', or 'wb'
+            encoding = self.encoding if self.is_text() else None
+            with open(self._path, mode, encoding=encoding) as file:
+                file.write(self.contents)
             self._contents = None
         else:
             shutil.copy(self._opath.path, self._path.path)
@@ -247,3 +379,25 @@ class File:
         self._opath = self._path.copy()
 
         return True
+
+
+class FileFactory(ABC):
+    @abstractmethod
+    def __call__(self, *args, **kwargs) -> FileLike:
+        pass
+
+
+class BinaryFileFactory(FileFactory):
+    """Factory for creating binary files."""
+
+    def __call__(self, *args, **kwargs) -> File:
+        kwargs['type'] = FileType.BINARY
+        return File(*args, **kwargs)
+
+
+class TextFileFactory(FileFactory):
+    """Factory for creating text files."""
+
+    def __call__(self, *args, **kwargs) -> File:
+        kwargs['type'] = FileType.TEXT
+        return File(*args, **kwargs)
