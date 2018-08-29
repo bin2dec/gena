@@ -1,3 +1,7 @@
+# The directory that contains source files
+SRC_DIR = 'src'
+
+# The directory for processed files
 DST_DIR = 'dist'
 
 

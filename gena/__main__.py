@@ -15,7 +15,6 @@ def main():
 
     arg_parser.add_argument(
         'src',
-        default='src',
         help='the directory that contains source files',
         metavar='source',
         nargs='?',
@@ -45,11 +44,14 @@ def main():
     if args.settings and os.path.exists(args.settings):
         settings.load_from_module(args.settings)
 
+    if args.src is not None:
+        settings.SRC_DIR = args.src
+
     if args.dst is not None:
         settings.DST_DIR = args.dst
 
     runner = utils.import_attr(settings.RUNNER)
-    runner = runner(args.src)
+    runner = runner()
     runner.run()
 
 

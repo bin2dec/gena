@@ -15,9 +15,7 @@ __all__ = (
 
 
 class FileRunner:
-    def __init__(self, src):
-        self._src = src
-
+    def __init__(self):
         default_file_factory = utils.import_attr(settings.DEFAULT_FILE_FACTORY)
         default_file_factory = default_file_factory()
 
@@ -44,7 +42,7 @@ class FileRunner:
             self._processing_rules.append(new_rule)
 
     def _get_paths(self):
-        for dirpath, _, filenames in os.walk(self._src):
+        for dirpath, _, filenames in os.walk(settings.SRC_DIR):
             for filename in filenames:
                 yield (dirpath, filename)
 
