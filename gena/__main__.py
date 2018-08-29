@@ -17,7 +17,14 @@ def main():
         'src',
         default='src',
         help='the directory that contains source files',
-        metavar='path',
+        metavar='source',
+        nargs='?',
+    )
+
+    arg_parser.add_argument(
+        'dst',
+        help='the directory for processed files',
+        metavar='destination',
         nargs='?',
     )
 
@@ -37,6 +44,9 @@ def main():
 
     if args.settings and os.path.exists(args.settings):
         settings.load_from_module(args.settings)
+
+    if args.dst is not None:
+        settings.DST_DIR = args.dst
 
     runner = utils.import_attr(settings.RUNNER)
     runner = runner(args.src)
