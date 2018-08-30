@@ -1,8 +1,10 @@
 import logging
 import os.path
+import sys
 import sysconfig
 
 from argparse import ArgumentParser
+from time import time
 
 from gena import __version__
 from gena import utils
@@ -95,9 +97,20 @@ def main():
     logger.debug(f'GenA {__version__}')
     logger.debug(f'Python {sysconfig.get_python_version()} on {sysconfig.get_platform()}')
 
-    runner = utils.import_attr(settings.RUNNER)
-    runner = runner()
-    runner.run()
+    try:
+        runner = utils.import_attr(settings.RUNNER)
+        start_time = time()
+        runner = runner()
+        files = runner.run()
+    except Exception as exception:
+        logger.critical(exception)
+
+        if settings.DEBUG:
+            raise
+        else:
+            sys.exit(1)
+    else:
+        print(f'Finished in {time() - start_time:.2f} sec. with {files} file(s) processed')
 
 
 if __name__ == "__main__":
