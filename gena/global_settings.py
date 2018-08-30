@@ -5,6 +5,9 @@ SRC_DIR = 'src'
 DST_DIR = 'dist'
 
 
+DEBUG = False
+
+
 TEMPLATE_DIRS = ()
 
 
@@ -71,3 +74,8 @@ PROCESSING_RULES = ()
 EXTERNAL_PROCESSOR = {
     'check': True,
 }
+
+
+LOG_FORMAT = '{message}'
+
+DEBUG_LOG_FORMAT = '{asctime:25}{levelname:10}{message}  ({name}:{lineno})'
