@@ -74,8 +74,12 @@ class FileRunner:
     def run(self):
         do_initial_jobs()
 
+        file_counter = 0
         for file, processors in self._get_tasks():
             for processor in processors:
                 file = processor.process(file)
+            file_counter += 1
 
         do_final_jobs()
+
+        return file_counter
