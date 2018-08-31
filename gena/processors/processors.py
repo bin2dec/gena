@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import jinja2
+import logging
 import subprocess
 
 from abc import ABC, abstractmethod
@@ -13,6 +14,7 @@ from typing import Callable, Iterable, Optional, Sequence, TypeVar, Union
 from gena.context import context
 from gena.files import FileLike, FileType
 from gena.settings import settings
+from gena.utils import map_as_kwargs
 
 
 __all__ = (
@@ -31,6 +33,9 @@ __all__ = (
 )
 
 
+logger = logging.getLogger(__name__)
+
+
 T = TypeVar('T')
 FileCallable = Union[T, Callable[[FileLike], T]]
 
@@ -44,6 +49,7 @@ class Processor(ABC):
 
     @abstractmethod
     def process(self, file: FileLike) -> FileLike:
+        logger.debug(f'{self.__class__.__name__}({map_as_kwargs(self.__dict__)}) is processing {file!r}')
         return file
 
 
@@ -51,6 +57,7 @@ class BinaryProcessor(Processor):
     """Base class for all processors that work with binary files (when file contents are bytes)."""
 
     def process(self, file: FileLike) -> FileLike:
+        file = super().process(file)
         if not file.is_binary():
             raise TypeError(f'{self.__class__.__name__} supports binary files only')
         return file
@@ -60,6 +67,7 @@ class TextProcessor(Processor):
     """Base class for all processors that work with text files (when file contents are a string)."""
 
     def process(self, file: FileLike) -> FileLike:
+        file = super().process(file)
         if not file.is_text():
             raise TypeError(f'{self.__class__.__name__} supports text files only')
         return file
@@ -124,6 +132,7 @@ class BundleProcessor(Processor):
         self.name = name
 
     def process(self, file: FileLike) -> FileLike:
+        file = super().process(file)
         context[self.section][self.name] += file.contents
         return file
 
@@ -167,6 +176,7 @@ class ExternalProcessor(Processor):
         self.command = command
 
     def process(self, file: FileLike) -> FileLike:
+        file = super().process(file)
         output = subprocess.run(self.command,
                                 input=file.contents,
                                 shell=False,
@@ -224,6 +234,8 @@ class FileMetaProcessor(Processor):
         self.skip_if_exists = skip_if_exists
 
     def process(self, file: FileLike) -> FileLike:
+        file = super().process(file)
+
         if self.key in file.meta and self.skip_if_exists:
             return file
 
@@ -235,6 +247,7 @@ class FileMetaProcessor(Processor):
                 new_value = self.callback(value, *self.callback_args, **self.callback_kwargs)
                 new_values.append(new_value)
             file.meta[self.key] = new_values
+            logger.debug(f'Added meta values to {file!r}: {self.key}={file.meta[self.key]!r}')
 
         return file
 
@@ -270,10 +283,13 @@ class FileNameProcessor(Processor):
         self.name = name
 
     def process(self, file: FileLike) -> FileLike:
+        file = super().process(file)
+        old_name = file.path.name
         if callable(self.name):
             file.path.name = self.name(file)
         else:
             file.path.name = self.name
+        logger.debug(f'Renamed {file!r}: "{old_name}" to "{file.path.name}"')
         return file
 
 
@@ -315,6 +331,7 @@ class GroupProcessor(Processor):
         self.name = name
 
     def process(self, file: FileLike) -> FileLike:
+        file = super().process(file)
         context.groups[self.name].append(file)
         return file
 
@@ -477,6 +494,7 @@ class SavingProcessor(Processor):
     rename_directory = True
 
     def process(self, file: FileLike) -> FileLike:
+        file = super().process(file)
         if self.rename_directory:
             file.path.directory = settings.DST_DIR
         file.save(append=self.append)
@@ -487,6 +505,7 @@ class StdoutProcessor(Processor):
     """Write the file contents to `stdout`."""
 
     def process(self, file: FileLike) -> FileLike:
+        file = super().process(file)
         if file.is_text():
             stdout.write(file.contents)
         else:
@@ -500,6 +519,7 @@ class TypeProcessor(Processor):
     type = FileType.TEXT
 
     def process(self, file: FileLike) -> FileLike:
+        file = super().process(file)
         file.type = self.type
         return file
 

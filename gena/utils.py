@@ -9,6 +9,7 @@ __all__ = (
     'fspath',
     'get_datetime',
     'import_attr',
+    'map_as_kwargs',
 )
 
 
@@ -32,3 +33,7 @@ def import_attr(s, default=None):
     module_name, attr = s.strip().rsplit('.', 1)
     module = import_module(module_name)
     return getattr(module, attr, default)
+
+
+def map_as_kwargs(m):
+    return ', '.join(f'{k}={v!r}' for k, v in m.items())
