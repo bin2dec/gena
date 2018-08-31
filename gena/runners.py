@@ -56,8 +56,13 @@ class FileRunner:
         default_file_factory = utils.import_attr(settings.DEFAULT_FILE_FACTORY)
         default_file_factory = default_file_factory()
 
-        self._processing_rules = []
-        for rule in settings.PROCESSING_RULES:
+        try:
+            rules = settings.RULES
+        except AttributeError:
+            rules = settings.PROCESSING_RULES
+
+        self._rules = []
+        for rule in rules:
             new_processors = []
             for processor in rule['processors']:
                 new_processor = utils.import_attr(processor['processor'])
@@ -76,7 +81,7 @@ class FileRunner:
                 'file_factory': file_factory,
                 'priority': rule.get('priority', settings.DEFAULT_PRIORITY)
             }
-            self._processing_rules.append(new_rule)
+            self._rules.append(new_rule)
 
     def _get_paths(self):
         for dirpath, _, filenames in os.walk(settings.SRC_DIR):
@@ -84,7 +89,7 @@ class FileRunner:
                 yield (dirpath, filename)
 
     def _get_rule(self, test):
-        for rule in self._processing_rules:
+        for rule in self._rules:
             if fnmatch(test, rule['test']):
                 return rule
 

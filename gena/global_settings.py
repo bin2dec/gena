@@ -1,7 +1,7 @@
-# The directory that contains source files
+# The directory that contains source files.
 SRC_DIR = 'src'
 
-# The directory for processed files
+# The directory for processed files.
 DST_DIR = 'dist'
 
 
@@ -43,10 +43,10 @@ DEFAULT_PRIORITY = 100
 #     ...
 # )
 
-# Initial jobs are called before the file processing
+# Initial jobs are called before the file processing.
 INITIAL_JOBS = ()
 
-# Final jobs are called after the file processing
+# Final jobs are called after the file processing.
 FINAL_JOBS = ()
 
 
@@ -72,7 +72,8 @@ MARKDOWN_OPTIONS = {
 }
 
 
-PROCESSING_RULES = ()
+# RULES is a list of rules to create processing tasks.
+RULES = ()
 
 
 # See https://docs.python.org/3.7/library/subprocess.html#subprocess.run
