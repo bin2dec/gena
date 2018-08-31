@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 import os
 import shutil
 
@@ -22,6 +23,9 @@ __all__ = (
     'FileType',
     'TextFileFactory',
 )
+
+
+logger = logging.getLogger(__name__)
 
 
 AnyPath = Union[os.PathLike, str]
@@ -377,6 +381,8 @@ class File(FileLike):
             shutil.copy(self._opath.path, self._path.path)
 
         self._opath = self._path.copy()
+
+        logger.debug(f'Saved {self!r}')
 
         return True
 
