@@ -1,5 +1,6 @@
 import heapq
 import itertools
+import logging
 import os
 
 from fnmatch import fnmatch
@@ -12,6 +13,9 @@ from gena.settings import settings
 __all__ = (
     'FileRunner',
 )
+
+
+logger = logging.getLogger(__name__)
 
 
 class FileRunner:
@@ -57,11 +61,15 @@ class FileRunner:
 
         for dirpath, filename in self._get_paths():
             rule = self._get_rule(filename)
+            path = os.path.join(dirpath, filename)
             if rule:
-                file = rule['file_factory'](dirpath, filename)
+                file = rule['file_factory'](path)
                 task = (file, rule['processors'])
                 entry = (rule['priority'], next(counter), task)
                 heapq.heappush(queue, entry)
+                logger.debug(f'Created a task for "{file.path}" with priority={rule["priority"]}')
+            else:
+                logger.debug(f'Skipped "{path}"')
 
         if queue:
             while True:
@@ -76,6 +84,7 @@ class FileRunner:
 
         file_counter = 0
         for file, processors in self._get_tasks():
+            logger.info(f'Processing "{file.path}"')
             for processor in processors:
                 file = processor.process(file)
             file_counter += 1
