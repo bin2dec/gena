@@ -90,7 +90,7 @@ def main():
 
     logging.basicConfig(
         format=settings.DEBUG_LOG_FORMAT if settings.DEBUG else settings.LOG_FORMAT,
-        level=args.log_level,
+        level=logging.DEBUG if settings.DEBUG else args.log_level,
         style='{',
     )
 
