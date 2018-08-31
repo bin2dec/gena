@@ -8,7 +8,12 @@ DST_DIR = 'dist'
 DEBUG = False
 
 
-TEMPLATE_DIRS = ()
+# TEMPLATE_DIRS contains the path to the templates as string, or if multiple locations are wanted a list of them.
+# For example:
+# TEMPLATE_DIRS = '/path/to/templates'
+# or
+# TEMPLATE_DIRS = ['/path/to/templates', '/other/path']
+TEMPLATE_DIRS = 'templates'
 
 
 LANG = 'en'
