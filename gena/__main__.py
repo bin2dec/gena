@@ -14,6 +14,9 @@ from gena.settings import settings
 logger = logging.getLogger(__name__)
 
 
+DEFAULT_LOG_LEVEL = logging.WARNING
+
+
 def main():
     arg_parser = ArgumentParser(
         'gena',
@@ -72,7 +75,7 @@ def main():
         help='show all messages'
     )
 
-    arg_parser.set_defaults(log_level=logging.WARNING)
+    arg_parser.set_defaults(log_level=DEFAULT_LOG_LEVEL)
 
     args = arg_parser.parse_args()
 
@@ -85,8 +88,10 @@ def main():
     if args.dst is not None:
         settings.DST_DIR = args.dst
 
-    if args.log_level == logging.DEBUG:
+    if args.log_level == logging.DEBUG:  # when run with `-d`
         settings.DEBUG = True
+    elif not args.log_level == DEFAULT_LOG_LEVEL:  # when run with `-q` or `-v`
+        settings.DEBUG = False
 
     logging.basicConfig(
         format=settings.DEBUG_LOG_FORMAT if settings.DEBUG else settings.LOG_FORMAT,
@@ -110,7 +115,8 @@ def main():
         else:
             sys.exit(1)
     else:
-        print(f'Finished in {time() - start_time:.2f} sec. with {files} file(s) processed')
+        if not args.log_level == logging.CRITICAL:
+            print(f'Finished in {time() - start_time:.2f} sec. with {files} file(s) processed')
 
 
 if __name__ == "__main__":
