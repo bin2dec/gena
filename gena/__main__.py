@@ -25,14 +25,14 @@ def main():
 
     arg_parser.add_argument(
         'src',
-        help='the directory that contains source files',
+        help='the directory that contains source files (default: src)',
         metavar='source',
         nargs='?',
     )
 
     arg_parser.add_argument(
         'dst',
-        help='the directory for processed files',
+        help='the directory for processed files (default: dist)',
         metavar='destination',
         nargs='?',
     )
@@ -40,7 +40,7 @@ def main():
     arg_parser.add_argument(
         '-s', '--settings',
         default='settings.py',
-        help='the settings of the application',
+        help='the settings of the application (default: settings.py)',
     )
 
     arg_parser.add_argument(
