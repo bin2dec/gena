@@ -14,9 +14,6 @@ from gena.settings import settings
 logger = logging.getLogger(__name__)
 
 
-DEFAULT_LOG_LEVEL = logging.WARNING
-
-
 def main():
     arg_parser = ArgumentParser(
         'gena',
@@ -75,8 +72,6 @@ def main():
         help='show all messages'
     )
 
-    arg_parser.set_defaults(log_level=DEFAULT_LOG_LEVEL)
-
     args = arg_parser.parse_args()
 
     if args.settings and os.path.exists(args.settings):
@@ -88,16 +83,11 @@ def main():
     if args.dst is not None:
         settings.DST_DIR = args.dst
 
-    if args.log_level == logging.DEBUG:  # when run with `-d`
+    if args.log_level == logging.DEBUG:
         settings.DEBUG = True
-    elif not args.log_level == DEFAULT_LOG_LEVEL:  # when run with `-q` or `-v`
-        settings.DEBUG = False
 
-    logging.basicConfig(
-        format=settings.DEBUG_LOG_FORMAT if settings.DEBUG else settings.LOG_FORMAT,
-        level=logging.DEBUG if settings.DEBUG else args.log_level,
-        style='{',
-    )
+    log_config = utils.import_attr(settings.LOGGER_CONFIGURATOR)
+    log_config(args.log_level)
 
     logger.debug(f'GenA {__version__}')
     logger.debug(f'Python {sysconfig.get_python_version()} on {sysconfig.get_platform()}')

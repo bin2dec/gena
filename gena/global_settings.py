@@ -81,7 +81,5 @@ EXTERNAL_PROCESSOR = {
     'check': True,
 }
 
-
-LOG_FORMAT = '{message}'
-
-DEBUG_LOG_FORMAT = '{asctime:25}{levelname:10}{message}  ({name}:{lineno})'
+# Modify the logging system. Add a logger configurator. Do a bit of optimization
+LOGGER_CONFIGURATOR = 'gena.log.config'
