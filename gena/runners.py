@@ -30,12 +30,15 @@ def do_jobs(jobs: Iterable):
     )
     """
 
+    debug = logger.isEnabledFor(logging.DEBUG)
+
     for job in jobs:
         obj = job['job']
         if not callable(obj):
             obj = utils.import_attr(obj)
         options = job.get('options', {})
-        logger.debug(f'Doing the {obj.__name__}({map_as_kwargs(options)}) job')
+        if debug:
+            logger.debug('Doing the %s(%s) job', obj.__name__, map_as_kwargs(options))
         obj(**options)
 
 
@@ -105,9 +108,9 @@ class FileRunner:
                 task = (file, rule['processors'])
                 entry = (rule['priority'], next(counter), task)
                 heapq.heappush(queue, entry)
-                logger.debug(f'Created a task for "{file.path}" with priority={rule["priority"]}')
+                logger.debug('Created a task for "%s" with priority=%s', file.path, rule['priority'])
             else:
-                logger.debug(f'Skipped "{path}"')
+                logger.debug('Skipped "%s"', path)
 
         if queue:
             while True:
@@ -122,7 +125,7 @@ class FileRunner:
 
         file_counter = 0
         for file, processors in self._get_tasks():
-            logger.info(f'Processing "{file.path}"')
+            logger.info('Processing "%s"', file.path)
             for processor in processors:
                 file = processor.process(file)
             file_counter += 1

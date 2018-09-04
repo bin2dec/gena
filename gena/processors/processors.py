@@ -49,7 +49,8 @@ class Processor(ABC):
 
     @abstractmethod
     def process(self, file: FileLike) -> FileLike:
-        logger.debug(f'{self.__class__.__name__}({map_as_kwargs(self.__dict__)}) is processing {file!r}')
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug('%s(%s) is processing %r', self.__class__.__name__, map_as_kwargs(self.__dict__), file)
         return file
 
 
@@ -247,7 +248,7 @@ class FileMetaProcessor(Processor):
                 new_value = self.callback(value, *self.callback_args, **self.callback_kwargs)
                 new_values.append(new_value)
             file.meta[self.key] = new_values
-            logger.debug(f'Added meta values to {file!r}: {self.key}={file.meta[self.key]!r}')
+            logger.debug('Added meta values to %r: %s=%r', file, self.key, file.meta[self.key])
 
         return file
 
@@ -289,7 +290,7 @@ class FileNameProcessor(Processor):
             file.path.name = self.name(file)
         else:
             file.path.name = self.name
-        logger.debug(f'Renamed {file!r}: "{old_name}" to "{file.path.name}"')
+        logger.debug('Renamed %r: "%s" to "%s"', file, old_name, file.path.name)
         return file
 
 

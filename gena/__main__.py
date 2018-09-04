@@ -89,8 +89,9 @@ def main():
     log_config = utils.import_attr(settings.LOGGER_CONFIGURATOR)
     log_config(args.log_level)
 
-    logger.debug(f'GenA {__version__}')
-    logger.debug(f'Python {sysconfig.get_python_version()} on {sysconfig.get_platform()}')
+    if logger.isEnabledFor(logging.DEBUG):
+        logger.debug('GenA %s', __version__)
+        logger.debug('Python %s on %s', sysconfig.get_python_version(), sysconfig.get_platform())
 
     try:
         runner = utils.import_attr(settings.RUNNER)
