@@ -228,7 +228,7 @@ class FilePath(FilePathLike):
         """Join one or more path components and assign the result to self._path."""
         path = os.path.join(*paths) if paths else ''
         if isinstance(path, bytes):
-            return os.fsdecode(path)
+            path = os.fsdecode(path)
         self._path: str = path
 
 
