@@ -20,6 +20,7 @@ from gena.utils import map_as_kwargs
 
 
 __all__ = (
+    'BinaryProcessor',
     'BundleProcessor',
     'ExternalProcessor',
     'FileMetaProcessor',
@@ -28,9 +29,11 @@ __all__ = (
     'HTMLMinifierProcessor',
     'Jinja2Processor',
     'MarkdownProcessor',
+    'Processor',
     'SavingProcessor',
     'StdoutProcessor',
     'TemplateProcessor',
+    'TextProcessor',
     'TypeProcessor',
 )
 
