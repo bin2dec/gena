@@ -12,6 +12,7 @@ python-slugify = "*"
 
 [dev-packages]
 mypy = "*"
+pylint = "*"
 pytest = "*"
 
 [requires]
