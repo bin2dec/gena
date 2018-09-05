@@ -1,33 +1,16 @@
 from __future__ import annotations
 
-import jinja2
 import os
 
-from htmlmin import minify as html_minify
 from shutil import rmtree
-from typing import Iterable
 
-from gena import utils
+import jinja2
+
+from htmlmin import minify as html_minify
+
 from gena.context import context
 from gena.files import File
 from gena.settings import settings
-
-
-def do_jobs(jobs: Iterable):
-    for job in jobs:
-        obj = job['job']
-        if not callable(obj):
-            obj = utils.import_attr(obj)
-        options = job.get('options', {})
-        obj(**options)
-
-
-def do_initial_jobs():
-    do_jobs(settings.INITIAL_JOBS)
-
-
-def do_final_jobs():
-    do_jobs(settings.FINAL_JOBS)
 
 
 def clear_dst_dir() -> None:

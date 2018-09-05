@@ -1,12 +1,51 @@
 """
 This module contains various shortcuts for creating processor rules more easily.
+Let's take a look at the difference between two sets of rules:
+
+1) Rules without shortcuts
+RULES = (
+    {
+        'test': '*.md',
+        'processors': (
+            {'processor': 'gena.processors.MarkdownProcessor'},
+            {
+                'processor': 'gena.processors.TemplateProcessor',
+                'options': {
+                    'template': 'index.html',
+                },
+            },
+            {
+                'processor': 'gena.processors.FileNameProcessor',
+                'options': {
+                    'name': 'index.html',
+                },
+            },
+            {'processor': 'gena.processors.SavingProcessor'},
+        ),
+    },
+)
+
+2) The same rules but with shortcuts
+RULES = (
+    {
+        'test': '*.md',
+        'processors': (
+            markdown(),
+            template('index.html'),
+            filename('index.html'),
+            save(),
+        ),
+    },
+)
 """
 
-from gena import utils
 from slugify import slugify
+
+from gena import utils
 
 
 __all__ = (
+    'bundle',
     'filename',
     'group',
     'html_minifier',
@@ -15,8 +54,18 @@ __all__ = (
     'meta_modified',
     'meta_slug',
     'save',
+    'stdout',
     'template',
 )
+
+
+def bundle(name):
+    return {
+        'processor': 'gena.processors.BundleProcessor',
+        'options': {
+            'name': name,
+        },
+    },
 
 
 def filename(name):
@@ -80,6 +129,10 @@ def meta_slug():
 
 def save():
     return {'processor': 'gena.processors.SavingProcessor'}
+
+
+def stdout():
+    return {'processor': 'gena.processors.StdoutProcessor'}
 
 
 def template(name):

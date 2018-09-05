@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 import os
 import shutil
 
@@ -22,6 +23,9 @@ __all__ = (
     'FileType',
     'TextFileFactory',
 )
+
+
+logger = logging.getLogger(__name__)
 
 
 AnyPath = Union[os.PathLike, str]
@@ -224,7 +228,7 @@ class FilePath(FilePathLike):
         """Join one or more path components and assign the result to self._path."""
         path = os.path.join(*paths) if paths else ''
         if isinstance(path, bytes):
-            return os.fsdecode(path)
+            path = os.fsdecode(path)
         self._path: str = path
 
 
@@ -377,6 +381,8 @@ class File(FileLike):
             shutil.copy(self._opath.path, self._path.path)
 
         self._opath = self._path.copy()
+
+        logger.info('Saved "%s"', self.path.path)
 
         return True
 

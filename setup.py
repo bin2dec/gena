@@ -9,7 +9,7 @@ REQUIRES = [
     'jinja2 >= 2.10',
     'markdown >= 2.6.11',
     'python-dateutil >= 2.7.3',
-    'python-slugify >= 1.2.5',
+    'python-slugify >= 1.2.6',
 ]
 
 BASE_DIR = os.path.dirname(__file__)
