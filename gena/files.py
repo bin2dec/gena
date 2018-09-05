@@ -382,7 +382,7 @@ class File(FileLike):
 
         self._opath = self._path.copy()
 
-        logger.debug('Saved %r', self)
+        logger.info('Saved "%s"', self.path.path)
 
         return True
 
