@@ -1,10 +1,12 @@
 from __future__ import annotations
 
-import jinja2
 import os
 
-from htmlmin import minify as html_minify
 from shutil import rmtree
+
+import jinja2
+
+from htmlmin import minify as html_minify
 
 from gena.context import context
 from gena.files import File

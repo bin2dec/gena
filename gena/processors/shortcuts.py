@@ -39,8 +39,9 @@ RULES = (
 )
 """
 
-from gena import utils
 from slugify import slugify
+
+from gena import utils
 
 
 __all__ = (

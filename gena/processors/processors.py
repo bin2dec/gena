@@ -1,15 +1,17 @@
 from __future__ import annotations
 
-import jinja2
 import logging
 import subprocess
 
 from abc import ABC, abstractmethod
 from collections import defaultdict
-from htmlmin import minify as html_minify
-from markdown import Markdown
 from sys import stdout
 from typing import Callable, Iterable, Optional, Sequence, TypeVar, Union
+
+import jinja2
+
+from htmlmin import minify as html_minify
+from markdown import Markdown
 
 from gena.context import context
 from gena.files import FileLike, FileType
