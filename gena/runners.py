@@ -59,10 +59,9 @@ class FileRunner:
         default_file_factory = utils.import_attr(settings.DEFAULT_FILE_FACTORY)
         default_file_factory = default_file_factory()
 
-        try:
-            rules = settings.RULES
-        except AttributeError:
-            rules = settings.PROCESSING_RULES
+        rules = settings.RULES or settings.get('PROCESSING_RULES', ())
+        if not rules:
+            logger.warning('No rules to process are found')
 
         self._rules = []
         for rule in rules:
