@@ -89,7 +89,7 @@ class BundleProcessor(Processor):
 
     1) In your settings file:
     ...
-    PROCESSING_RULES = (
+    RULES = (
         {
             'test': '*.css',
             'processors': (
@@ -149,7 +149,7 @@ class ExternalProcessor(Processor):
     The file contents are sent to stdin of the process. Then captured stdout is assigned back to the file contents.
     For example, we would like to compress our JavaScript files that aren't compressed yet:
 
-    PROCESSING_RULES = (
+    RULES = (
         ...
         {
             'test': '*[!.min].js',
@@ -202,7 +202,7 @@ class FileMetaProcessor(Processor):
     some callable which returns an iterable object.
     For example, we would like to make a slug from our article title for future use:
 
-    PROCESSING_RULES = (
+    RULES = (
         ...
         {
             'test': '*.md',
@@ -263,7 +263,7 @@ class FileNameProcessor(Processor):
 
     For example, we would like to change extensions of our markdown files (presumably after some markdown processing):
 
-    PROCESSING_RULES = (
+    RULES = (
         ...
         {
             'test': '*.md',
@@ -306,7 +306,7 @@ class GroupProcessor(Processor):
     to your articles.
     Let's look at the following rule:
 
-    PROCESSING_RULES = (
+    RULES = (
         ...
         {
             'test': '*.md',
@@ -347,7 +347,7 @@ class HTMLMinifierProcessor(TextProcessor):
 
     For example, we would like to minify the contents of our files that have been processed by MarkdownProcessor:
 
-    PROCESSING_RULES = (
+    RULES = (
         ...
         {
             'test': '*.md',
@@ -380,7 +380,7 @@ class Jinja2Processor(TextProcessor):
     - all settings variables
     For example, we would like to render our template named article.html:
 
-    PROCESSING_RULES = (
+    RULES = (
         ...
         {
             'test': '*.md',
@@ -422,7 +422,7 @@ class MarkdownProcessor(TextProcessor):
 
     For example, we would like to convert all our markdown files:
 
-    PROCESSING_RULES = (
+    RULES = (
         ...
         {
             'test': '*.md',
@@ -460,7 +460,7 @@ class SavingProcessor(Processor):
 
     A simple usage example:
 
-    PROCESSING_RULES = (
+    RULES = (
         ...
         {
             'test': '*.css',
@@ -473,7 +473,7 @@ class SavingProcessor(Processor):
 
     An example of bundling:
 
-    PROCESSING_RULES = (
+    RULES = (
         ...
         {
             'test': '*.css',
