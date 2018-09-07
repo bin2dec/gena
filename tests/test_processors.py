@@ -5,7 +5,7 @@ from gzip import compress
 from string import capwords
 
 from gena.files import File, FileType
-from gena.processors.processors import *
+from gena.processors import *
 
 
 BASE_DIR = os.path.dirname(__file__)
