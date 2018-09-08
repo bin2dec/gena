@@ -127,6 +127,8 @@ class BundleProcessor(Processor):
         ...
     </head>
     ...
+
+    Notice that all bundled files must be the same type (binary or text).
     """
 
     section = 'bundles'
@@ -134,12 +136,15 @@ class BundleProcessor(Processor):
     def __init__(self, *, name: str, **kwargs) -> None:
         super().__init__(**kwargs)
         if self.section not in context:
-            context[self.section] = defaultdict(str)
+            context[self.section] = {}
         self.name = name
 
     def process(self, file: FileLike) -> FileLike:
         file = super().process(file)
-        context[self.section][self.name] += file.contents
+        try:
+            context[self.section][self.name] += file.contents
+        except KeyError:
+            context[self.section][self.name] = file.contents
         return file
 
 
