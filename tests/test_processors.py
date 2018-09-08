@@ -15,6 +15,28 @@ TEMPLATES_DIR = os.path.join(DATA_DIR, 'templates')
 UTILS_DIR = os.path.join(BASE_DIR, 'utils')
 
 
+class TestBundleProcessor:
+    def test_binary_file_processing(self, context):
+        file1 = File('file1', type=FileType.BINARY)
+        file1.contents = b'test1'
+        file2 = File('file2', type=FileType.BINARY)
+        file2.contents = b'test2'
+        processor = BundleProcessor(name='test')
+        processor.process(file1)
+        processor.process(file2)
+        assert context.bundles['test'] == b'test1test2'
+
+    def test_text_file_processing(self, context):
+        file1 = File('file1')
+        file1.contents = 'test1'
+        file2 = File('file2')
+        file2.contents = 'test2'
+        processor = BundleProcessor(name='test')
+        processor.process(file1)
+        processor.process(file2)
+        assert context.bundles['test'] == 'test1test2'
+
+
 class TestExternalProcessor:
     def test_binary_file_processing(self, article_binary_file):
         gzipped_contents = compress(article_binary_file.contents)
