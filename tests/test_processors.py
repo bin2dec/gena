@@ -113,10 +113,13 @@ class TestFileNameProcessor:
 
 
 class TestGroupProcessor:
-    def test_processing(self, article_text_file, context):
-        processor = GroupProcessor(name='articles')
-        output_file = processor.process(article_text_file)
-        assert context.groups['articles'] == [output_file]
+    def test_processing(self, context):
+        file1 = File('file1')
+        file2 = File('file2')
+        processor = GroupProcessor(name='test')
+        processor.process(file1)
+        processor.process(file2)
+        assert context.groups['test'] == [file1, file2]
 
 
 class TestHTMLMinifierProcessor:
