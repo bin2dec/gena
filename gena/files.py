@@ -367,7 +367,10 @@ class File(FileLike):
         if self._path == self._opath:
             return False
 
-        if self._path.directory and not os.path.exists(self._path.directory):
+        if os.path.exists(self._path):
+            if not append:
+                logger.warning('"%s" already exists and will be replaced', self._path)
+        elif self._path.directory and not os.path.exists(self._path.directory):
             os.makedirs(self._path.directory)
 
         if append or self._contents is not None:
