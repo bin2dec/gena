@@ -463,7 +463,6 @@ class SavingProcessor(Processor):
 
     If `append` is True and there's already a file with the same name, then the contents are appended to
     the end of this existing file.
-    If `rename_directory` is True, then the file path is changed to settings.DST_DIR before the saving.
 
     A simple usage example:
 
@@ -504,11 +503,11 @@ class SavingProcessor(Processor):
     """
 
     append = False
-    rename_directory = True
+    directory = None
 
     def process(self, file: FileLike) -> FileLike:
         file = super().process(file)
-        if self.rename_directory:
+        if self.directory is None:
             file.path.directory = settings.DST_DIR
         file.save(append=self.append)
         return file

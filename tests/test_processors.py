@@ -159,17 +159,10 @@ class TestMarkdownProcessor:
 
 
 class TestSavingProcessor:
-    def test_processing_with_directory_renaming(self, article_text_file, sample_article_as_str, settings, tmpdir):
+    def test_processing(self, article_text_file, sample_article_as_str, settings, tmpdir):
         tmpfile = tmpdir.join(article_text_file.path.name)
         settings.DST_DIR = tmpfile.dirpath()
-        processor = SavingProcessor(rename_directory=True)
-        processor.process(article_text_file)
-        assert tmpfile.read() == sample_article_as_str
-
-    def test_processing_without_directory_renaming(self, article_text_file, sample_article_as_str, tmpdir):
-        tmpfile = tmpdir.join(article_text_file.path.name)
-        article_text_file.path.path = tmpfile
-        processor = SavingProcessor(rename_directory=False)
+        processor = SavingProcessor()
         processor.process(article_text_file)
         assert tmpfile.read() == sample_article_as_str
 
