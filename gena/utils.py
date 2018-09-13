@@ -1,8 +1,12 @@
+from __future__ import annotations
+
 import os
 
 from datetime import datetime
-from dateutil.parser import parse as timestrparse
 from importlib import import_module
+from typing import Any
+
+from dateutil.parser import parse as timestrparse
 
 
 __all__ = (
@@ -29,10 +33,15 @@ def get_datetime(s, *args, **kwargs):
         return timestrparse(s, *args, **kwargs)
 
 
-def import_attr(s, default=None):
-    module_name, attr = s.strip().rsplit('.', 1)
+def import_attr(path: str) -> Any:
+    """Import a module attribute. For example:
+
+    runner = utils.import_attr('gena.runners.FileRunner')
+    """
+
+    module_name, attr = path.strip().rsplit('.', 1)
     module = import_module(module_name)
-    return getattr(module, attr, default)
+    return getattr(module, attr)
 
 
 def map_as_kwargs(m):
