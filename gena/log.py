@@ -3,6 +3,11 @@ import logging
 from gena.settings import settings
 
 
+__all__ = (
+    'config',
+)
+
+
 NORMAL_LOG_FORMAT = '{levelname:10}{message}'
 
 VERBOSE_LOG_FORMAT = '{asctime:25}{levelname:10}{message}  ({name}:{lineno})'
