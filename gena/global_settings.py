@@ -50,14 +50,6 @@ INITIAL_JOBS = ()
 FINAL_JOBS = ()
 
 
-# See possible options https://htmlmin.readthedocs.io/en/latest/reference.html#main-functions
-HTML_MINIFIER_OPTIONS = {
-    'remove_comments': True,
-    'remove_empty_space': True,
-    'reduce_boolean_attributes': True,
-}
-
-
 # See possible options http://jinja.pocoo.org/docs/api/#jinja2.Environment
 JINJA2_OPTIONS = {
     'enable_async': True,

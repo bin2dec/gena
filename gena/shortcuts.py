@@ -48,7 +48,6 @@ __all__ = (
     'bundle',
     'filename',
     'group',
-    'html_minifier',
     'markdown',
     'meta_date',
     'meta_modified',
@@ -84,10 +83,6 @@ def group(name):
             'name': name,
         },
     }
-
-
-def html_minifier():
-    return {'processor': 'gena.processors.HTMLMinifierProcessor'}
 
 
 def markdown():

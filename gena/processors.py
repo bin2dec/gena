@@ -10,7 +10,6 @@ from typing import Callable, Iterable, Optional, Sequence, TypeVar, Union
 
 import jinja2
 
-from htmlmin import minify as html_minify
 from markdown import Markdown
 
 from gena.context import context
@@ -26,7 +25,6 @@ __all__ = (
     'FileMetaProcessor',
     'FileNameProcessor',
     'GroupProcessor',
-    'HTMLMinifierProcessor',
     'Jinja2Processor',
     'MarkdownProcessor',
     'Processor',
@@ -346,35 +344,6 @@ class GroupProcessor(Processor):
     def process(self, file: FileLike) -> FileLike:
         file = super().process(file)
         context[self.section][self.name].append(file)
-        return file
-
-
-class HTMLMinifierProcessor(TextProcessor):
-    """Minify HTML.
-
-    For example, we would like to minify the contents of our files that have been processed by MarkdownProcessor:
-
-    RULES = (
-        ...
-        {
-            'test': '*.md',
-            'processors': (
-                ...
-                {'processor': 'gena.processors.MarkdownProcessor'},      # we do markdown processing first
-                ...
-                {'processor': 'gena.processors.HTMLMinifierProcessor'},  # then we run our minifier
-                ...
-            ),
-        },
-        ...
-    )
-
-    You can also customize the processing by using HTML_MINIFIER_OPTIONS in your settings.
-    """
-
-    def process(self, file: FileLike) -> FileLike:
-        file = super().process(file)
-        file.contents = html_minify(file.contents, **settings.HTML_MINIFIER_OPTIONS)
         return file
 
 
