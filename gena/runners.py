@@ -57,7 +57,6 @@ def do_final_jobs():
 class FileRunner:
     def __init__(self):
         default_file_factory = utils.import_attr(settings.DEFAULT_FILE_FACTORY)
-        default_file_factory = default_file_factory()
 
         rules = settings.RULES or settings.get('PROCESSING_RULES', ())
         if not rules:
@@ -73,7 +72,6 @@ class FileRunner:
 
             if 'file_factory' in rule:
                 file_factory = utils.import_attr(rule['file_factory'])
-                file_factory = file_factory()
             else:
                 file_factory = default_file_factory
 

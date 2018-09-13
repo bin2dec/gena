@@ -13,15 +13,14 @@ from gena import utils
 
 
 __all__ = (
-    'BinaryFileFactory',
+    'binary_file',
     'File',
-    'FileFactory',
     'FileLike',
     'FileMeta',
     'FilePath',
     'FilePathLike',
     'FileType',
-    'TextFileFactory',
+    'text_file',
 )
 
 
@@ -396,17 +395,13 @@ class FileFactory(ABC):
         pass
 
 
-class BinaryFileFactory(FileFactory):
+def binary_file(*args, **kwargs) -> File:
     """Factory for creating binary files."""
-
-    def __call__(self, *args, **kwargs) -> File:
-        kwargs['type'] = FileType.BINARY
-        return File(*args, **kwargs)
+    kwargs['type'] = FileType.BINARY
+    return File(*args, **kwargs)
 
 
-class TextFileFactory(FileFactory):
+def text_file(*args, **kwargs) -> File:
     """Factory for creating text files."""
-
-    def __call__(self, *args, **kwargs) -> File:
-        kwargs['type'] = FileType.TEXT
-        return File(*args, **kwargs)
+    kwargs['type'] = FileType.TEXT
+    return File(*args, **kwargs)
