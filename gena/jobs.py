@@ -1,15 +1,11 @@
+"""The module contains a bunch of initial and final jobs."""
+
 from __future__ import annotations
 
 import os
 
 from shutil import rmtree
 
-import jinja2
-
-from htmlmin import minify as html_minify
-
-from gena.context import context
-from gena.files import File
 from gena.settings import settings
 
 
@@ -31,17 +27,3 @@ def clear_dst_dir() -> None:
                 os.remove(file)
             else:
                 rmtree(file)
-
-
-def generate_file_from_template(filename: str = 'index.html', *, template: str = 'index.html',
-                                minify: bool = False) -> None:
-    j2_loader = jinja2.FileSystemLoader(searchpath=settings.TEMPLATE_DIRS)
-    j2_environment = jinja2.Environment(loader=j2_loader, **settings.JINJA2_OPTIONS)
-    j2_template = j2_environment.get_template(template)
-
-    file = File(filename)
-    file.path.directory = settings.DST_DIR
-    file.contents = j2_template.render({**context, **settings})
-    if minify:
-        file.contents = html_minify(file.contents, **settings.HTML_MINIFIER_OPTIONS)
-    file.save()
