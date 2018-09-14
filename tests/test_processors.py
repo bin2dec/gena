@@ -122,16 +122,6 @@ class TestGroupProcessor:
         assert context.groups['test'] == [file1, file2]
 
 
-class TestHTMLMinifierProcessor:
-    def test_processing(self):
-        with open(os.path.join(OUTPUT_DIR, 'gateway-ridge.min.html')) as file:
-            sample_contents = file.read()
-        input_file = File(OUTPUT_DIR, 'gateway-ridge.html')
-        processor = HTMLMinifierProcessor()
-        output_file = processor.process(input_file)
-        assert output_file.contents == sample_contents
-
-
 class TestJinja2Processor:
     def test_processing(self, settings):
         with open(os.path.join(OUTPUT_DIR, 'gateway-ridge.html')) as file:
@@ -177,4 +167,3 @@ class TestTypeProcessor:
         processor = TypeProcessor(type=FileType.BINARY)
         output_file = processor.process(article_text_file)
         assert output_file.type == FileType.BINARY
-
