@@ -9,6 +9,11 @@ from shutil import rmtree
 from gena.settings import settings
 
 
+__all__ = (
+    'clear_dst_dir',
+)
+
+
 def clear_dst_dir() -> None:
     """Remove the contents of the destination directory.
 
