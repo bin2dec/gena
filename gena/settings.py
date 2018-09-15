@@ -41,6 +41,9 @@ class Settings(UserDict):
         else:
             self.data[key] = value
 
+    def __str__(self):
+        return os.linesep.join(f'{k} = {v!r}' for k, v in self.data.items())
+
     def clear(self):
         super().clear()
         self.data = {k: v for k, v in getmembers(global_settings) if k.isupper()}

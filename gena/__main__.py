@@ -72,6 +72,12 @@ def main():
         help='show all messages'
     )
 
+    arg_parser.add_argument(
+        '--show-settings',
+        action='store_true',
+        help='show the settings',
+    )
+
     args = arg_parser.parse_args()
 
     if args.settings and os.path.exists(args.settings):
@@ -92,6 +98,9 @@ def main():
     if logger.isEnabledFor(logging.DEBUG):
         logger.debug('GenA %s', __version__)
         logger.debug('Python %s on %s', sysconfig.get_python_version(), sysconfig.get_platform())
+
+    if args.show_settings:
+        print(settings)
 
     try:
         runner = utils.import_attr(settings.RUNNER)
