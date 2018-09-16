@@ -1,9 +1,10 @@
+import fnmatch
 import heapq
 import itertools
 import logging
 import os
+import re
 
-from fnmatch import fnmatch
 from typing import Iterable
 
 from gena import utils
@@ -64,22 +65,26 @@ class FileRunner:
 
         self._rules = []
         for rule in rules:
+            new_test = os.path.normpath(rule['test'])
+            new_test = fnmatch.translate(new_test)
+            new_test = re.compile(new_test).match
+
             new_processors = []
             for processor in rule['processors']:
                 new_processor = utils.import_attr(processor['processor'])
                 new_processor = new_processor(**processor.get('options', {}))
-                new_processors.append(new_processor)
+                new_processors.append(new_processor.process)
 
             if 'file_factory' in rule:
-                file_factory = utils.import_attr(rule['file_factory'])
+                new_file_factory = utils.import_attr(rule['file_factory'])
             else:
-                file_factory = default_file_factory
+                new_file_factory = default_file_factory
 
             new_rule = {
-                'test': rule['test'],
+                'test': new_test,
                 'processors': new_processors,
-                'file_factory': file_factory,
-                'priority': rule.get('priority', settings.DEFAULT_PRIORITY)
+                'file_factory': new_file_factory,
+                'priority': rule.get('priority', settings.DEFAULT_PRIORITY),
             }
             self._rules.append(new_rule)
 
@@ -90,7 +95,7 @@ class FileRunner:
 
     def _get_rule(self, test):
         for rule in self._rules:
-            if fnmatch(test, rule['test']):
+            if rule['test'](os.path.normpath(test)):
                 return rule
 
     def _get_tasks(self):
@@ -124,7 +129,7 @@ class FileRunner:
         for file, processors in self._get_tasks():
             logger.info('Processing "%s"', file.path)
             for processor in processors:
-                file = processor.process(file)
+                file = processor(file)
             file_counter += 1
 
         do_final_jobs()
