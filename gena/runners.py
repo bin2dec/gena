@@ -57,11 +57,12 @@ def do_final_jobs():
 
 class FileRunner:
     def __init__(self):
-        default_file_factory = utils.import_attr(settings.DEFAULT_FILE_FACTORY)
-
         rules = settings.RULES or settings.get('PROCESSING_RULES', ())
-        if not rules:
-            logger.warning('No rules to process are found')
+
+        if rules:
+            default_file_factory = utils.import_attr(settings.DEFAULT_FILE_FACTORY)
+        else:
+            logger.warning('No rules are found to process')
 
         self._rules = []
         for rule in rules:
@@ -122,6 +123,9 @@ class FileRunner:
                     break
 
     def run(self):
+        if not self._rules:
+            return 0
+
         do_initial_jobs()
 
         file_counter = 0
