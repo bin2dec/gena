@@ -89,22 +89,21 @@ class FileRunner:
             self._rules.append(new_rule)
 
     def _get_paths(self):
-        for dirpath, _, filenames in os.walk(settings.SRC_DIR):
-            for filename in filenames:
-                yield (dirpath, filename)
+        for root, _, files in os.walk(settings.SRC_DIR):
+            for file in files:
+                yield os.path.join(root, file)
 
-    def _get_rule(self, test):
+    def _get_rule(self, path):
         for rule in self._rules:
-            if rule['test'](os.path.normpath(test)):
+            if rule['test'](os.path.normpath(path)):
                 return rule
 
     def _get_tasks(self):
         counter = itertools.count()  # the counter is needed in situations when priorities are equal
         queue = []
 
-        for dirpath, filename in self._get_paths():
-            rule = self._get_rule(filename)
-            path = os.path.join(dirpath, filename)
+        for path in self._get_paths():
+            rule = self._get_rule(path)
             if rule:
                 file = rule['file_factory'](path)
                 task = (file, rule['processors'])
