@@ -61,7 +61,7 @@ class FilePathLike(os.PathLike):
 
     @basename.setter
     @abstractmethod
-    def basename(self, basename: str) -> None:
+    def basename(self, basename: AnyPath) -> None:
         pass
 
     @property
@@ -71,7 +71,7 @@ class FilePathLike(os.PathLike):
 
     @directory.setter
     @abstractmethod
-    def directory(self, directory: str) -> None:
+    def directory(self, directory: AnyPath) -> None:
         pass
 
     @property
@@ -81,7 +81,7 @@ class FilePathLike(os.PathLike):
 
     @extension.setter
     @abstractmethod
-    def extension(self, extension: str) -> None:
+    def extension(self, extension: AnyPath) -> None:
         pass
 
     @property
@@ -91,7 +91,7 @@ class FilePathLike(os.PathLike):
 
     @name.setter
     @abstractmethod
-    def name(self, name: str) -> None:
+    def name(self, name: AnyPath) -> None:
         pass
 
     @property
@@ -101,7 +101,7 @@ class FilePathLike(os.PathLike):
 
     @path.setter
     @abstractmethod
-    def path(self, path: str) -> None:
+    def path(self, path: AnyPath) -> None:
         pass
 
     @abstractmethod
@@ -154,7 +154,7 @@ class FilePath(FilePathLike):
         return os.path.splitext(self.name)[0]
 
     @basename.setter
-    def basename(self, basename: str) -> None:
+    def basename(self, basename: AnyPath) -> None:
         basename = utils.fspath(basename)
         if os.sep in basename:
             raise ValueError('separators are not allowed in a file base name')
@@ -171,7 +171,7 @@ class FilePath(FilePathLike):
         return os.path.dirname(self._path)
 
     @directory.setter
-    def directory(self, directory: str) -> None:
+    def directory(self, directory: AnyPath) -> None:
         self.join(directory, self.name)
 
     @property
@@ -185,7 +185,7 @@ class FilePath(FilePathLike):
         return os.path.splitext(self.name)[1]
 
     @extension.setter
-    def extension(self, extension: str) -> None:
+    def extension(self, extension: AnyPath) -> None:
         extension = utils.fspath(extension)
         if os.sep in extension:
             raise ValueError('separators are not allowed in a file extension')
@@ -206,7 +206,7 @@ class FilePath(FilePathLike):
         return os.path.basename(self._path)
 
     @name.setter
-    def name(self, name: str) -> None:
+    def name(self, name: AnyPath) -> None:
         name = utils.fspath(name)
         if os.sep in name:
             raise ValueError('separators are not allowed in a file name')
@@ -217,7 +217,7 @@ class FilePath(FilePathLike):
         return self._path
 
     @path.setter
-    def path(self, path: str) -> None:
+    def path(self, path: AnyPath) -> None:
         self.join(path)
 
     def copy(self) -> FilePath:
