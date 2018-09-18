@@ -66,9 +66,12 @@ class FileRunner:
 
         self._rules = []
         for rule in rules:
-            new_test = os.path.normpath(rule['test'])
-            new_test = fnmatch.translate(new_test)
-            new_test = re.compile(new_test).match
+            if 'retest' in rule:
+                new_test = os.path.normpath(rule['retest'])
+            else:
+                new_test = os.path.normpath(rule['test'])
+                new_test = fnmatch.translate(new_test)
+            new_test = re.compile(new_test).search
 
             new_processors = []
             for processor in rule['processors']:
