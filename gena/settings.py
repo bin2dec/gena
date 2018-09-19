@@ -4,7 +4,7 @@ from importlib import import_module
 from collections import UserDict
 from inspect import getmembers
 
-from gena import global_settings
+from gena import default_settings
 from gena import utils
 
 
@@ -21,8 +21,7 @@ def _get_members(obj):
 class Settings(UserDict):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        default_settings = _get_members(global_settings)
-        self.data = {**default_settings, **self.data}
+        self.data = {**_get_members(default_settings), **self.data}
 
     def __getattr__(self, name):
         if name in self:
@@ -41,7 +40,7 @@ class Settings(UserDict):
     def clear(self):
         """Return to the default settings."""
         super().clear()
-        self.data = _get_members(global_settings)
+        self.data = _get_members(default_settings)
 
     def load_from_file(self, path):
         """Load settings from a file. For example:

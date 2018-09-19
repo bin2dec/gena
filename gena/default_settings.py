@@ -1,3 +1,5 @@
+"""Default GenA settings."""
+
 # The directory that contains source files.
 SRC_DIR = 'src'
 
