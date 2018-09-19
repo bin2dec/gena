@@ -1,5 +1,6 @@
 import os
 
+from importlib import import_module
 from collections import UserDict
 from inspect import getmembers
 
@@ -50,6 +51,16 @@ class Settings(UserDict):
         """
 
         module = utils.import_module(path)
+        self.data.update(_get_members(module))
+
+    def load_from_module(self, module):
+        """Load settings from a module. For example:
+
+        from gena import settings
+        settings.load_from_module('gena.contrib.blog.settings')
+        """
+
+        module = import_module(module)
         self.data.update(_get_members(module))
 
 
