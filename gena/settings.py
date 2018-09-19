@@ -3,7 +3,6 @@ import os
 
 from collections import UserDict
 from inspect import getmembers
-from types import ModuleType
 
 from gena import global_settings
 
@@ -11,6 +10,11 @@ from gena import global_settings
 __all__ = (
     'settings',
 )
+
+
+def _get_members(obj):
+    """Grab all uppercase attributes from the object `obj`."""
+    return {k: v for k, v in getmembers(obj) if k.isupper()}
 
 
 def import_module(path):
@@ -27,7 +31,7 @@ def import_module(path):
 class Settings(UserDict):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        default_settings = {k: v for k, v in getmembers(global_settings) if k.isupper()}
+        default_settings = _get_members(global_settings)
         self.data = {**default_settings, **self.data}
 
     def __getattr__(self, name):
@@ -45,13 +49,19 @@ class Settings(UserDict):
         return os.linesep.join(f'{k} = {v!r}' for k, v in self.data.items())
 
     def clear(self):
+        """Return to the default settings."""
         super().clear()
-        self.data = {k: v for k, v in getmembers(global_settings) if k.isupper()}
+        self.data = _get_members(global_settings)
 
-    def load_from_module(self, module):
-        if not isinstance(module, ModuleType):
-            module = import_module(module)
-        self.data.update((k, v) for k, v in getmembers(module) if k.isupper())
+    def load_from_file(self, path):
+        """Load settings from a file. For example:
+
+        from gena import settings
+        settings.load_from_file('/home/user/settings.py')
+        """
+
+        module = import_module(path)
+        self.data.update(_get_members(module))
 
 
 settings = Settings()

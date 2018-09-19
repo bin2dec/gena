@@ -81,7 +81,7 @@ def main():
     args = arg_parser.parse_args()
 
     if args.settings and os.path.exists(args.settings):
-        settings.load_from_module(args.settings)
+        settings.load_from_file(args.settings)
 
     if args.src is not None:
         settings.SRC_DIR = args.src
