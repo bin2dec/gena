@@ -1,10 +1,10 @@
-import importlib.util
 import os
 
 from collections import UserDict
 from inspect import getmembers
 
 from gena import global_settings
+from gena import utils
 
 
 __all__ = (
@@ -15,17 +15,6 @@ __all__ = (
 def _get_members(obj):
     """Grab all uppercase attributes from the object `obj`."""
     return {k: v for k, v in getmembers(obj) if k.isupper()}
-
-
-def import_module(path):
-    name = os.path.basename(path)
-    if not name:
-        raise ImportError(f'cannot import "{path}"')
-    name = os.path.splitext(name)[0]
-    spec = importlib.util.spec_from_file_location(name, path)
-    module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)
-    return module
 
 
 class Settings(UserDict):
@@ -60,7 +49,7 @@ class Settings(UserDict):
         settings.load_from_file('/home/user/settings.py')
         """
 
-        module = import_module(path)
+        module = utils.import_module(path)
         self.data.update(_get_members(module))
 
 
