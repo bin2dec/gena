@@ -8,6 +8,10 @@ DST_DIR = 'dist'
 DEBUG = False
 
 
+# List of additional settings modules
+EXTRA_SETTINGS = ()
+
+
 # TEMPLATE_DIRS contains the path to the templates as string, or if multiple locations are wanted a list of them.
 # For example:
 # TEMPLATE_DIRS = '/path/to/templates'
