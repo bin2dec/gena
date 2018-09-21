@@ -67,9 +67,9 @@ class FileRunner:
         self._rules = []
         for rule in rules:
             if 'retest' in rule:
-                new_test = os.path.normpath(rule['retest'])
+                new_test = os.path.normcase(rule['retest'])
             else:
-                new_test = os.path.normpath(rule['test'])
+                new_test = os.path.normcase(rule['test'])
                 new_test = fnmatch.translate(new_test)
             new_test = re.compile(new_test).search
 
@@ -99,7 +99,7 @@ class FileRunner:
 
     def _get_rule(self, path):
         for rule in self._rules:
-            if rule['test'](os.path.normpath(path)):
+            if rule['test'](os.path.normcase(path)):
                 return rule
 
     def _get_tasks(self):
