@@ -59,10 +59,10 @@ class FileRunner:
     def __init__(self):
         rules = settings.RULES or settings.get('PROCESSING_RULES', ())
 
-        if rules:
-            default_file_factory = utils.import_attr(settings.DEFAULT_FILE_FACTORY)
-        else:
-            logger.warning('No rules are found to process')
+        if not rules:
+            raise ValueError('no rules are found to process')
+
+        default_file_factory = utils.import_attr(settings.DEFAULT_FILE_FACTORY)
 
         self._rules = []
         for rule in rules:
