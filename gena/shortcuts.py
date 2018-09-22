@@ -122,8 +122,14 @@ def meta_slug():
     }
 
 
-def save():
-    return {'processor': 'gena.processors.SavingProcessor'}
+def save(append=False, path=''):
+    return {
+        'processor': 'gena.processors.SavingProcessor',
+        'options': {
+            'append': append,
+            'path': path,
+        },
+    }
 
 
 def stdout():
