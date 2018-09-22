@@ -389,12 +389,6 @@ class File(FileLike):
         return True
 
 
-class FileFactory(ABC):
-    @abstractmethod
-    def __call__(self, *args, **kwargs) -> FileLike:
-        pass
-
-
 def binary_file(*args, **kwargs) -> File:
     """Factory for creating binary files."""
     kwargs['type'] = FileType.BINARY
