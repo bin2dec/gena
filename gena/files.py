@@ -228,7 +228,7 @@ class FilePath(FilePathLike):
         path = os.path.join(*paths) if paths else ''
         if isinstance(path, bytes):
             path = os.fsdecode(path)
-        self._path: str = path
+        self._path: str = os.path.normpath(path)
 
 
 class FileLike(ABC):
