@@ -472,12 +472,16 @@ class SavingProcessor(Processor):
     """
 
     append = False
-    directory = None
+    path = ''
 
     def process(self, file: FileLike) -> FileLike:
         file = super().process(file)
-        if self.directory is None:
+        if not self.path:
             file.path.directory = settings.DST_DIR
+        elif callable(self.path):
+            file.path.path = self.path(file)
+        else:
+            file.path.path = self.path.format(file=file)
         file.save(append=self.append)
         return file
 
