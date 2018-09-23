@@ -91,6 +91,7 @@ class FileRunner:
                 'priority': rule.get('priority', settings.DEFAULT_PRIORITY),
             }
             self._rules.append(new_rule)
+            logger.debug('Got a rule for "%s"', rule['test'])
 
     def _get_paths(self):
         for root, _, files in os.walk(settings.SRC_DIR):
