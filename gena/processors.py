@@ -168,7 +168,7 @@ class ExternalProcessor(Processor):
                 {
                     'processor': 'gena.processors.FileNameProcessor',
                     'options': {
-                        'name': lambda file: f'{file.path.basename}.min.js',
+                        'name': '{file.path.basename}.min.js',
                     },
                 },
                 ...
@@ -275,7 +275,7 @@ class FileNameProcessor(Processor):
                 {
                     'processor': 'gena.processors.FileNameProcessor',
                     'options': {
-                        'name': lambda file: f'{file.basename}.html',
+                        'name': '{file.basename}.html',
                     },
                 },
                 ...
@@ -297,7 +297,7 @@ class FileNameProcessor(Processor):
         if callable(self.name):
             file.path.name = self.name(file)
         else:
-            file.path.name = self.name
+            file.path.name = self.name.format(file=file)
         logger.debug('Renamed %r: "%s" to "%s"', file, old_name, file.path.name)
         return file
 
