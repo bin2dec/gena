@@ -44,8 +44,8 @@ class FileMetaValue(UserList):
 
 
 class FileMeta(UserDict):
-    def __setitem__(self, key: str, item: Iterable) -> None:
-        self.data[key] = FileMetaValue(item)
+    def __setitem__(self, key: str, value: Iterable) -> None:
+        self.data[key] = FileMetaValue(value)
 
     def __getattr__(self, name: str) -> Iterable:
         if name in self:
