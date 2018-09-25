@@ -13,11 +13,11 @@ class Context(UserDict):
             return self.data[name]
         raise AttributeError(name)
 
-    def __setattr__(self, key: str, value: Any) -> None:
-        if key == 'data':
-            super().__setattr__(key, value)
+    def __setattr__(self, name: str, value: Any) -> None:
+        if name == 'data':
+            super().__setattr__(name, value)
         else:
-            self.data[key] = value
+            self.data[name] = value
 
 
 context = Context()
