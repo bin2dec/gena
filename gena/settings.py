@@ -28,11 +28,11 @@ class Settings(UserDict):
             return self.data[name]
         raise AttributeError(name)
 
-    def __setattr__(self, key, value):
-        if key == 'data':
-            super().__setattr__(key, value)
+    def __setattr__(self, name, value):
+        if name == 'data':
+            super().__setattr__(name, value)
         else:
-            self.data[key] = value
+            self.data[name] = value
 
     def __str__(self):
         return os.linesep.join(f'{k} = {v!r}' for k, v in self.data.items())
