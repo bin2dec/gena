@@ -121,7 +121,7 @@ class BundleProcessor(Processor):
     ...
     <head>
         ...
-        <style>{{ context.bundles.css }}</style>
+        <style>{{ context.css }}</style>
         ...
     </head>
     ...
@@ -129,20 +129,16 @@ class BundleProcessor(Processor):
     Notice that all bundled files must be the same type (binary or text).
     """
 
-    section = 'bundles'
-
     def __init__(self, *, name: str, **kwargs) -> None:
         super().__init__(**kwargs)
-        if self.section not in context:
-            context[self.section] = {}
         self.name = name
 
     def process(self, file: FileLike) -> FileLike:
         file = super().process(file)
         try:
-            context[self.section][self.name] += file.contents
+            context[self.name] += file.contents
         except KeyError:
-            context[self.section][self.name] = file.contents
+            context[self.name] = file.contents
         return file
 
 

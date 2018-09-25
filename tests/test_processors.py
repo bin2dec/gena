@@ -24,7 +24,7 @@ class TestBundleProcessor:
         processor = BundleProcessor(name='test')
         processor.process(file1)
         processor.process(file2)
-        assert context.bundles['test'] == b'test1test2'
+        assert context.test == b'test1test2'
 
     def test_text_file_processing(self, context):
         file1 = File('file1')
@@ -34,7 +34,7 @@ class TestBundleProcessor:
         processor = BundleProcessor(name='test')
         processor.process(file1)
         processor.process(file2)
-        assert context.bundles['test'] == 'test1test2'
+        assert context.test == 'test1test2'
 
 
 class TestExternalProcessor:
