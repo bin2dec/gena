@@ -119,7 +119,7 @@ class TestGroupProcessor:
         processor = GroupProcessor(name='test')
         processor.process(file1)
         processor.process(file2)
-        assert context.groups['test'] == [file1, file2]
+        assert context.test == [file1, file2]
 
 
 class TestJinja2Processor:

@@ -4,7 +4,6 @@ import logging
 import subprocess
 
 from abc import ABC, abstractmethod
-from collections import defaultdict
 from sys import stdout
 from typing import Callable, Iterable, Optional, Sequence, TypeVar, Union
 
@@ -324,22 +323,18 @@ class GroupProcessor(Processor):
     )
 
     According to this rule, all our markdown files will be part of the group named `articles` (now globally accessible
-    via context.groups['articles'] if `section` is 'groups').
+    via context.articles).
     Next, we can use this bunch of the files in some final job to generate an article list.
     Note that it's generally better to place GroupProcessor after SavingProcessor.
     """
 
-    section = 'groups'
-
     def __init__(self, *, name: str, **kwargs) -> None:
         super().__init__(**kwargs)
-        if self.section not in context:
-            context.groups = defaultdict(list)
-        self.name = name
+        self.group = context.add_item(name, [])
 
     def process(self, file: FileLike) -> FileLike:
         file = super().process(file)
-        context[self.section][self.name].append(file)
+        self.group.append(file)
         return file
 
 
