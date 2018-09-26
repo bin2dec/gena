@@ -17,6 +17,7 @@ __all__ = (
     'File',
     'FileLike',
     'FileMeta',
+    'FileMetaValue',
     'FilePath',
     'FilePathLike',
     'FileType',
