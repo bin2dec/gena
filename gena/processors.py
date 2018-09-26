@@ -52,7 +52,8 @@ class Processor(ABC):
     @abstractmethod
     def process(self, file: FileLike) -> FileLike:
         if logger.isEnabledFor(logging.DEBUG):
-            logger.debug('%s(%s) is processing %r', self.__class__.__name__, map_as_kwargs(self.__dict__), file)
+            attrs = {k: v for k, v in self.__dict__.items() if not k.startswith('_')}
+            logger.debug('%s(%s) is processing %r', self.__class__.__name__, map_as_kwargs(attrs), file)
         return file
 
 
