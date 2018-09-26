@@ -64,7 +64,7 @@ def bundle(name):
         'options': {
             'name': name,
         },
-    },
+    }
 
 
 def filename(name):
