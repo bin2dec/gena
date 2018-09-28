@@ -22,6 +22,9 @@ EXTRA_SETTINGS = ()
 TEMPLATE_DIRS = 'templates'
 
 
+CACHE_DIR = ''
+
+
 LANG = 'en'
 
 
