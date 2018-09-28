@@ -7,13 +7,12 @@ from abc import ABC, abstractmethod
 from sys import stdout
 from typing import Callable, Iterable, Optional, Sequence, TypeVar, Union
 
-import jinja2
-
 from markdown import Markdown
 
 from gena.context import context
 from gena.files import FileLike, FileType
 from gena.settings import settings
+from gena.templating import TemplateEngine, JinjaTemplateEngine
 from gena.utils import map_as_kwargs
 
 
@@ -24,7 +23,6 @@ __all__ = (
     'FileMetaProcessor',
     'FileNameProcessor',
     'GroupProcessor',
-    'Jinja2Processor',
     'MarkdownProcessor',
     'Processor',
     'SavingProcessor',
@@ -339,52 +337,6 @@ class GroupProcessor(Processor):
         return file
 
 
-class Jinja2Processor(TextProcessor):
-    """Render Jinja2 templates.
-
-    There are several variables available in templates:
-    - the file contents
-    - all meta variables of the file
-    - all settings variables
-    For example, we would like to render our template named article.html:
-
-    RULES = (
-        ...
-        {
-            'test': '*.md',
-            'processors': (
-                ...
-                {
-                    'processor': 'gena.processors.TemplateProcessor',
-                    'options': {
-                        'template': 'article.html',
-                    },
-                }
-                ...
-            ),
-        },
-        ...
-    )
-
-    The processor uses settings.TEMPLATE_DIRS to find templates. TEMPLATE_DIRS can be a string or a list of strings
-    if multiple locations are wanted.
-    """
-
-    def __init__(self, template: str, **kwargs) -> None:
-        super().__init__(**kwargs)
-
-        loader = jinja2.FileSystemLoader(searchpath=settings.TEMPLATE_DIRS)
-        environment = jinja2.Environment(loader=loader, **settings.JINJA2_OPTIONS)
-        self.template = environment.get_template(template)
-
-    def process(self, file: FileLike) -> FileLike:
-        file = super().process(file)
-        variables = {'context': context, 'contents': file.contents, **file.meta, **settings}
-        file.contents = self.template.render(variables)
-
-        return file
-
-
 class MarkdownProcessor(TextProcessor):
     """Convert Markdown syntax into HTML.
 
@@ -490,6 +442,59 @@ class StdoutProcessor(Processor):
         return file
 
 
+class TemplateProcessor(TextProcessor):
+    """Render templates.
+
+    There are several variables available in templates:
+    - the file contents
+    - all meta variables of the file
+    - all settings variables
+    For example, we would like to render our template named article.html:
+
+    RULES = (
+        ...
+        {
+            'test': '*.md',
+            'processors': (
+                ...
+                {
+                    'processor': 'gena.processors.TemplateProcessor',
+                    'options': {
+                        'template': 'article.html',
+                    },
+                }
+                ...
+            ),
+        },
+        ...
+    )
+
+    The processor uses settings.TEMPLATE_DIRS to find templates. TEMPLATE_DIRS can be a string or a list of strings
+    if multiple locations are wanted.
+
+    The default template engine is Jinja2.
+    """
+
+    def __init__(self, template: str, engine: Optional[TemplateEngine] = None, **kwargs) -> None:
+        super().__init__(**kwargs)
+        self.template = template
+        self.engine = engine or JinjaTemplateEngine()
+
+    def process(self, file: FileLike) -> FileLike:
+        file = super().process(file)
+        file.contents = self.engine.render(
+            self.template,
+            {
+                'context': context,
+                'contents': file.contents,
+                **file.meta,
+                **settings,
+            },
+        )
+
+        return file
+
+
 class TypeProcessor(Processor):
     """Change the file type."""
 
@@ -499,6 +504,3 @@ class TypeProcessor(Processor):
         file = super().process(file)
         file.type = self.type
         return file
-
-
-TemplateProcessor = Jinja2Processor  # this is simply an alias for Jinja2Processor
