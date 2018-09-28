@@ -60,9 +60,7 @@ FINAL_JOBS = ()
 
 
 # See possible options http://jinja.pocoo.org/docs/api/#jinja2.Environment
-JINJA2_OPTIONS = {
-    'enable_async': True,
-}
+JINJA_OPTIONS = {}
 
 
 # See possible options https://python-markdown.github.io/reference/#markdown

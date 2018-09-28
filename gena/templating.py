@@ -41,7 +41,7 @@ class JinjaTemplateEngine(TemplateEngine):
             jinja_cache = None
 
         self._jinja_environment = jinja2.Environment(loader=jinja_loader, bytecode_cache=jinja_cache,
-                                                     **settings.JINJA2_OPTIONS)
+                                                     **settings.JINJA_OPTIONS)
 
     def render(self, template: str, context: Dict) -> str:
         jinja_template = self._jinja_environment.get_template(template)
