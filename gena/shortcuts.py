@@ -136,10 +136,11 @@ def stdout():
     return {'processor': 'gena.processors.StdoutProcessor'}
 
 
-def template(name):
+def template(name, engine=None):
     return {
         'processor': 'gena.processors.TemplateProcessor',
         'options': {
             'template': name,
+            'engine': engine,
         },
     }
