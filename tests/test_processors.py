@@ -122,14 +122,14 @@ class TestGroupProcessor:
         assert context.test == [file1, file2]
 
 
-class TestJinja2Processor:
+class TestTemplateProcessor:
     def test_processing(self, settings):
         with open(os.path.join(OUTPUT_DIR, 'gateway-ridge.html')) as file:
             sample_contents = file.read()
         input_file = File(OUTPUT_DIR, 'article.html')
         input_file.meta['title'] = ['Gateway Ridge']
         settings.TEMPLATE_DIRS = TEMPLATES_DIR
-        processor = Jinja2Processor(template='article.html')
+        processor = TemplateProcessor(template='article.html')
         output_file = processor.process(input_file)
         assert output_file.contents == sample_contents
 
