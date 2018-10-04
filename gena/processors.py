@@ -12,7 +12,7 @@ from markdown import Markdown
 from gena.context import context
 from gena.files import FileLike, FileType
 from gena.settings import settings
-from gena.templating import TemplateEngine, JinjaTemplateEngine
+from gena.templating import JinjaTemplateEngine, TemplateEngine
 from gena.utils import map_as_kwargs
 
 

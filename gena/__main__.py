@@ -100,8 +100,8 @@ def main():
         logger.debug('Python %s on %s', sysconfig.get_python_version(), sysconfig.get_platform())
 
     for extra_settings in settings.EXTRA_SETTINGS:
-        settings.load_from_module(extra_settings)
         logger.debug('Loading extra settings from "%s"', extra_settings)
+        settings.load_from_module(extra_settings)
 
     if args.show_settings:
         print(settings)
@@ -123,5 +123,5 @@ def main():
             print(f'Finished in {time() - start_time:.2f} sec. with {files} file(s) processed')
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()
