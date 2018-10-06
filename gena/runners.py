@@ -68,9 +68,11 @@ class FileRunner:
         for rule in rules:
             if 'retest' in rule:
                 new_test = os.path.normcase(rule['retest'])
+                logger.debug('Got a rule for "%s"', rule['retest'])
             else:
                 new_test = os.path.normcase(rule['test'])
                 new_test = fnmatch.translate(new_test)
+                logger.debug('Got a rule for "%s"', rule['test'])
             new_test = re.compile(new_test).search
 
             new_processors = []
@@ -91,7 +93,6 @@ class FileRunner:
                 'priority': rule.get('priority', settings.DEFAULT_PRIORITY),
             }
             self._rules.append(new_rule)
-            logger.debug('Got a rule for "%s"', rule['test'])
 
     def _get_paths(self):
         for root, _, files in os.walk(settings.SRC_DIR):
