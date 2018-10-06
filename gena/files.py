@@ -364,7 +364,7 @@ class File(FileLike):
         Note that it's not possible to rewrite the original file using this method.
         """
 
-        if self._path == self._opath:
+        if os.path.exists(self._opath) and self._path == self._opath:
             return False
 
         if os.path.exists(self._path):
