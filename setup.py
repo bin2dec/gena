@@ -15,6 +15,9 @@ EXTRAS = {
     'minifiers': [
         'htmlmin >= 0.1.12',
     ],
+    'blog': [
+        'lxml >= 4.2.5',
+    ],
 }
 
 BASE_DIR = os.path.dirname(__file__)

@@ -9,6 +9,7 @@ jinja2 = "*"
 markdown = "*"
 python-dateutil = "*"
 python-slugify = "*"
+lxml = "*"
 
 [dev-packages]
 mypy = "*"
