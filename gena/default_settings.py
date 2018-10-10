@@ -1,3 +1,5 @@
+"""Default GenA settings."""
+
 # The directory that contains source files.
 SRC_DIR = 'src'
 
@@ -8,6 +10,10 @@ DST_DIR = 'dist'
 DEBUG = False
 
 
+# List of additional settings modules
+EXTRA_SETTINGS = ()
+
+
 # TEMPLATE_DIRS contains the path to the templates as string, or if multiple locations are wanted a list of them.
 # For example:
 # TEMPLATE_DIRS = '/path/to/templates'
@@ -16,13 +22,16 @@ DEBUG = False
 TEMPLATE_DIRS = 'templates'
 
 
+CACHE_DIR = ''
+
+
 LANG = 'en'
 
 
 RUNNER = 'gena.runners.FileRunner'
 
 
-DEFAULT_FILE_FACTORY = 'gena.files.TextFileFactory'
+DEFAULT_FILE_FACTORY = 'gena.files.text_file'
 
 
 # A default priority for processing tasks. A lower number means a higher priority.
@@ -50,18 +59,8 @@ INITIAL_JOBS = ()
 FINAL_JOBS = ()
 
 
-# See possible options https://htmlmin.readthedocs.io/en/latest/reference.html#main-functions
-HTML_MINIFIER_OPTIONS = {
-    'remove_comments': True,
-    'remove_empty_space': True,
-    'reduce_boolean_attributes': True,
-}
-
-
 # See possible options http://jinja.pocoo.org/docs/api/#jinja2.Environment
-JINJA2_OPTIONS = {
-    'enable_async': True,
-}
+JINJA_OPTIONS = {}
 
 
 # See possible options https://python-markdown.github.io/reference/#markdown

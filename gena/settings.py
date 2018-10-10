@@ -1,11 +1,11 @@
-import importlib.util
 import os
 
+from importlib import import_module
 from collections import UserDict
 from inspect import getmembers
-from types import ModuleType
 
-from gena import global_settings
+from gena import default_settings
+from gena import utils
 
 
 __all__ = (
@@ -13,42 +13,54 @@ __all__ = (
 )
 
 
-def import_module(path):
-    name = os.path.basename(path)
-    if not name:
-        raise ImportError(f'cannot import "{path}"')
-    name = os.path.splitext(name)[0]
-    spec = importlib.util.spec_from_file_location(name, path)
-    module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)
-    return module
+def _get_members(obj):
+    """Grab all uppercase attributes from the object `obj`."""
+    return {k: v for k, v in getmembers(obj) if k.isupper()}
 
 
 class Settings(UserDict):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        default_settings = {k: v for k, v in getmembers(global_settings) if k.isupper()}
-        self.data = {**default_settings, **self.data}
+        self.data = {**_get_members(default_settings), **self.data}
 
     def __getattr__(self, name):
         if name in self:
             return self.data[name]
         raise AttributeError(name)
 
-    def __setattr__(self, key, value):
-        if key == 'data':
-            super().__setattr__(key, value)
+    def __setattr__(self, name, value):
+        if name == 'data':
+            super().__setattr__(name, value)
         else:
-            self.data[key] = value
+            self.data[name] = value
+
+    def __str__(self):
+        return os.linesep.join(f'{k} = {v!r}' for k, v in self.data.items())
 
     def clear(self):
+        """Return to the default settings."""
         super().clear()
-        self.data = {k: v for k, v in getmembers(global_settings) if k.isupper()}
+        self.data = _get_members(default_settings)
+
+    def load_from_file(self, path):
+        """Load settings from a file. For example:
+
+        from gena import settings
+        settings.load_from_file('/home/user/settings.py')
+        """
+
+        module = utils.import_module(path)
+        self.data.update(_get_members(module))
 
     def load_from_module(self, module):
-        if not isinstance(module, ModuleType):
-            module = import_module(module)
-        self.data.update((k, v) for k, v in getmembers(module) if k.isupper())
+        """Load settings from a module. For example:
+
+        from gena import settings
+        settings.load_from_module('gena.contrib.blog.settings')
+        """
+
+        module = import_module(module)
+        self.data.update(_get_members(module))
 
 
 settings = Settings()

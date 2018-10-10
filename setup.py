@@ -4,13 +4,21 @@ import re
 from setuptools import find_packages, setup
 
 
-REQUIRES = [
-    'htmlmin >= 0.1.12',
+REQUIREMENTS = [
     'jinja2 >= 2.10',
     'markdown >= 2.6.11',
     'python-dateutil >= 2.7.3',
     'python-slugify >= 1.2.6',
 ]
+
+EXTRAS = {
+    'minifiers': [
+        'htmlmin >= 0.1.12',
+    ],
+    'blog': [
+        'lxml >= 4.2.5',
+    ],
+}
 
 BASE_DIR = os.path.dirname(__file__)
 
@@ -43,7 +51,8 @@ setup(
     license='AGPLv3',
     url='https://gitlab.com/dec0der/gena',
     python_requires='>=3.7',
-    install_requires=REQUIRES,
+    install_requires=REQUIREMENTS,
+    extras_require=EXTRAS,
     tests_require=['pytest'],
     packages=find_packages(exclude=['tests']),
     zip_safe=False,

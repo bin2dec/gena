@@ -5,7 +5,7 @@ from gzip import compress
 from string import capwords
 
 from gena.files import File, FileType
-from gena.processors.processors import *
+from gena.processors import *
 
 
 BASE_DIR = os.path.dirname(__file__)
@@ -13,6 +13,28 @@ DATA_DIR = os.path.join(BASE_DIR, 'data')
 OUTPUT_DIR = os.path.join(DATA_DIR, 'output')
 TEMPLATES_DIR = os.path.join(DATA_DIR, 'templates')
 UTILS_DIR = os.path.join(BASE_DIR, 'utils')
+
+
+class TestBundleProcessor:
+    def test_binary_file_processing(self, context):
+        file1 = File('file1', type=FileType.BINARY)
+        file1.contents = b'test1'
+        file2 = File('file2', type=FileType.BINARY)
+        file2.contents = b'test2'
+        processor = BundleProcessor(name='test')
+        processor.process(file1)
+        processor.process(file2)
+        assert context.test == b'test1test2'
+
+    def test_text_file_processing(self, context):
+        file1 = File('file1')
+        file1.contents = 'test1'
+        file2 = File('file2')
+        file2.contents = 'test2'
+        processor = BundleProcessor(name='test')
+        processor.process(file1)
+        processor.process(file2)
+        assert context.test == 'test1test2'
 
 
 class TestExternalProcessor:
@@ -91,30 +113,23 @@ class TestFileNameProcessor:
 
 
 class TestGroupProcessor:
-    def test_processing(self, article_text_file, context):
-        processor = GroupProcessor(name='articles')
-        output_file = processor.process(article_text_file)
-        assert context.groups['articles'] == [output_file]
+    def test_processing(self, context):
+        file1 = File('file1')
+        file2 = File('file2')
+        processor = GroupProcessor(name='test')
+        processor.process(file1)
+        processor.process(file2)
+        assert context.test == [file1, file2]
 
 
-class TestHTMLMinifierProcessor:
-    def test_processing(self):
-        with open(os.path.join(OUTPUT_DIR, 'gateway-ridge.min.html')) as file:
-            sample_contents = file.read()
-        input_file = File(OUTPUT_DIR, 'gateway-ridge.html')
-        processor = HTMLMinifierProcessor()
-        output_file = processor.process(input_file)
-        assert output_file.contents == sample_contents
-
-
-class TestJinja2Processor:
+class TestTemplateProcessor:
     def test_processing(self, settings):
         with open(os.path.join(OUTPUT_DIR, 'gateway-ridge.html')) as file:
             sample_contents = file.read()
         input_file = File(OUTPUT_DIR, 'article.html')
         input_file.meta['title'] = ['Gateway Ridge']
         settings.TEMPLATE_DIRS = TEMPLATES_DIR
-        processor = Jinja2Processor(template='article.html')
+        processor = TemplateProcessor(template='article.html')
         output_file = processor.process(input_file)
         assert output_file.contents == sample_contents
 
@@ -134,17 +149,10 @@ class TestMarkdownProcessor:
 
 
 class TestSavingProcessor:
-    def test_processing_with_directory_renaming(self, article_text_file, sample_article_as_str, settings, tmpdir):
+    def test_processing(self, article_text_file, sample_article_as_str, settings, tmpdir):
         tmpfile = tmpdir.join(article_text_file.path.name)
         settings.DST_DIR = tmpfile.dirpath()
-        processor = SavingProcessor(rename_directory=True)
-        processor.process(article_text_file)
-        assert tmpfile.read() == sample_article_as_str
-
-    def test_processing_without_directory_renaming(self, article_text_file, sample_article_as_str, tmpdir):
-        tmpfile = tmpdir.join(article_text_file.path.name)
-        article_text_file.path.path = tmpfile
-        processor = SavingProcessor(rename_directory=False)
+        processor = SavingProcessor()
         processor.process(article_text_file)
         assert tmpfile.read() == sample_article_as_str
 
@@ -159,4 +167,3 @@ class TestTypeProcessor:
         processor = TypeProcessor(type=FileType.BINARY)
         output_file = processor.process(article_text_file)
         assert output_file.type == FileType.BINARY
-

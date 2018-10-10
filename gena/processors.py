@@ -4,18 +4,15 @@ import logging
 import subprocess
 
 from abc import ABC, abstractmethod
-from collections import defaultdict
 from sys import stdout
 from typing import Callable, Iterable, Optional, Sequence, TypeVar, Union
 
-import jinja2
-
-from htmlmin import minify as html_minify
 from markdown import Markdown
 
 from gena.context import context
 from gena.files import FileLike, FileType
 from gena.settings import settings
+from gena.templating import JinjaTemplateEngine, TemplateEngine
 from gena.utils import map_as_kwargs
 
 
@@ -26,8 +23,6 @@ __all__ = (
     'FileMetaProcessor',
     'FileNameProcessor',
     'GroupProcessor',
-    'HTMLMinifierProcessor',
-    'Jinja2Processor',
     'MarkdownProcessor',
     'Processor',
     'SavingProcessor',
@@ -55,7 +50,8 @@ class Processor(ABC):
     @abstractmethod
     def process(self, file: FileLike) -> FileLike:
         if logger.isEnabledFor(logging.DEBUG):
-            logger.debug('%s(%s) is processing %r', self.__class__.__name__, map_as_kwargs(self.__dict__), file)
+            attrs = {k: v for k, v in self.__dict__.items() if not k.startswith('_')}
+            logger.debug('%s(%s) is processing %r', self.__class__.__name__, map_as_kwargs(attrs), file)
         return file
 
 
@@ -89,7 +85,7 @@ class BundleProcessor(Processor):
 
     1) In your settings file:
     ...
-    PROCESSING_RULES = (
+    RULES = (
         {
             'test': '*.css',
             'processors': (
@@ -123,23 +119,24 @@ class BundleProcessor(Processor):
     ...
     <head>
         ...
-        <style>{{ context.bundles.css }}</style>
+        <style>{{ context.css }}</style>
         ...
     </head>
     ...
-    """
 
-    section = 'bundles'
+    Notice that all bundled files must be the same type (binary or text).
+    """
 
     def __init__(self, *, name: str, **kwargs) -> None:
         super().__init__(**kwargs)
-        if self.section not in context:
-            context[self.section] = defaultdict(str)
         self.name = name
 
     def process(self, file: FileLike) -> FileLike:
         file = super().process(file)
-        context[self.section][self.name] += file.contents
+        try:
+            context[self.name] += file.contents
+        except KeyError:
+            context[self.name] = file.contents
         return file
 
 
@@ -149,7 +146,7 @@ class ExternalProcessor(Processor):
     The file contents are sent to stdin of the process. Then captured stdout is assigned back to the file contents.
     For example, we would like to compress our JavaScript files that aren't compressed yet:
 
-    PROCESSING_RULES = (
+    RULES = (
         ...
         {
             'test': '*[!.min].js',
@@ -165,7 +162,7 @@ class ExternalProcessor(Processor):
                 {
                     'processor': 'gena.processors.FileNameProcessor',
                     'options': {
-                        'name': lambda file: f'{file.path.basename}.min.js',
+                        'name': '{file.path.basename}.min.js',
                     },
                 },
                 ...
@@ -202,7 +199,7 @@ class FileMetaProcessor(Processor):
     some callable which returns an iterable object.
     For example, we would like to make a slug from our article title for future use:
 
-    PROCESSING_RULES = (
+    RULES = (
         ...
         {
             'test': '*.md',
@@ -263,7 +260,7 @@ class FileNameProcessor(Processor):
 
     For example, we would like to change extensions of our markdown files (presumably after some markdown processing):
 
-    PROCESSING_RULES = (
+    RULES = (
         ...
         {
             'test': '*.md',
@@ -272,7 +269,7 @@ class FileNameProcessor(Processor):
                 {
                     'processor': 'gena.processors.FileNameProcessor',
                     'options': {
-                        'name': lambda file: f'{file.basename}.html',
+                        'name': '{file.basename}.html',
                     },
                 },
                 ...
@@ -294,7 +291,7 @@ class FileNameProcessor(Processor):
         if callable(self.name):
             file.path.name = self.name(file)
         else:
-            file.path.name = self.name
+            file.path.name = self.name.format(file=file)
         logger.debug('Renamed %r: "%s" to "%s"', file, old_name, file.path.name)
         return file
 
@@ -306,7 +303,7 @@ class GroupProcessor(Processor):
     to your articles.
     Let's look at the following rule:
 
-    PROCESSING_RULES = (
+    RULES = (
         ...
         {
             'test': '*.md',
@@ -325,95 +322,18 @@ class GroupProcessor(Processor):
     )
 
     According to this rule, all our markdown files will be part of the group named `articles` (now globally accessible
-    via context.groups['articles']).
+    via context.articles).
     Next, we can use this bunch of the files in some final job to generate an article list.
     Note that it's generally better to place GroupProcessor after SavingProcessor.
     """
 
     def __init__(self, *, name: str, **kwargs) -> None:
         super().__init__(**kwargs)
-        if 'groups' not in context:
-            context.groups = defaultdict(list)
-        self.name = name
+        self.group = context.add_item(name, [])
 
     def process(self, file: FileLike) -> FileLike:
         file = super().process(file)
-        context.groups[self.name].append(file)
-        return file
-
-
-class HTMLMinifierProcessor(TextProcessor):
-    """Minify HTML.
-
-    For example, we would like to minify the contents of our files that have been processed by MarkdownProcessor:
-
-    PROCESSING_RULES = (
-        ...
-        {
-            'test': '*.md',
-            'processors': (
-                ...
-                {'processor': 'gena.processors.MarkdownProcessor'},      # we do markdown processing first
-                ...
-                {'processor': 'gena.processors.HTMLMinifierProcessor'},  # then we run our minifier
-                ...
-            ),
-        },
-        ...
-    )
-
-    You can also customize the processing by using HTML_MINIFIER_OPTIONS in your settings.
-    """
-
-    def process(self, file: FileLike) -> FileLike:
-        file = super().process(file)
-        file.contents = html_minify(file.contents, **settings.HTML_MINIFIER_OPTIONS)
-        return file
-
-
-class Jinja2Processor(TextProcessor):
-    """Render Jinja2 templates.
-
-    There are several variables available in templates:
-    - the file contents
-    - all meta variables of the file
-    - all settings variables
-    For example, we would like to render our template named article.html:
-
-    PROCESSING_RULES = (
-        ...
-        {
-            'test': '*.md',
-            'processors': (
-                ...
-                {
-                    'processor': 'gena.processors.TemplateProcessor',
-                    'options': {
-                        'template': 'article.html',
-                    },
-                }
-                ...
-            ),
-        },
-        ...
-    )
-
-    The processor uses settings.TEMPLATE_DIRS to find templates. TEMPLATE_DIRS can be a string or a list of strings
-    if multiple locations are wanted.
-    """
-
-    def __init__(self, template: str, **kwargs) -> None:
-        super().__init__(**kwargs)
-
-        loader = jinja2.FileSystemLoader(searchpath=settings.TEMPLATE_DIRS)
-        environment = jinja2.Environment(loader=loader, **settings.JINJA2_OPTIONS)
-        self.template = environment.get_template(template)
-
-    def process(self, file: FileLike) -> FileLike:
-        file = super().process(file)
-        variables = {'context': context, 'contents': file.contents, **file.meta, **settings}
-        file.contents = self.template.render(variables)
-
+        self.group.append(file)
         return file
 
 
@@ -422,7 +342,7 @@ class MarkdownProcessor(TextProcessor):
 
     For example, we would like to convert all our markdown files:
 
-    PROCESSING_RULES = (
+    RULES = (
         ...
         {
             'test': '*.md',
@@ -456,11 +376,10 @@ class SavingProcessor(Processor):
 
     If `append` is True and there's already a file with the same name, then the contents are appended to
     the end of this existing file.
-    If `rename_directory` is True, then the file path is changed to settings.DST_DIR before the saving.
 
     A simple usage example:
 
-    PROCESSING_RULES = (
+    RULES = (
         ...
         {
             'test': '*.css',
@@ -473,7 +392,7 @@ class SavingProcessor(Processor):
 
     An example of bundling:
 
-    PROCESSING_RULES = (
+    RULES = (
         ...
         {
             'test': '*.css',
@@ -497,12 +416,16 @@ class SavingProcessor(Processor):
     """
 
     append = False
-    rename_directory = True
+    path = ''
 
     def process(self, file: FileLike) -> FileLike:
         file = super().process(file)
-        if self.rename_directory:
+        if not self.path:
             file.path.directory = settings.DST_DIR
+        elif callable(self.path):
+            file.path.path = self.path(file)
+        else:
+            file.path.path = self.path.format(file=file)
         file.save(append=self.append)
         return file
 
@@ -519,6 +442,59 @@ class StdoutProcessor(Processor):
         return file
 
 
+class TemplateProcessor(TextProcessor):
+    """Render templates.
+
+    There are several variables available in templates:
+    - the file contents
+    - all meta variables of the file
+    - all settings variables
+    For example, we would like to render our template named article.html:
+
+    RULES = (
+        ...
+        {
+            'test': '*.md',
+            'processors': (
+                ...
+                {
+                    'processor': 'gena.processors.TemplateProcessor',
+                    'options': {
+                        'template': 'article.html',
+                    },
+                }
+                ...
+            ),
+        },
+        ...
+    )
+
+    The processor uses settings.TEMPLATE_DIRS to find templates. TEMPLATE_DIRS can be a string or a list of strings
+    if multiple locations are wanted.
+
+    The default template engine is Jinja2.
+    """
+
+    def __init__(self, template: str, engine: Optional[TemplateEngine] = None, **kwargs) -> None:
+        super().__init__(**kwargs)
+        self.template = template
+        self.engine = engine or JinjaTemplateEngine()
+
+    def process(self, file: FileLike) -> FileLike:
+        file = super().process(file)
+        file.contents = self.engine.render(
+            self.template,
+            {
+                'context': context,
+                'contents': file.contents,
+                **file.meta,
+                **settings,
+            },
+        )
+
+        return file
+
+
 class TypeProcessor(Processor):
     """Change the file type."""
 
@@ -528,6 +504,3 @@ class TypeProcessor(Processor):
         file = super().process(file)
         file.type = self.type
         return file
-
-
-TemplateProcessor = Jinja2Processor  # this is simply an alias for Jinja2Processor

@@ -1,9 +1,10 @@
+import fnmatch
 import heapq
 import itertools
 import logging
 import os
+import re
 
-from fnmatch import fnmatch
 from typing import Iterable
 
 from gena import utils
@@ -56,52 +57,59 @@ def do_final_jobs():
 
 class FileRunner:
     def __init__(self):
-        default_file_factory = utils.import_attr(settings.DEFAULT_FILE_FACTORY)
-        default_file_factory = default_file_factory()
-
         rules = settings.RULES or settings.get('PROCESSING_RULES', ())
+
         if not rules:
-            logger.warning('No rules to process are found')
+            raise ValueError('no rules are found to process')
+
+        default_file_factory = utils.import_attr(settings.DEFAULT_FILE_FACTORY)
 
         self._rules = []
         for rule in rules:
+            if 'retest' in rule:
+                new_test = os.path.normcase(rule['retest'])
+                logger.debug('Got a rule for "%s"', rule['retest'])
+            else:
+                new_test = os.path.normcase(rule['test'])
+                new_test = fnmatch.translate(new_test)
+                logger.debug('Got a rule for "%s"', rule['test'])
+            new_test = re.compile(new_test).search
+
             new_processors = []
             for processor in rule['processors']:
                 new_processor = utils.import_attr(processor['processor'])
                 new_processor = new_processor(**processor.get('options', {}))
-                new_processors.append(new_processor)
+                new_processors.append(new_processor.process)
 
             if 'file_factory' in rule:
-                file_factory = utils.import_attr(rule['file_factory'])
-                file_factory = file_factory()
+                new_file_factory = utils.import_attr(rule['file_factory'])
             else:
-                file_factory = default_file_factory
+                new_file_factory = default_file_factory
 
             new_rule = {
-                'test': rule['test'],
+                'test': new_test,
                 'processors': new_processors,
-                'file_factory': file_factory,
-                'priority': rule.get('priority', settings.DEFAULT_PRIORITY)
+                'file_factory': new_file_factory,
+                'priority': rule.get('priority', settings.DEFAULT_PRIORITY),
             }
             self._rules.append(new_rule)
 
     def _get_paths(self):
-        for dirpath, _, filenames in os.walk(settings.SRC_DIR):
-            for filename in filenames:
-                yield (dirpath, filename)
+        for root, _, files in os.walk(settings.SRC_DIR):
+            for file in files:
+                yield os.path.join(root, file)
 
-    def _get_rule(self, test):
+    def _get_rule(self, path):
         for rule in self._rules:
-            if fnmatch(test, rule['test']):
+            if rule['test'](os.path.normcase(path)):
                 return rule
 
     def _get_tasks(self):
         counter = itertools.count()  # the counter is needed in situations when priorities are equal
         queue = []
 
-        for dirpath, filename in self._get_paths():
-            rule = self._get_rule(filename)
-            path = os.path.join(dirpath, filename)
+        for path in self._get_paths():
+            rule = self._get_rule(path)
             if rule:
                 file = rule['file_factory'](path)
                 task = (file, rule['processors'])
@@ -120,13 +128,16 @@ class FileRunner:
                     break
 
     def run(self):
+        if not self._rules:
+            return 0
+
         do_initial_jobs()
 
         file_counter = 0
         for file, processors in self._get_tasks():
             logger.info('Processing "%s"', file.path)
             for processor in processors:
-                file = processor.process(file)
+                file = processor(file)
             file_counter += 1
 
         do_final_jobs()

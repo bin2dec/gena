@@ -72,10 +72,16 @@ def main():
         help='show all messages'
     )
 
+    arg_parser.add_argument(
+        '--show-settings',
+        action='store_true',
+        help='show the settings',
+    )
+
     args = arg_parser.parse_args()
 
     if args.settings and os.path.exists(args.settings):
-        settings.load_from_module(args.settings)
+        settings.load_from_file(args.settings)
 
     if args.src is not None:
         settings.SRC_DIR = args.src
@@ -92,6 +98,13 @@ def main():
     if logger.isEnabledFor(logging.DEBUG):
         logger.debug('GenA %s', __version__)
         logger.debug('Python %s on %s', sysconfig.get_python_version(), sysconfig.get_platform())
+
+    for extra_settings in settings.EXTRA_SETTINGS:
+        logger.debug('Loading extra settings from "%s"', extra_settings)
+        settings.load_from_module(extra_settings)
+
+    if args.show_settings:
+        print(settings)
 
     try:
         runner = utils.import_attr(settings.RUNNER)
@@ -110,5 +123,5 @@ def main():
             print(f'Finished in {time() - start_time:.2f} sec. with {files} file(s) processed')
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()

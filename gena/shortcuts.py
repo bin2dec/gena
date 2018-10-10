@@ -48,7 +48,6 @@ __all__ = (
     'bundle',
     'filename',
     'group',
-    'html_minifier',
     'markdown',
     'meta_date',
     'meta_modified',
@@ -65,7 +64,7 @@ def bundle(name):
         'options': {
             'name': name,
         },
-    },
+    }
 
 
 def filename(name):
@@ -84,10 +83,6 @@ def group(name):
             'name': name,
         },
     }
-
-
-def html_minifier():
-    return {'processor': 'gena.processors.HTMLMinifierProcessor'}
 
 
 def markdown():
@@ -127,18 +122,25 @@ def meta_slug():
     }
 
 
-def save():
-    return {'processor': 'gena.processors.SavingProcessor'}
+def save(append=False, path=''):
+    return {
+        'processor': 'gena.processors.SavingProcessor',
+        'options': {
+            'append': append,
+            'path': path,
+        },
+    }
 
 
 def stdout():
     return {'processor': 'gena.processors.StdoutProcessor'}
 
 
-def template(name):
+def template(name, engine=None):
     return {
         'processor': 'gena.processors.TemplateProcessor',
         'options': {
             'template': name,
+            'engine': engine,
         },
     }
