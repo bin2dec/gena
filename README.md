@@ -3,11 +3,10 @@ GenA
 
 GenA is a universal static site generator. It's written in [Python](http://www.python.org/).
 
-
 Installation
 ------------
 
-GenA is currently under development, but it already has basic functionality. You can use it right now.
+GenA is currently under development, but it already has basic functionality. You can use it right now!
 Install the latest stable release
 
     pip install git+https://gitlab.com/dec0der/gena@master
@@ -15,7 +14,6 @@ Install the latest stable release
 Or if you are a developer, do
 
     git clone https://gitlab.com/dec0der/gena.git
-
 
 Usage
 -----
@@ -31,7 +29,6 @@ the *src* subdirectory, then you can run GenA like that:
 
 In this case, the processed files will be placed in the *dist* subdirectory.
 You can also set *source* and *destination* in your settings (*SRC_DIR* and *DST_DIR* respectively).
-
 
 Examples
 --------
