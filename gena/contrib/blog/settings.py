@@ -48,6 +48,13 @@ RULES = (
     },
 
     {
+        'retest': 'favicon\.(gif|ico|jpe?g|png|svg)$',
+        'processors': (
+            save(path=f'{settings.DST_DIR}/favicon.ico'),
+        ),
+    },
+
+    {
         'retest': f'{BLOG_IMAGES_ASSETS_DIR}/.*\.(bmp|gif|ico|jpe?g|png|svg|tiff?)$',
         'processors': (
             save(path=f'{settings.DST_DIR}/{BLOG_IMAGES_ASSETS_DIR}/{{file.path.name}}'),
