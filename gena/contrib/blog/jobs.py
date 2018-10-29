@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import logging
 
-from typing import Optional
+from typing import Optional, Sequence
 
 from gena.context import context
 from gena.files import File
@@ -20,14 +20,8 @@ __all__ = (
 logger = logging.getLogger(__name__)
 
 
-def build_main_page(template_engine: Optional[TemplateEngine] = None) -> None:
-    """Create a blog main page."""
-
-    try:
-        posts = context.blog_posts
-    except AttributeError:
-        logger.warning('no blog posts are found to build the main page')
-        return
+def save_posts(posts: Sequence, *, directory: str, template: str, template_engine: Optional[TemplateEngine] = None):
+    """Save a blog post list."""
 
     # Split blog posts up into groups depending on BLOG_POSTS_PER_PAGE
     if settings.BLOG_POSTS_PER_PAGE:
@@ -40,21 +34,34 @@ def build_main_page(template_engine: Optional[TemplateEngine] = None) -> None:
 
     groups_num = len(groups)
 
-    # Create a page for each blog post group (index.html...indexN.html)
+    # Create a page for each blog post group (index.html...indexN.html).
+    # Save this page into a given directory
     for i, group in enumerate(groups, start=1):
-        template_context = {'posts': group}
+        template_context = {'posts': group, **settings}
 
         if i == 1:  # the first page
             template_context['previous_page'] = None
-            file = File(settings.DST_DIR, 'index.html')
+            file = File(directory, 'index.html')
         else:
             template_context['previous_page'] = 'index.html' if i == 2 else f'index{i-1}.html'
-            file = File(settings.DST_DIR, f'index{i}.html')
+            file = File(directory, f'index{i}.html')
 
         if i == groups_num:  # the last page
             template_context['next_page'] = None
         else:
             template_context['next_page'] = f'index{i+1}.html'
 
-        file.contents = template_engine.render(settings.BLOG_MAIN_PAGE_TEMPLATE, template_context)
+        file.contents = template_engine.render(template, template_context)
         file.save()
+
+
+def build_main_page(template_engine: Optional[TemplateEngine] = None) -> None:
+    """Create a blog main page."""
+
+    try:
+        posts = context.blog_posts
+    except AttributeError:
+        logger.warning('no blog posts are found to build the main page')
+    else:
+        save_posts(posts, directory=settings.DST_DIR, template=settings.BLOG_MAIN_PAGE_TEMPLATE,
+                   template_engine=template_engine)
