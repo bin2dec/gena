@@ -5,12 +5,13 @@ from __future__ import annotations
 import re
 
 from dataclasses import dataclass
+from datetime import datetime
 from typing import Optional
 
 import lxml.html
 
 from gena.context import context
-from gena.files import FileLike, FileMetaValue
+from gena.files import FileLike
 from gena.processors import TextProcessor
 from gena.settings import settings
 
@@ -21,13 +22,22 @@ __all__ = (
 
 
 @dataclass()
-class Post:
-    author: FileMetaValue
-    date: FileMetaValue
+class BlogAuthor:
+    name: str
+
+
+@dataclass()
+class BlogPost:
+    authors: list
+    date: datetime
+    slug: str
     teaser: str
-    title: FileMetaValue
-    url: str
+    title: str
     contents: Optional[str] = None
+
+    @property
+    def url(self):
+        return f'/{settings.BLOG_POSTS_DIR}/{self.slug}/'
 
 
 class BlogPostProcessor(TextProcessor):
@@ -41,18 +51,22 @@ class BlogPostProcessor(TextProcessor):
     def process(self, file: FileLike) -> FileLike:
         file = super().process(file)
 
+        # authors
+        authors = [BlogAuthor(name=author) for author in file.meta.author]
+
+        # teaser
         body = lxml.html.fragment_fromstring(file.contents, 'body')
         body = lxml.html.tostring(body, encoding='unicode')
         teaser = self._teaser_regexp.split(body, maxsplit=1)[0]
         teaser = lxml.html.fromstring(teaser)
         teaser = lxml.html.tostring(teaser, encoding='unicode')
 
-        post = Post(
-            author=file.meta.author,
-            date=file.meta.date,
+        post = BlogPost(
+            authors=authors,
+            date=file.meta.date[0],
+            slug=file.meta.slug[0],
             teaser=teaser,
-            title=file.meta.title,
-            url=f'{settings.BLOG_POSTS_DIR}/{file.meta.slug}/',
+            title=file.meta.title[0],
         )
 
         if self.contents:
