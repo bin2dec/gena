@@ -16,6 +16,7 @@ from gena.templating import JinjaTemplateEngine, TemplateEngine
 __all__ = (
     'build_author_archive',
     'build_main_page',
+    'build_tag_archive',
 )
 
 
@@ -93,3 +94,29 @@ def build_main_page(template_engine: Optional[TemplateEngine] = None) -> None:
     else:
         save_posts(posts, directory=settings.DST_DIR, template=settings.BLOG_MAIN_PAGE_TEMPLATE,
                    template_engine=template_engine)
+
+
+def build_tag_archive(template_engine: Optional[TemplateEngine] = None) -> None:
+    """Create a tag archive."""
+
+    try:
+        posts = context.blog_posts
+    except AttributeError:
+        logger.warning('no blog posts are found to build the tag archive')
+        return
+
+    tags = defaultdict(list)
+    for post in posts:
+        for tag in post.tags:
+            tags[tag].append(post)
+
+    if template_engine is None:
+        template_engine = JinjaTemplateEngine()
+
+    tag_list = File(settings.DST_DIR, settings.BLOG_TAGS_DIR, 'index.html')
+    tag_list.contents = template_engine.render(settings.BLOG_TAG_LIST_TEMPLATE, {'tags': tags, **settings})
+    tag_list.save()
+
+    for tag, posts in tags.items():
+        save_posts(posts, directory=f'{settings.DST_DIR}/{settings.BLOG_TAGS_DIR}/{tag}',
+                   template=settings.BLOG_TAG_DETAIL_TEMPLATE, template_engine=template_engine)

@@ -15,16 +15,20 @@ BLOG_JS_ASSETS_DIR = getattr(settings, 'BLOG_JS_ASSETS_DIR', f'{BLOG_ASSETS_ROOT
 BLOG_AUTHORS_DIR = getattr(settings, 'BLOG_AUTHORS_DIR', 'authors')
 BLOG_PAGES_DIR = getattr(settings, 'BLOG_PAGES_DIR', 'pages')
 BLOG_POSTS_DIR = getattr(settings, 'BLOG_POSTS_DIR', 'posts')
+BLOG_TAGS_DIR = getattr(settings, 'BLOG_TAGS_DIR', 'tags')
 
 
 # Templates
+BLOG_AUTHOR_DETAIL_TEMPLATE = getattr(settings, 'BLOG_AUTHOR_DETAIL_TEMPLATE', 'author_detail.html')
+BLOG_AUTHOR_LIST_TEMPLATE = getattr(settings, 'BLOG_AUTHOR_LIST_TEMPLATE', 'author_list.html')
+
 BLOG_MAIN_PAGE_TEMPLATE = getattr(settings, 'BLOG_MAIN_PAGE_TEMPLATE', 'main.html')
 
 BLOG_PAGE_TEMPLATE = getattr(settings, 'BLOG_PAGE_TEMPLATE', 'page.html')
 BLOG_POST_TEMPLATE = getattr(settings, 'BLOG_POST_TEMPLATE', 'post.html')
 
-BLOG_AUTHOR_DETAIL_TEMPLATE = getattr(settings, 'BLOG_AUTHOR_DETAIL_TEMPLATE', 'author_detail.html')
-BLOG_AUTHOR_LIST_TEMPLATE = getattr(settings, 'BLOG_AUTHOR_LIST_TEMPLATE', 'author_list.html')
+BLOG_TAG_DETAIL_TEMPLATE = getattr(settings, 'BLOG_TAG_DETAIL_TEMPLATE', 'tag_detail.html')
+BLOG_TAG_LIST_TEMPLATE = getattr(settings, 'BLOG_TAG_LIST_TEMPLATE', 'tag_list.html')
 
 
 # Context
@@ -111,6 +115,16 @@ if getattr(settings, 'BLOG_AUTHOR_ARCHIVE', True):
     FINAL_JOBS += (
         {
             'job': 'gena.contrib.blog.jobs.build_author_archive',
+            'options': {
+                'template_engine': _template_engine,
+            },
+        },
+    )
+
+if getattr(settings, 'BLOG_TAG_ARCHIVE', True):
+    FINAL_JOBS += (
+        {
+            'job': 'gena.contrib.blog.jobs.build_tag_archive',
             'options': {
                 'template_engine': _template_engine,
             },

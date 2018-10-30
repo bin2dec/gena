@@ -38,6 +38,7 @@ class BlogPost:
     authors: list
     date: datetime
     slug: str
+    tags: list
     teaser: str
     title: str
     contents: Optional[str] = None
@@ -45,6 +46,18 @@ class BlogPost:
     @property
     def url(self):
         return f'/{settings.BLOG_POSTS_DIR}/{self.slug}/'
+
+
+@dataclass(unsafe_hash=True)
+class BlogTag:
+    name: str
+
+    def __str__(self):
+        return self.name
+
+    @property
+    def url(self):
+        return f'/{settings.BLOG_TAGS_DIR}/{self.name}/'
 
 
 class BlogPostProcessor(TextProcessor):
@@ -61,6 +74,9 @@ class BlogPostProcessor(TextProcessor):
         # authors
         authors = [BlogAuthor(name=author) for author in file.meta.author]
 
+        # tags
+        tags = [BlogTag(name=tag) for tag in file.meta.get('tags', ())]
+
         # teaser
         body = lxml.html.fragment_fromstring(file.contents, 'body')
         body = lxml.html.tostring(body, encoding='unicode')
@@ -72,6 +88,7 @@ class BlogPostProcessor(TextProcessor):
             authors=authors,
             date=file.meta.date[0],
             slug=file.meta.slug[0],
+            tags=tags,
             teaser=teaser,
             title=file.meta.title[0],
         )
