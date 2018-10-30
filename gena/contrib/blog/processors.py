@@ -6,7 +6,7 @@ import re
 
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Optional
+from typing import Optional, Sequence
 
 import lxml.html
 
@@ -35,10 +35,10 @@ class BlogAuthor:
 
 @dataclass()
 class BlogPost:
-    authors: list
+    authors: Sequence[BlogAuthor]
     date: datetime
     slug: str
-    tags: list
+    tags: Sequence[BlogTag]
     teaser: str
     title: str
     contents: Optional[str] = None
