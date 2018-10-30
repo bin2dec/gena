@@ -72,7 +72,7 @@ class BlogPostProcessor(TextProcessor):
         file = super().process(file)
 
         # authors
-        authors = [BlogAuthor(name=author) for author in file.meta.author]
+        authors = [BlogAuthor(name=author) for author in file.meta.get('author', ())]
 
         # tags
         tags = [BlogTag(name=tag) for tag in file.meta.get('tags', ())]
