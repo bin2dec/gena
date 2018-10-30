@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import logging
 
+from collections import defaultdict
 from typing import Optional, Sequence
 
 from gena.context import context
@@ -13,6 +14,7 @@ from gena.templating import JinjaTemplateEngine, TemplateEngine
 
 
 __all__ = (
+    'build_author_archive',
     'build_main_page',
 )
 
@@ -53,6 +55,32 @@ def save_posts(posts: Sequence, *, directory: str, template: str, template_engin
 
         file.contents = template_engine.render(template, template_context)
         file.save()
+
+
+def build_author_archive(template_engine: Optional[TemplateEngine] = None) -> None:
+    """Create an author archive."""
+
+    try:
+        posts = context.blog_posts
+    except AttributeError:
+        logger.warning('no blog posts are found to build the author archive')
+        return
+
+    authors = defaultdict(list)
+    for post in posts:
+        for author in post.authors:
+            authors[author].append(post)
+
+    if template_engine is None:
+        template_engine = JinjaTemplateEngine()
+
+    author_list = File(settings.DST_DIR, settings.BLOG_AUTHORS_DIR, 'index.html')
+    author_list.contents = template_engine.render(settings.BLOG_AUTHOR_LIST_TEMPLATE, {'authors': authors, **settings})
+    author_list.save()
+
+    for author, posts in authors.items():
+        save_posts(posts, directory=f'{settings.DST_DIR}/{settings.BLOG_AUTHORS_DIR}/{author}',
+                   template=settings.BLOG_AUTHOR_DETAIL_TEMPLATE, template_engine=template_engine)
 
 
 def build_main_page(template_engine: Optional[TemplateEngine] = None) -> None:

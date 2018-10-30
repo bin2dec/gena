@@ -21,9 +21,16 @@ __all__ = (
 )
 
 
-@dataclass()
+@dataclass(unsafe_hash=True)
 class BlogAuthor:
     name: str
+
+    def __str__(self):
+        return self.name
+
+    @property
+    def url(self):
+        return f'/{settings.BLOG_AUTHORS_DIR}/{self.name}/'
 
 
 @dataclass()
