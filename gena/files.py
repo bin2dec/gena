@@ -106,7 +106,7 @@ class FilePathLike(os.PathLike):
         pass
 
     @abstractmethod
-    def copy(self) -> FilePath:
+    def copy(self) -> FilePathLike:
         pass
 
 
