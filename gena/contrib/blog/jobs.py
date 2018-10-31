@@ -81,7 +81,7 @@ def build_author_archive(template_engine: Optional[TemplateEngine] = None) -> No
     author_list.save()
 
     for author, posts in authors.items():
-        save_posts(posts, directory=f'{settings.DST_DIR}/{settings.BLOG_AUTHORS_DIR}/{author}',
+        save_posts(posts, directory=f'{settings.DST_DIR}/{settings.BLOG_AUTHORS_DIR}/{author.slug}',
                    template=settings.BLOG_AUTHOR_DETAIL_TEMPLATE, template_engine=template_engine)
 
 
@@ -105,7 +105,7 @@ def build_category_archive(template_engine: Optional[TemplateEngine] = None) -> 
     category_list.save()
 
     for category, posts in categories.items():
-        save_posts(posts, directory=f'{settings.DST_DIR}/{settings.BLOG_CATEGORIES_DIR}/{category}',
+        save_posts(posts, directory=f'{settings.DST_DIR}/{settings.BLOG_CATEGORIES_DIR}/{category.slug}',
                    template=settings.BLOG_CATEGORY_DETAIL_TEMPLATE, template_engine=template_engine)
 
 
@@ -143,5 +143,5 @@ def build_tag_archive(template_engine: Optional[TemplateEngine] = None) -> None:
     tag_list.save()
 
     for tag, posts in tags.items():
-        save_posts(posts, directory=f'{settings.DST_DIR}/{settings.BLOG_TAGS_DIR}/{tag}',
+        save_posts(posts, directory=f'{settings.DST_DIR}/{settings.BLOG_TAGS_DIR}/{tag.slug}',
                    template=settings.BLOG_TAG_DETAIL_TEMPLATE, template_engine=template_engine)

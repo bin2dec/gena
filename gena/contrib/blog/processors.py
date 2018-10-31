@@ -10,6 +10,8 @@ from typing import Optional, Sequence
 
 import lxml.html
 
+from slugify import slugify
+
 from gena.context import context
 from gena.files import FileLike
 from gena.processors import TextProcessor
@@ -29,8 +31,12 @@ class BlogAuthor:
         return self.name
 
     @property
+    def slug(self):
+        return slugify(self.name)
+
+    @property
     def url(self):
-        return f'/{settings.BLOG_AUTHORS_DIR}/{self.name}/'
+        return f'/{settings.BLOG_AUTHORS_DIR}/{self.slug}/'
 
 
 @dataclass(unsafe_hash=True)
@@ -41,8 +47,12 @@ class BlogCategory:
         return self.name
 
     @property
+    def slug(self):
+        return slugify(self.name)
+
+    @property
     def url(self):
-        return f'/{settings.BLOG_CATEGORIES_DIR}/{self.name}/'
+        return f'/{settings.BLOG_CATEGORIES_DIR}/{self.slug}/'
 
 
 @dataclass(unsafe_hash=True)
@@ -53,8 +63,12 @@ class BlogTag:
         return self.name
 
     @property
+    def slug(self):
+        return slugify(self.name)
+
+    @property
     def url(self):
-        return f'/{settings.BLOG_TAGS_DIR}/{self.name}/'
+        return f'/{settings.BLOG_TAGS_DIR}/{self.slug}/'
 
 
 @dataclass()
