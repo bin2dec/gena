@@ -33,19 +33,16 @@ class BlogAuthor:
         return f'/{settings.BLOG_AUTHORS_DIR}/{self.name}/'
 
 
-@dataclass()
-class BlogPost:
-    authors: Sequence[BlogAuthor]
-    date: datetime
-    slug: str
-    tags: Sequence[BlogTag]
-    teaser: str
-    title: str
-    contents: Optional[str] = None
+@dataclass(unsafe_hash=True)
+class BlogCategory:
+    name: str
+
+    def __str__(self):
+        return self.name
 
     @property
     def url(self):
-        return f'/{settings.BLOG_POSTS_DIR}/{self.slug}/'
+        return f'/{settings.BLOG_CATEGORIES_DIR}/{self.name}/'
 
 
 @dataclass(unsafe_hash=True)
@@ -58,6 +55,22 @@ class BlogTag:
     @property
     def url(self):
         return f'/{settings.BLOG_TAGS_DIR}/{self.name}/'
+
+
+@dataclass()
+class BlogPost:
+    authors: Sequence[BlogAuthor]
+    category: BlogCategory
+    date: datetime
+    slug: str
+    tags: Sequence[BlogTag]
+    teaser: str
+    title: str
+    contents: Optional[str] = None
+
+    @property
+    def url(self):
+        return f'/{settings.BLOG_POSTS_DIR}/{self.slug}/'
 
 
 class BlogPostProcessor(TextProcessor):
@@ -74,6 +87,9 @@ class BlogPostProcessor(TextProcessor):
         # authors
         authors = [BlogAuthor(name=author) for author in file.meta.get('authors', ())]
 
+        # category
+        category = BlogCategory(name=str(file.meta.get('category', '')))
+
         # tags
         tags = [BlogTag(name=tag) for tag in file.meta.get('tags', ())]
 
@@ -86,6 +102,7 @@ class BlogPostProcessor(TextProcessor):
 
         post = BlogPost(
             authors=authors,
+            category=category,
             date=file.meta.date[0],
             slug=file.meta.slug[0],
             tags=tags,

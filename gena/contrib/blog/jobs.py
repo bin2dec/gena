@@ -15,6 +15,7 @@ from gena.templating import JinjaTemplateEngine, TemplateEngine
 
 __all__ = (
     'build_author_archive',
+    'build_category_archive',
     'build_main_page',
     'build_tag_archive',
 )
@@ -82,6 +83,30 @@ def build_author_archive(template_engine: Optional[TemplateEngine] = None) -> No
     for author, posts in authors.items():
         save_posts(posts, directory=f'{settings.DST_DIR}/{settings.BLOG_AUTHORS_DIR}/{author}',
                    template=settings.BLOG_AUTHOR_DETAIL_TEMPLATE, template_engine=template_engine)
+
+
+def build_category_archive(template_engine: Optional[TemplateEngine] = None) -> None:
+    """Create a category archive."""
+
+    try:
+        posts = context.blog_posts
+    except AttributeError:
+        logger.warning('no blog posts are found to build the category archive')
+        return
+
+    categories = defaultdict(list)
+    for post in posts:
+        if post.category:
+            categories[post.category].append(post)
+
+    category_list = File(settings.DST_DIR, settings.BLOG_CATEGORIES_DIR, 'index.html')
+    category_list.contents = template_engine.render(settings.BLOG_CATEGORY_LIST_TEMPLATE,
+                                                    {'categories': categories, **settings})
+    category_list.save()
+
+    for category, posts in categories.items():
+        save_posts(posts, directory=f'{settings.DST_DIR}/{settings.BLOG_CATEGORIES_DIR}/{category}',
+                   template=settings.BLOG_CATEGORY_DETAIL_TEMPLATE, template_engine=template_engine)
 
 
 def build_main_page(template_engine: Optional[TemplateEngine] = None) -> None:
