@@ -26,15 +26,15 @@ __all__ = (
 class BlogAuthor:
     name: str
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.name
 
     @property
-    def slug(self):
+    def slug(self) -> str:
         return slugify(self.name)
 
     @property
-    def url(self):
+    def url(self) -> str:
         return f'/{settings.BLOG_AUTHORS_DIR}/{self.slug}/'
 
 
@@ -42,15 +42,15 @@ class BlogAuthor:
 class BlogCategory:
     name: str
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.name
 
     @property
-    def slug(self):
+    def slug(self) -> str:
         return slugify(self.name)
 
     @property
-    def url(self):
+    def url(self) -> str:
         return f'/{settings.BLOG_CATEGORIES_DIR}/{self.slug}/'
 
 
@@ -58,15 +58,15 @@ class BlogCategory:
 class BlogTag:
     name: str
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.name
 
     @property
-    def slug(self):
+    def slug(self) -> str:
         return slugify(self.name)
 
     @property
-    def url(self):
+    def url(self) -> str:
         return f'/{settings.BLOG_TAGS_DIR}/{self.slug}/'
 
 
@@ -90,7 +90,7 @@ class BlogPost:
         return teaser
 
     @property
-    def url(self):
+    def url(self) -> str:
         return f'/{settings.BLOG_POSTS_DIR}/{self.slug}/'
 
     @staticmethod
