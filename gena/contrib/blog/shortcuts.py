@@ -5,10 +5,10 @@ __all__ = (
 )
 
 
-def blog_post(contents=False):
+def blog_post(template_engine=None):
     return {
         'processor': 'gena.contrib.blog.processors.BlogPostProcessor',
         'options': {
-            'contents': contents,
+            'template_engine': template_engine,
         },
     }
