@@ -6,7 +6,7 @@ import lxml.html
 
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Optional, Sequence
+from typing import Sequence
 
 from slugify import slugify
 
@@ -74,19 +74,19 @@ class BlogTag:
 class BlogPost:
     authors: Sequence[BlogAuthor]
     category: BlogCategory
+    contents: str
     date: datetime
     slug: str
     tags: Sequence[BlogTag]
     teaser: str
     title: str
-    contents: Optional[str] = None
 
     @property
     def url(self):
         return f'/{settings.BLOG_POSTS_DIR}/{self.slug}/'
 
     @staticmethod
-    def from_file(file: FileLike, store_contents: bool = False) -> BlogPost:
+    def from_file(file: FileLike) -> BlogPost:
         # authors
         authors = [BlogAuthor(name=author) for author in file.meta.get('authors', ())]
 
@@ -106,14 +106,12 @@ class BlogPost:
         post = BlogPost(
             authors=authors,
             category=category,
+            contents=file.contents,
             date=file.meta.date[0],
             slug=file.meta.slug[0],
             tags=tags,
             teaser=teaser,
             title=file.meta.title[0],
         )
-
-        if store_contents:
-            post.contents = file.contents
 
         return post

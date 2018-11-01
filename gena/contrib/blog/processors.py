@@ -26,7 +26,7 @@ class BlogPostProcessor(TextProcessor):
     def process(self, file: FileLike) -> FileLike:
         file = super().process(file)
 
-        post = BlogPost.from_file(file, True)
+        post = BlogPost.from_file(file)
         self._posts.append(post)
 
         file.contents = self.template_engine.render(settings.BLOG_POST_TEMPLATE, {'post': post, **settings})
