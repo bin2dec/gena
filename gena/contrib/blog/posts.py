@@ -78,8 +78,16 @@ class BlogPost:
     date: datetime
     slug: str
     tags: Sequence[BlogTag]
-    teaser: str
     title: str
+
+    @property
+    def teaser(self) -> str:
+        body = lxml.html.fragment_fromstring(self.contents, 'body')
+        body = lxml.html.tostring(body, encoding='unicode')
+        teaser = re.split(settings.BLOG_TEASER_REGEXP, body, maxsplit=1)[0]
+        teaser = lxml.html.fromstring(teaser)
+        teaser = lxml.html.tostring(teaser, encoding='unicode')
+        return teaser
 
     @property
     def url(self):
@@ -87,21 +95,9 @@ class BlogPost:
 
     @staticmethod
     def from_file(file: FileLike) -> BlogPost:
-        # authors
         authors = [BlogAuthor(name=author) for author in file.meta.get('authors', ())]
-
-        # category
         category = BlogCategory(name=str(file.meta.get('category', '')))
-
-        # tags
         tags = [BlogTag(name=tag) for tag in file.meta.get('tags', ())]
-
-        # teaser
-        body = lxml.html.fragment_fromstring(file.contents, 'body')
-        body = lxml.html.tostring(body, encoding='unicode')
-        teaser = re.split(settings.BLOG_TEASER_REGEXP, body, maxsplit=1)[0]
-        teaser = lxml.html.fromstring(teaser)
-        teaser = lxml.html.tostring(teaser, encoding='unicode')
 
         post = BlogPost(
             authors=authors,
@@ -110,7 +106,6 @@ class BlogPost:
             date=file.meta.date[0],
             slug=file.meta.slug[0],
             tags=tags,
-            teaser=teaser,
             title=file.meta.title[0],
         )
 
