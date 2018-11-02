@@ -12,11 +12,11 @@ BLOG_CSS_ASSETS_DIR = getattr(settings, 'BLOG_CSS_ASSETS_DIR', f'{BLOG_ASSETS_RO
 BLOG_IMAGES_ASSETS_DIR = getattr(settings, 'BLOG_IMAGES_ASSETS_DIR', f'{BLOG_ASSETS_ROOT}/images')
 BLOG_JS_ASSETS_DIR = getattr(settings, 'BLOG_JS_ASSETS_DIR', f'{BLOG_ASSETS_ROOT}/js')
 
-BLOG_AUTHORS_DIR = getattr(settings, 'BLOG_AUTHORS_DIR', 'authors')
-BLOG_CATEGORIES_DIR = getattr(settings, 'BLOG_CATEGORIES_DIR', 'categories')
+BLOG_AUTHOR_ARCHIVE_DIR = getattr(settings, 'BLOG_AUTHOR_ARCHIVE_DIR', 'authors')
+BLOG_CATEGORY_ARCHIVE_DIR = getattr(settings, 'BLOG_CATEGORY_ARCHIVE_DIR', 'categories')
 BLOG_PAGES_DIR = getattr(settings, 'BLOG_PAGES_DIR', 'pages')
 BLOG_POSTS_DIR = getattr(settings, 'BLOG_POSTS_DIR', 'posts')
-BLOG_TAGS_DIR = getattr(settings, 'BLOG_TAGS_DIR', 'tags')
+BLOG_TAG_ARCHIVE_DIR = getattr(settings, 'BLOG_TAG_ARCHIVE_DIR', 'tags')
 
 
 # Templates

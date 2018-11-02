@@ -76,12 +76,12 @@ def build_author_archive(template_engine: Optional[TemplateEngine] = None) -> No
         for author in post.authors:
             authors[author].append(post)
 
-    author_list = File(settings.DST_DIR, settings.BLOG_AUTHORS_DIR, 'index.html')
+    author_list = File(settings.DST_DIR, settings.BLOG_AUTHOR_ARCHIVE_DIR, 'index.html')
     author_list.contents = template_engine.render(settings.BLOG_AUTHOR_LIST_TEMPLATE, {'authors': authors, **settings})
     author_list.save()
 
     for author, posts in authors.items():
-        save_posts(posts, directory=f'{settings.DST_DIR}/{settings.BLOG_AUTHORS_DIR}/{author.slug}',
+        save_posts(posts, directory=f'{settings.DST_DIR}/{settings.BLOG_AUTHOR_ARCHIVE_DIR}/{author.slug}',
                    template=settings.BLOG_AUTHOR_DETAIL_TEMPLATE, template_engine=template_engine)
 
 
@@ -99,13 +99,13 @@ def build_category_archive(template_engine: Optional[TemplateEngine] = None) -> 
         if post.category:
             categories[post.category].append(post)
 
-    category_list = File(settings.DST_DIR, settings.BLOG_CATEGORIES_DIR, 'index.html')
+    category_list = File(settings.DST_DIR, settings.BLOG_CATEGORY_ARCHIVE_DIR, 'index.html')
     category_list.contents = template_engine.render(settings.BLOG_CATEGORY_LIST_TEMPLATE,
                                                     {'categories': categories, **settings})
     category_list.save()
 
     for category, posts in categories.items():
-        save_posts(posts, directory=f'{settings.DST_DIR}/{settings.BLOG_CATEGORIES_DIR}/{category.slug}',
+        save_posts(posts, directory=f'{settings.DST_DIR}/{settings.BLOG_CATEGORY_ARCHIVE_DIR}/{category.slug}',
                    template=settings.BLOG_CATEGORY_DETAIL_TEMPLATE, template_engine=template_engine)
 
 
@@ -138,10 +138,10 @@ def build_tag_archive(template_engine: Optional[TemplateEngine] = None) -> None:
         for tag in post.tags:
             tags[tag].append(post)
 
-    tag_list = File(settings.DST_DIR, settings.BLOG_TAGS_DIR, 'index.html')
+    tag_list = File(settings.DST_DIR, settings.BLOG_TAG_ARCHIVE_DIR, 'index.html')
     tag_list.contents = template_engine.render(settings.BLOG_TAG_LIST_TEMPLATE, {'tags': tags, **settings})
     tag_list.save()
 
     for tag, posts in tags.items():
-        save_posts(posts, directory=f'{settings.DST_DIR}/{settings.BLOG_TAGS_DIR}/{tag.slug}',
+        save_posts(posts, directory=f'{settings.DST_DIR}/{settings.BLOG_TAG_ARCHIVE_DIR}/{tag.slug}',
                    template=settings.BLOG_TAG_DETAIL_TEMPLATE, template_engine=template_engine)
