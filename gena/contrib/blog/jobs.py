@@ -27,14 +27,14 @@ logger = logging.getLogger(__name__)
 def save_posts(posts: Sequence, *, directory: str, template: str, template_engine: Optional[TemplateEngine] = None):
     """Save a blog post list."""
 
+    if template_engine is None:
+        template_engine = JinjaTemplateEngine()
+
     # Split blog posts up into groups depending on BLOG_POSTS_PER_PAGE
     if settings.BLOG_POSTS_PER_PAGE:
         groups = [posts[i:i+settings.BLOG_POSTS_PER_PAGE] for i in range(0, len(posts), settings.BLOG_POSTS_PER_PAGE)]
     else:  # BLOG_POSTS_PER_PAGE = 0
         groups = [posts]
-
-    if template_engine is None:
-        template_engine = JinjaTemplateEngine()
 
     groups_num = len(groups)
 
@@ -68,13 +68,13 @@ def build_author_archive(template_engine: Optional[TemplateEngine] = None) -> No
         logger.warning('no blog posts are found to build the author archive')
         return
 
+    if template_engine is None:
+        template_engine = JinjaTemplateEngine()
+
     authors = defaultdict(list)
     for post in posts:
         for author in post.authors:
             authors[author].append(post)
-
-    if template_engine is None:
-        template_engine = JinjaTemplateEngine()
 
     author_list = File(settings.DST_DIR, settings.BLOG_AUTHORS_DIR, 'index.html')
     author_list.contents = template_engine.render(settings.BLOG_AUTHOR_LIST_TEMPLATE, {'authors': authors, **settings})
@@ -130,13 +130,13 @@ def build_tag_archive(template_engine: Optional[TemplateEngine] = None) -> None:
         logger.warning('no blog posts are found to build the tag archive')
         return
 
+    if template_engine is None:
+        template_engine = JinjaTemplateEngine()
+
     tags = defaultdict(list)
     for post in posts:
         for tag in post.tags:
             tags[tag].append(post)
-
-    if template_engine is None:
-        template_engine = JinjaTemplateEngine()
 
     tag_list = File(settings.DST_DIR, settings.BLOG_TAGS_DIR, 'index.html')
     tag_list.contents = template_engine.render(settings.BLOG_TAG_LIST_TEMPLATE, {'tags': tags, **settings})
