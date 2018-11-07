@@ -13,11 +13,11 @@ BLOG_IMAGES_ASSETS_DIR = getattr(settings, 'BLOG_IMAGES_ASSETS_DIR', f'{BLOG_ASS
 BLOG_JS_ASSETS_DIR = getattr(settings, 'BLOG_JS_ASSETS_DIR', f'{BLOG_ASSETS_ROOT}/js')
 
 BLOG_ARCHIVE_DIR = getattr(settings, 'BLOG_ARCHIVE_DIR', 'archive')
-BLOG_AUTHOR_ARCHIVE_DIR = getattr(settings, 'BLOG_AUTHOR_ARCHIVE_DIR', 'authors')
-BLOG_CATEGORY_ARCHIVE_DIR = getattr(settings, 'BLOG_CATEGORY_ARCHIVE_DIR', 'categories')
+BLOG_AUTHORS_DIR = getattr(settings, 'BLOG_AUTHORS_DIR', 'authors')
+BLOG_CATEGORIES_DIR = getattr(settings, 'BLOG_CATEGORIES_DIR', 'categories')
 BLOG_PAGES_DIR = getattr(settings, 'BLOG_PAGES_DIR', 'pages')
 BLOG_POSTS_DIR = getattr(settings, 'BLOG_POSTS_DIR', 'posts')
-BLOG_TAG_ARCHIVE_DIR = getattr(settings, 'BLOG_TAG_ARCHIVE_DIR', 'tags')
+BLOG_TAGS_DIR = getattr(settings, 'BLOG_TAGS_DIR', 'tags')
 
 
 # Templates
@@ -129,30 +129,30 @@ if getattr(settings, 'BLOG_ARCHIVE', True):
         },
     )
 
-if getattr(settings, 'BLOG_AUTHOR_ARCHIVE', True):
+if getattr(settings, 'BLOG_AUTHORS', True):
     FINAL_JOBS += (
         {
-            'job': 'gena.contrib.blog.jobs.build_author_archive',
+            'job': 'gena.contrib.blog.jobs.build_authors',
             'options': {
                 'template_engine': _template_engine,
             },
         },
     )
 
-if getattr(settings, 'BLOG_CATEGORY_ARCHIVE', True):
+if getattr(settings, 'BLOG_CATEGORIES', True):
     FINAL_JOBS += (
         {
-            'job': 'gena.contrib.blog.jobs.build_category_archive',
+            'job': 'gena.contrib.blog.jobs.build_categories',
             'options': {
                 'template_engine': _template_engine,
             },
         },
     )
 
-if getattr(settings, 'BLOG_TAG_ARCHIVE', True):
+if getattr(settings, 'BLOG_TAGS', True):
     FINAL_JOBS += (
         {
-            'job': 'gena.contrib.blog.jobs.build_tag_archive',
+            'job': 'gena.contrib.blog.jobs.build_tags',
             'options': {
                 'template_engine': _template_engine,
             },

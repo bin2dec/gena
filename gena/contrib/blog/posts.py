@@ -35,7 +35,7 @@ class BlogAuthor:
 
     @property
     def url(self) -> str:
-        return f'/{settings.BLOG_AUTHOR_ARCHIVE_DIR}/{self.slug}/'
+        return f'/{settings.BLOG_AUTHORS_DIR}/{self.slug}/'
 
 
 @dataclass(unsafe_hash=True)
@@ -51,7 +51,7 @@ class BlogCategory:
 
     @property
     def url(self) -> str:
-        return f'/{settings.BLOG_CATEGORY_ARCHIVE_DIR}/{self.slug}/'
+        return f'/{settings.BLOG_CATEGORIES_DIR}/{self.slug}/'
 
 
 @dataclass(unsafe_hash=True)
@@ -67,7 +67,7 @@ class BlogTag:
 
     @property
     def url(self) -> str:
-        return f'/{settings.BLOG_TAG_ARCHIVE_DIR}/{self.slug}/'
+        return f'/{settings.BLOG_TAGS_DIR}/{self.slug}/'
 
 
 @dataclass()
