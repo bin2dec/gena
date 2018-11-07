@@ -5,7 +5,7 @@ from __future__ import annotations
 import logging
 
 from collections import defaultdict
-from typing import Optional, Sequence
+from typing import Mapping, Optional, Sequence
 
 from gena.context import context
 from gena.files import File
@@ -24,11 +24,15 @@ __all__ = (
 logger = logging.getLogger(__name__)
 
 
-def save_posts(posts: Sequence, *, directory: str, template: str, template_engine: Optional[TemplateEngine] = None):
+def save_posts(posts: Sequence, *, directory: str, template: str, template_engine: Optional[TemplateEngine] = None,
+               extra_context: Optional[Mapping] = None):
     """Save a blog post list."""
 
     if template_engine is None:
         template_engine = JinjaTemplateEngine()
+
+    if extra_context is None:
+        extra_context = {}
 
     # Split blog posts up into groups depending on BLOG_POSTS_PER_PAGE
     if settings.BLOG_POSTS_PER_PAGE:
@@ -41,7 +45,7 @@ def save_posts(posts: Sequence, *, directory: str, template: str, template_engin
     # Create a page for each blog post group (index.html...indexN.html).
     # Save this page into a given directory
     for i, group in enumerate(groups, start=1):
-        template_context = {'posts': group, **settings}
+        template_context = {'posts': group, **extra_context, **settings}
 
         if i == 1:  # the first page
             template_context['previous_page'] = None
