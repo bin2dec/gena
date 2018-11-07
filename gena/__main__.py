@@ -1,3 +1,5 @@
+"""GenA is a universal static site generator."""
+
 import logging
 import os.path
 import sys
@@ -16,6 +18,8 @@ logger = logging.getLogger(__name__)
 
 
 class HTTPRequestHandler(SimpleHTTPRequestHandler):
+    """Serves files from the current directory and below, directly mapping the directory structure to HTTP requests."""
+
     error_logging = False
     request_logging = True
 
@@ -23,18 +27,23 @@ class HTTPRequestHandler(SimpleHTTPRequestHandler):
         super().__init__(*args, directory=settings.DST_DIR, **kwargs)
 
     def log_error(self, format, *args):
+        """Logs an error when a request cannot be fulfilled."""
         if self.error_logging:
             super().log_error(format, *args)
 
     def log_message(self, format, *args):
+        """Logs an arbitrary message."""
         logger.debug('%s', format % args)
 
     def log_request(self, code='-', size='-'):
+        """Logs an accepted (successful) request."""
         if self.request_logging:
             super().log_request(code, size)
 
 
 def _build(args):
+    """Build a project."""
+
     if args.src is not None:
         settings.SRC_DIR = args.src
 
@@ -59,6 +68,8 @@ def _build(args):
 
 
 def _run(args):
+    """Run a simple HTTP server to serve files from the destination directory."""
+
     if args.src is not None:
         settings.SRC_DIR = args.src
 
