@@ -36,6 +36,9 @@ def save_posts(posts: Sequence, *, directory: str, template: str, template_engin
     if extra_context is None:
         extra_context = {}
 
+    # Sort posts by creation date
+    posts = sorted(posts, key=lambda post: post.date, reverse=True)
+
     # Split blog posts up into groups depending on BLOG_POSTS_PER_PAGE
     if settings.BLOG_POSTS_PER_PAGE:
         groups = [posts[i:i+settings.BLOG_POSTS_PER_PAGE] for i in range(0, len(posts), settings.BLOG_POSTS_PER_PAGE)]
