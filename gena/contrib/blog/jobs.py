@@ -11,9 +11,11 @@ from gena.context import context
 from gena.files import File
 from gena.settings import settings
 from gena.templating import JinjaTemplateEngine, TemplateEngine
+from gena.utils import UserDict
 
 
 __all__ = (
+    'build_archive',
     'build_author_archive',
     'build_category_archive',
     'build_main_page',
@@ -61,6 +63,56 @@ def save_posts(posts: Sequence, *, directory: str, template: str, template_engin
 
         file.contents = template_engine.render(template, template_context)
         file.save()
+
+
+def build_archive(template_engine: Optional[TemplateEngine] = None) -> None:
+    """Create a post archive."""
+
+    try:
+        posts = context.blog_posts
+    except AttributeError:
+        logger.warning('no blog posts are found to build the post archive')
+        return
+
+    if template_engine is None:
+        template_engine = JinjaTemplateEngine()
+
+    years = UserDict()
+    for post in posts:
+        year, month = post.date.timetuple()[:2]
+
+        try:
+            years[year]['posts'].append(post)
+        except KeyError:
+            years[year] = UserDict(
+                months=UserDict(),
+                posts=[post],
+                url=f'/{settings.BLOG_ARCHIVE_DIR}/{year}/',
+            )
+
+        months = years[year]['months']
+
+        try:
+            months[month]['posts'].append(post)
+        except KeyError:
+            months[month] = UserDict(
+                posts=[post],
+                url=f'/{settings.BLOG_ARCHIVE_DIR}/{year}/{month}/',
+            )
+
+    archive = File(settings.DST_DIR, settings.BLOG_ARCHIVE_DIR, 'index.html')
+    archive.contents = template_engine.render(settings.BLOG_ARCHIVE_TEMPLATE, {'years': years, **settings})
+    archive.save()
+
+    for year, y_data in years.items():
+        save_posts(y_data['posts'], directory=f'{settings.DST_DIR}/{settings.BLOG_ARCHIVE_DIR}/{year}',
+                   template=settings.BLOG_YEAR_DETAIL_TEMPLATE, template_engine=template_engine,
+                   extra_context={'year': year})
+
+        for month, m_data in y_data['months'].items():
+            save_posts(m_data['posts'], directory=f'{settings.DST_DIR}/{settings.BLOG_ARCHIVE_DIR}/{year}/{month}',
+                       template=settings.BLOG_MONTH_DETAIL_TEMPLATE, template_engine=template_engine,
+                       extra_context={'year': year, 'month': month})
 
 
 def build_author_archive(template_engine: Optional[TemplateEngine] = None) -> None:
