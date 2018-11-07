@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import collections
 import importlib.util
 import os
 
@@ -15,6 +16,7 @@ __all__ = (
     'get_datetime',
     'import_attr',
     'map_as_kwargs',
+    'UserDict',
 )
 
 
@@ -67,3 +69,16 @@ def import_module(path: str) -> ModuleType:
 
 def map_as_kwargs(m):
     return ', '.join(f'{k}={v!r}' for k, v in m.items())
+
+
+class UserDict(collections.UserDict):
+    def __getattr__(self, name):
+        if name in self:
+            return self.data[name]
+        raise AttributeError(name)
+
+    def __setattr__(self, name, value):
+        if name == 'data':
+            super().__setattr__(name, value)
+        else:
+            self.data[name] = value

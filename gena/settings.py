@@ -1,11 +1,11 @@
 import os
 
 from importlib import import_module
-from collections import UserDict
 from inspect import getmembers
 
 from gena import default_settings
 from gena import utils
+from gena.utils import UserDict
 
 
 __all__ = (
@@ -22,17 +22,6 @@ class Settings(UserDict):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.data = {**_get_members(default_settings), **self.data}
-
-    def __getattr__(self, name):
-        if name in self:
-            return self.data[name]
-        raise AttributeError(name)
-
-    def __setattr__(self, name, value):
-        if name == 'data':
-            super().__setattr__(name, value)
-        else:
-            self.data[name] = value
 
     def __str__(self):
         return os.linesep.join(f'{k} = {v!r}' for k, v in self.data.items())
