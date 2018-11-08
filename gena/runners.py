@@ -8,6 +8,7 @@ import re
 from typing import Iterable
 
 from gena import utils
+from gena.exceptions import StopProcessing
 from gena.settings import settings
 from gena.utils import map_as_kwargs
 
@@ -137,7 +138,11 @@ class FileRunner:
         for file, processors in self._get_tasks():
             logger.info('Processing "%s"', file.path)
             for processor in processors:
-                file = processor(file)
+                try:
+                    file = processor(file)
+                except StopProcessing as e:
+                    logger.debug('Stop processing "%s". %s', e.file, e.message)
+                    break
             file_counter += 1
 
         do_final_jobs()
