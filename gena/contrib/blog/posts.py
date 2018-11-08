@@ -6,6 +6,7 @@ import lxml.html
 
 from dataclasses import dataclass
 from datetime import datetime
+from enum import Enum
 from typing import Sequence
 
 from slugify import slugify
@@ -18,8 +19,15 @@ __all__ = (
     'BlogAuthor',
     'BlogCategory',
     'BlogPost',
+    'BlogStatus',
     'BlogTag',
 )
+
+
+class BlogStatus(Enum):
+    DRAFT = 'draft'
+    PRIVATE = 'private'
+    PUBLIC = 'public'
 
 
 @dataclass(unsafe_hash=True)
@@ -77,6 +85,7 @@ class BlogPost:
     contents: str
     date: datetime
     slug: str
+    status: BlogStatus
     tags: Sequence[BlogTag]
     title: str
 
@@ -97,6 +106,10 @@ class BlogPost:
     def from_file(file: FileLike) -> BlogPost:
         authors = [BlogAuthor(name=author) for author in file.meta.get('authors', ())]
         category = BlogCategory(name=str(file.meta.get('category', '')))
+        if 'status' in file.meta:
+            status = BlogStatus(file.meta.status[0].lower())
+        else:
+            status = BlogStatus.PUBLIC
         tags = [BlogTag(name=tag) for tag in file.meta.get('tags', ())]
 
         post = BlogPost(
@@ -105,6 +118,7 @@ class BlogPost:
             contents=file.contents,
             date=file.meta.date[0],
             slug=file.meta.slug[0],
+            status=status,
             tags=tags,
             title=file.meta.title[0],
         )

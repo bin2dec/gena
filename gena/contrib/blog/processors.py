@@ -5,7 +5,8 @@ from __future__ import annotations
 from typing import Optional
 
 from gena.context import context
-from gena.contrib.blog.posts import BlogPost
+from gena.contrib.blog.posts import BlogPost, BlogStatus
+from gena.exceptions import StopProcessing
 from gena.files import FileLike
 from gena.processors import TextProcessor
 from gena.settings import settings
@@ -27,7 +28,11 @@ class BlogPostProcessor(TextProcessor):
         file = super().process(file)
 
         post = BlogPost.from_file(file)
-        self._posts.append(post)
+
+        if post.status == BlogStatus.DRAFT:
+            raise StopProcessing(f'The blog post "{post.title}" is a draft', processor=self, file=file)
+        elif post.status == BlogStatus.PUBLIC:
+            self._posts.append(post)
 
         file.contents = self.template_engine.render(settings.BLOG_POST_TEMPLATE, {'post': post, **settings})
 
