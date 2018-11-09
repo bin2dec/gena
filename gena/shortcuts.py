@@ -55,6 +55,7 @@ __all__ = (
     'save',
     'stdout',
     'template',
+    'uglifyjs',
 )
 
 
@@ -142,5 +143,19 @@ def template(name, engine=None):
         'options': {
             'template': name,
             'engine': engine,
+        },
+    }
+
+
+def uglifyjs(*args):
+    """You need to install UglifyJS to use this shortcut: https://github.com/mishoo/UglifyJS2#install."""
+
+    if not args:
+        args = ('uglifyjs', '-c', '-m')
+
+    return {
+        'processor': 'gena.processors.ExternalProcessor',
+        'options': {
+            'command': args,
         },
     }
