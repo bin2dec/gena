@@ -46,6 +46,7 @@ from gena import utils
 
 __all__ = (
     'bundle',
+    'cssmin',
     'filename',
     'group',
     'markdown',
@@ -64,6 +65,20 @@ def bundle(name):
         'processor': 'gena.processors.BundleProcessor',
         'options': {
             'name': name,
+        },
+    }
+
+
+def cssmin(*args):
+    """You need to install cssmin to use this shortcut: https://github.com/jbleuzen/node-cssmin#installation."""
+
+    if not args:
+        args = ('cssmin',)
+
+    return {
+        'processor': 'gena.processors.ExternalProcessor',
+        'options': {
+            'command': args,
         },
     }
 
