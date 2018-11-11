@@ -53,6 +53,7 @@ __all__ = (
     'meta_date',
     'meta_modified',
     'meta_slug',
+    'sass',
     'save',
     'stdout',
     'template',
@@ -134,6 +135,20 @@ def meta_slug():
             'callback': slugify,
             'default': lambda file: file.meta.title,
             'skip_if_exists': True,
+        },
+    }
+
+
+def sass(*args):
+    """You need to install Sass to use this shortcut: http://sass-lang.com/install."""
+
+    if not args:
+        args = ('sass', '--stdin', '-s', 'compressed')
+
+    return {
+        'processor': 'gena.processors.ExternalProcessor',
+        'options': {
+            'command': args,
         },
     }
 
