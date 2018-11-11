@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+import os
 import subprocess
 
 from abc import ABC, abstractmethod
@@ -174,18 +175,25 @@ class ExternalProcessor(Processor):
     Here we used third-party minifier called UglifyJS (http://lisperator.net/uglifyjs/) to compress these files.
     """
 
-    def __init__(self, *, command: Sequence[str], **kwargs) -> None:
+    def __init__(self, *, command: Sequence[str], chdir: Optional[str] = None, **kwargs) -> None:
         super().__init__(**kwargs)
         self.command = command
+        self.chdir = chdir
 
     def process(self, file: FileLike) -> FileLike:
         file = super().process(file)
+        curdir = os.getcwd()
+        if self.chdir is None:
+            os.chdir(file.path.directory)
+        else:
+            os.chdir(self.chdir)
         output = subprocess.run(self.command,
                                 input=file.contents,
                                 shell=False,
                                 stdout=subprocess.PIPE,
                                 text=file.is_text() or None,
                                 **settings.EXTERNAL_PROCESSOR)
+        os.chdir(curdir)
         file.contents = output.stdout
         return file
 
