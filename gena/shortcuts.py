@@ -70,10 +70,10 @@ def bundle(name):
     }
 
 
-def cssmin(*args):
+def cssmin(args=None):
     """You need to install cssmin to use this shortcut: https://github.com/jbleuzen/node-cssmin#installation."""
 
-    if not args:
+    if args is None:
         args = ('cssmin',)
 
     return {
@@ -139,10 +139,10 @@ def meta_slug():
     }
 
 
-def sass(*args):
+def sass(args=None):
     """You need to install Sass to use this shortcut: http://sass-lang.com/install."""
 
-    if not args:
+    if args is None:
         args = ('sass', '--stdin', '-s', 'compressed')
 
     return {
@@ -177,10 +177,10 @@ def template(name, engine=None):
     }
 
 
-def uglifyjs(*args):
+def uglifyjs(args=None):
     """You need to install UglifyJS to use this shortcut: https://github.com/mishoo/UglifyJS2#install."""
 
-    if not args:
+    if args is None:
         args = ('uglifyjs', '-c', '-m')
 
     return {
