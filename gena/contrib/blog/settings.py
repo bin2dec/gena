@@ -11,6 +11,7 @@ BLOG_ASSETS_ROOT = getattr(settings, 'BLOG_ASSETS_ROOT', 'assets')
 BLOG_CSS_ASSETS_DIR = getattr(settings, 'BLOG_CSS_ASSETS_DIR', f'{BLOG_ASSETS_ROOT}/css')
 BLOG_IMAGES_ASSETS_DIR = getattr(settings, 'BLOG_IMAGES_ASSETS_DIR', f'{BLOG_ASSETS_ROOT}/images')
 BLOG_JS_ASSETS_DIR = getattr(settings, 'BLOG_JS_ASSETS_DIR', f'{BLOG_ASSETS_ROOT}/js')
+BLOG_SASS_ASSETS_DIR = getattr(settings, 'BLOG_SASS_ASSETS_DIR', f'{BLOG_ASSETS_ROOT}/sass')
 
 BLOG_ARCHIVE_DIR = getattr(settings, 'BLOG_ARCHIVE_DIR', 'archive')
 BLOG_AUTHORS_DIR = getattr(settings, 'BLOG_AUTHORS_DIR', 'authors')
@@ -112,16 +113,32 @@ if getattr(settings, 'BLOG_CSS_MIN', False):
                           f'{{file.path.basename}}.min{{file.path.extension}}'),
             ),
         },
+
+        {
+            'retest': f'{BLOG_SASS_ASSETS_DIR}/(.*/)?[^_][^/]*\.(sass|scss)*$',
+            'processors': (
+                sass(),
+                save(path=f'{settings.DST_DIR}/{BLOG_CSS_ASSETS_DIR}/{{file.path.basename}}.min.css'),
+            ),
+        },
     ]
 else:
-    RULES.append(
+    RULES += [
         {
             'test': f'{BLOG_CSS_ASSETS_DIR}/*.css',
             'processors': (
                 save(path=f'{settings.DST_DIR}/{BLOG_CSS_ASSETS_DIR}/{{file.path.name}}'),
             ),
         },
-    )
+
+        {
+            'retest': f'{BLOG_SASS_ASSETS_DIR}/(.*/)?[^_][^/]*\.(sass|scss)*$',
+            'processors': (
+                sass(args=('sass', '--stdin')),
+                save(path=f'{settings.DST_DIR}/{BLOG_CSS_ASSETS_DIR}/{{file.path.basename}}.css'),
+            ),
+        },
+    ]
 
 if getattr(settings, 'BLOG_JS_MIN', False):
     RULES += [
