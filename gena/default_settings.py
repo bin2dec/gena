@@ -72,7 +72,7 @@ MARKDOWN_OPTIONS = {
 
 
 # RULES is a list of rules to create processing tasks.
-RULES = ()
+RULES = []
 
 
 # See https://docs.python.org/3.7/library/subprocess.html#subprocess.run

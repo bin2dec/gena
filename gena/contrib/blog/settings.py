@@ -56,7 +56,7 @@ BLOG_POSTS_PER_PAGE = getattr(settings, 'BLOG_POSTS_PER_PAGE', 5)
 _template_engine = JinjaTemplateEngine()
 
 
-RULES = [
+RULES = settings.RULES + [
     {
         'retest': 'favicon\.(gif|ico|jpe?g|png|svg)$',
         'processors': (
