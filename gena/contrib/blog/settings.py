@@ -55,14 +55,7 @@ BLOG_POSTS_PER_PAGE = getattr(settings, 'BLOG_POSTS_PER_PAGE', 5)
 _template_engine = JinjaTemplateEngine()
 
 
-RULES = (
-    {
-        'test': f'{BLOG_CSS_ASSETS_DIR}/*.css',
-        'processors': (
-            save(path=f'{settings.DST_DIR}/{BLOG_CSS_ASSETS_DIR}/{{file.path.name}}'),
-        ),
-    },
-
+RULES = [
     {
         'retest': 'favicon\.(gif|ico|jpe?g|png|svg)$',
         'processors': (
@@ -107,7 +100,35 @@ RULES = (
             save(path=f'{settings.DST_DIR}/{BLOG_POSTS_DIR}/{{file.meta.slug}}/index.html'),
         ),
     },
-)
+]
+
+if getattr(settings, 'BLOG_CSS_MIN', False):
+    RULES += [
+        {
+            'test': f'{BLOG_CSS_ASSETS_DIR}/*.min.css',
+            'processors': (
+                save(path=f'{settings.DST_DIR}/{BLOG_CSS_ASSETS_DIR}/{{file.path.name}}'),
+            ),
+        },
+
+        {
+            'test': f'{BLOG_CSS_ASSETS_DIR}/*.css',
+            'processors': (
+                cssmin(),
+                save(path=f'{settings.DST_DIR}/{BLOG_CSS_ASSETS_DIR}/'
+                          f'{{file.path.basename}}.min{{file.path.extension}}'),
+            ),
+        },
+    ]
+else:
+    RULES.append(
+        {
+            'test': f'{BLOG_CSS_ASSETS_DIR}/*.css',
+            'processors': (
+                save(path=f'{settings.DST_DIR}/{BLOG_CSS_ASSETS_DIR}/{{file.path.name}}'),
+            ),
+        },
+    )
 
 
 FINAL_JOBS = settings.FINAL_JOBS + (
