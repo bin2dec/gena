@@ -71,13 +71,6 @@ RULES = [
     },
 
     {
-        'test': f'{BLOG_JS_ASSETS_DIR}/*.js',
-        'processors': (
-            save(path=f'{settings.DST_DIR}/{BLOG_JS_ASSETS_DIR}/{{file.path.name}}'),
-        ),
-    },
-
-    {
         'test': f'{BLOG_PAGES_DIR}/*.md',
         'processors': (
             markdown(),
@@ -126,6 +119,34 @@ else:
             'test': f'{BLOG_CSS_ASSETS_DIR}/*.css',
             'processors': (
                 save(path=f'{settings.DST_DIR}/{BLOG_CSS_ASSETS_DIR}/{{file.path.name}}'),
+            ),
+        },
+    )
+
+if getattr(settings, 'BLOG_JS_MIN', False):
+    RULES += [
+        {
+            'test': f'{BLOG_JS_ASSETS_DIR}/*.min.js',
+            'processors': (
+                save(path=f'{settings.DST_DIR}/{BLOG_JS_ASSETS_DIR}/{{file.path.name}}'),
+            ),
+        },
+
+        {
+            'test': f'{BLOG_JS_ASSETS_DIR}/*.js',
+            'processors': (
+                uglifyjs(),
+                save(path=f'{settings.DST_DIR}/{BLOG_JS_ASSETS_DIR}/'
+                          f'{{file.path.basename}}.min{{file.path.extension}}'),
+            ),
+        },
+    ]
+else:
+    RULES.append(
+        {
+            'test': f'{BLOG_JS_ASSETS_DIR}/*.js',
+            'processors': (
+                save(path=f'{settings.DST_DIR}/{BLOG_JS_ASSETS_DIR}/{{file.path.name}}'),
             ),
         },
     )
