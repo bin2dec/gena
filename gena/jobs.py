@@ -2,16 +2,61 @@
 
 from __future__ import annotations
 
+import logging
 import os
 
 from shutil import rmtree
+from typing import Iterable
 
+from gena import utils
 from gena.settings import settings
+from gena.utils import map_as_kwargs
 
 
 __all__ = (
     'clear_dst_dir',
+    'do_final_jobs',
+    'do_initial_jobs',
+    'do_jobs',
 )
+
+
+logger = logging.getLogger(__name__)
+
+
+def do_jobs(jobs: Iterable):
+    """Do jobs from the given list.
+
+    A job is a special callable object that can be called before or after the file processing.
+    An example of a valid job list (can be declared in your settings):
+
+    INITIAL_JOBS = (
+        {'job': 'gena.jobs.clear_dst_dir'},
+    )
+    """
+
+    debug = logger.isEnabledFor(logging.DEBUG)
+
+    for job in jobs:
+        obj = job['job']
+        if not callable(obj):
+            obj = utils.import_attr(obj)
+        options = job.get('options', {})
+        if debug:
+            logger.debug('Doing the %s(%s) job', obj.__name__, map_as_kwargs(options))
+        obj(**options)
+
+
+def do_initial_jobs():
+    """Initial jobs are called before the file processing."""
+    logger.debug('Doing the initial jobs')
+    do_jobs(settings.INITIAL_JOBS)
+
+
+def do_final_jobs():
+    """Final jobs are called after the file processing."""
+    logger.debug('Doing the final jobs')
+    do_jobs(settings.FINAL_JOBS)
 
 
 def clear_dst_dir() -> None:

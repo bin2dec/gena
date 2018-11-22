@@ -12,6 +12,7 @@ from time import time
 from gena import __version__
 from gena import utils
 from gena.settings import settings
+from gena.jobs import do_final_jobs, do_initial_jobs
 
 
 logger = logging.getLogger(__name__)
@@ -54,7 +55,9 @@ def _build(args):
         runner = utils.import_attr(settings.RUNNER)
         start_time = time()
         runner = runner()
+        do_initial_jobs()
         files = runner.run()
+        do_final_jobs()
     except Exception as exception:
         logger.critical(exception)
 
@@ -79,7 +82,9 @@ def _run(args):
     try:
         runner = utils.import_attr(settings.RUNNER)
         runner = runner()
+        do_initial_jobs()
         runner.run()
+        do_final_jobs()
 
         if not args.log_level == logging.CRITICAL:
             print(f'Starting an HTTP server at http://{args.address}:{args.port}/\n'
