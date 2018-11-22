@@ -94,7 +94,7 @@ class FileRunner:
         if not self._rules:
             return 0
 
-        file_counter = 0
+        files = []
         for file, processors in self._get_tasks():
             logger.info('Processing "%s"', file.path)
             for processor in processors:
@@ -103,6 +103,6 @@ class FileRunner:
                 except StopProcessing as e:
                     logger.debug('Stop processing "%s". %s', e.file, e.message)
                     break
-            file_counter += 1
+            files.append(file)
 
-        return file_counter
+        return files

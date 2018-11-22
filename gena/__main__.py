@@ -67,7 +67,7 @@ def _build(args):
             sys.exit(1)
     else:
         if not args.log_level == logging.CRITICAL:
-            print(f'Finished in {time() - start_time:.2f} sec. with {files} file(s) processed')
+            print(f'Finished in {time() - start_time:.2f} sec. with {len(files)} file(s) processed')
 
 
 def _run(args):
