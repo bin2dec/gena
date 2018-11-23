@@ -96,6 +96,7 @@ class FileRunner:
 
         files = []
         for file, processors in self._get_tasks():
+            files.append(file.copy())
             logger.info('Processing "%s"', file.path)
             for processor in processors:
                 try:
@@ -103,6 +104,5 @@ class FileRunner:
                 except StopProcessing as e:
                     logger.debug('Stop processing "%s". %s', e.file, e.message)
                     break
-            files.append(file)
 
         return files
