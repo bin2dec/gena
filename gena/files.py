@@ -55,6 +55,10 @@ class FileMeta(UserDict):
 
 
 class FilePathLike(os.PathLike):
+    @abstractmethod
+    def __eq__(self, other: Any) -> bool:
+        pass
+
     @property
     @abstractmethod
     def basename(self) -> str:
