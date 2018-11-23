@@ -264,6 +264,10 @@ class FileLike(ABC):
         pass
 
     @abstractmethod
+    def copy(self) -> File:
+        pass
+
+    @abstractmethod
     def is_binary(self) -> bool:
         pass
 
@@ -347,6 +351,9 @@ class File(FileLike):
                 else:
                     raise TypeError('unknown or not acceptable type')
             self._type = type_
+
+    def copy(self) -> File:
+        return self.__class__(self.path)
 
     def is_binary(self) -> bool:
         return self._type is FileType.BINARY
