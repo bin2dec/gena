@@ -233,6 +233,10 @@ class FilePath(FilePathLike):
 
 
 class FileLike(ABC):
+    @abstractmethod
+    def __eq__(self, other: Any) -> bool:
+        pass
+
     @property
     @abstractmethod
     def contents(self) -> FileContents:
@@ -292,6 +296,11 @@ class File(FileLike):
 
         for key, value in kwargs.items():
             setattr(self, key, value)
+
+    def __eq__(self, other: Any) -> bool:
+        if isinstance(other, File):
+            return self.path == other.path
+        return False
 
     def __repr__(self, *args, **kwargs):
         return f'{self.__class__.__name__}({self._path.path!r}, type={self._type})'
