@@ -22,7 +22,6 @@ class BlogPostProcessor(TextProcessor):
     def __init__(self, template_engine: Optional[TemplateEngine] = None, **kwargs) -> None:
         super().__init__(**kwargs)
         self.template_engine = template_engine or JinjaTemplateEngine()
-        self._posts = context.add_item(settings.BLOG_CONTEXT_POSTS, [])
 
     def process(self, file: FileLike) -> FileLike:
         file = super().process(file)
@@ -32,7 +31,7 @@ class BlogPostProcessor(TextProcessor):
         if post.status == BlogStatus.DRAFT:
             raise StopProcessing(f'The blog post "{post.title}" is a draft', processor=self, file=file)
         elif post.status == BlogStatus.PUBLIC:
-            self._posts.append(post)
+            context.add_to_list(settings.BLOG_CONTEXT_POSTS, post)
 
         file.contents = self.template_engine.render(settings.BLOG_POST_TEMPLATE, {'post': post, **settings})
 

@@ -16,5 +16,11 @@ class Context(UserDict):
             self.data[key] = value
         return self.data[key]
 
+    def add_to_list(self, key: str, value: Any) -> None:
+        if key in self.data:
+            self.data[key].append(value)
+        else:
+            self.data[key] = [value]
+
 
 context = Context()

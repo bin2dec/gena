@@ -337,11 +337,11 @@ class GroupProcessor(Processor):
 
     def __init__(self, *, name: str, **kwargs) -> None:
         super().__init__(**kwargs)
-        self.group = context.add_item(name, [])
+        self.name = name
 
     def process(self, file: FileLike) -> FileLike:
         file = super().process(file)
-        self.group.append(file)
+        context.add_to_list(self.name, file)
         return file
 
 
