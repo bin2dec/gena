@@ -11,7 +11,7 @@ __all__ = (
 
 
 class Context(UserDict):
-    def add_item(self, key: str, value: Any = None, *, replace: bool = False) -> Any:
+    def add(self, key: str, value: Any = None, *, replace: bool = False) -> Any:
         if replace or key not in self.data:
             self.data[key] = value
         return self.data[key]
