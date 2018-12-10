@@ -7,6 +7,7 @@ import re
 
 from gena import utils
 from gena.exceptions import StopProcessing
+from gena.jobs import do_final_jobs, do_initial_jobs
 from gena.settings import settings
 
 
@@ -68,6 +69,9 @@ class FileRunner:
                 return rule
 
     def _get_tasks(self):
+        if not self._rules:
+            return
+
         counter = itertools.count()  # the counter is needed in situations when priorities are equal
         queue = []
 
@@ -91,11 +95,14 @@ class FileRunner:
                     break
 
     def run(self):
-        if not self._rules:
+        tasks = self._get_tasks()
+        if not tasks:
             return []
 
+        do_initial_jobs()
+
         files = []
-        for file, processors in self._get_tasks():
+        for file, processors in tasks:
             logger.info('Processing "%s"', file.path)
             for processor in processors:
                 try:
@@ -104,5 +111,7 @@ class FileRunner:
                     logger.debug('Stop processing "%s". %s', e.file, e.message)
                     break
             files.append(file)
+
+        do_final_jobs()
 
         return files

@@ -55,9 +55,7 @@ def _build(args):
         runner = utils.import_attr(settings.RUNNER)
         start_time = time()
         runner = runner()
-        do_initial_jobs()
         files = runner.run()
-        do_final_jobs()
     except Exception as exception:
         logger.critical(exception)
 
@@ -82,9 +80,7 @@ def _run(args):
     try:
         runner = utils.import_attr(settings.RUNNER)
         runner = runner()
-        do_initial_jobs()
         runner.run()
-        do_final_jobs()
 
         if not args.log_level == logging.CRITICAL:
             print(f'Starting an HTTP server at http://{args.address}:{args.port}/\n'
