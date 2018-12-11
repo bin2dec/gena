@@ -12,7 +12,6 @@ from time import time
 from gena import __version__
 from gena import utils
 from gena.settings import settings
-from gena.jobs import do_final_jobs, do_initial_jobs
 
 
 logger = logging.getLogger(__name__)
@@ -143,12 +142,6 @@ def main():
         const=logging.DEBUG,
         dest='log_level',
         help='show all messages'
-    )
-
-    parser.add_argument(
-        '--show-settings',
-        action='store_true',
-        help='show the settings',
     )
 
     subparsers = parser.add_subparsers(
