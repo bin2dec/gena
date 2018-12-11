@@ -46,7 +46,7 @@ BLOG_CONTEXT_PREFIX = getattr(settings, 'BLOG_CONTEXT_SECTION', 'blog_')
 BLOG_CONTEXT_POSTS = getattr(settings, 'BLOG_CONTEXT_POSTS', f'{BLOG_CONTEXT_PREFIX}posts')
 
 
-BLOG_TEASER_REGEXP = '<!--\s*more\s*-->'
+BLOG_TEASER_REGEXP = r'<!--\s*more\s*-->'
 
 
 # How many posts are displayed per page. When BLOG_POSTS_PER_PAGE=0, all posts are displayed
@@ -58,14 +58,14 @@ _template_engine = JinjaTemplateEngine()
 
 RULES = settings.RULES + [
     {
-        'retest': 'favicon\.(gif|ico|jpe?g|png|svg)$',
+        'retest': r'favicon\.(gif|ico|jpe?g|png|svg)$',
         'processors': (
             save(path=f'{settings.DST_DIR}/favicon.ico'),
         ),
     },
 
     {
-        'retest': f'{BLOG_IMAGES_ASSETS_DIR}/.*\.(bmp|gif|ico|jpe?g|png|svg|tiff?)$',
+        'retest': fr'{BLOG_IMAGES_ASSETS_DIR}/.*\.(bmp|gif|ico|jpe?g|png|svg|tiff?)$',
         'processors': (
             save(path=f'{settings.DST_DIR}/{BLOG_IMAGES_ASSETS_DIR}/{{file.path.name}}'),
         ),
@@ -115,7 +115,7 @@ if getattr(settings, 'BLOG_CSS_MIN', False):
         },
 
         {
-            'retest': f'{BLOG_SASS_ASSETS_DIR}/(.*/)?[^_][^/]*\.(sass|scss)*$',
+            'retest': fr'{BLOG_SASS_ASSETS_DIR}/(.*/)?[^_][^/]*\.(sass|scss)*$',
             'processors': (
                 sass(),
                 save(path=f'{settings.DST_DIR}/{BLOG_CSS_ASSETS_DIR}/{{file.path.basename}}.min.css'),
@@ -132,7 +132,7 @@ else:
         },
 
         {
-            'retest': f'{BLOG_SASS_ASSETS_DIR}/(.*/)?[^_][^/]*\.(sass|scss)*$',
+            'retest': fr'{BLOG_SASS_ASSETS_DIR}/(.*/)?[^_][^/]*\.(sass|scss)*$',
             'processors': (
                 sass(args=('sass', '--stdin')),
                 save(path=f'{settings.DST_DIR}/{BLOG_CSS_ASSETS_DIR}/{{file.path.basename}}.css'),
