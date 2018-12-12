@@ -21,6 +21,20 @@ BLOG_POSTS_DIR = getattr(settings, 'BLOG_POSTS_DIR', 'posts')
 BLOG_TAGS_DIR = getattr(settings, 'BLOG_TAGS_DIR', 'tags')
 
 
+# URLs
+BLOG_URL = getattr(settings, 'BLOG_URL', '')
+
+BLOG_CSS_URL = getattr(settings, 'BLOG_CSS_URL', f'{BLOG_URL}/{BLOG_CSS_ASSETS_DIR}')
+BLOG_IMAGES_URL = getattr(settings, 'BLOG_IMAGES_URL', f'{BLOG_URL}/{BLOG_IMAGES_ASSETS_DIR}')
+BLOG_JS_URL = getattr(settings, 'BLOG_JS_URL', f'{BLOG_URL}/{BLOG_JS_ASSETS_DIR}')
+
+BLOG_AUTHORS_URL = getattr(settings, 'BLOG_AUTHORS_URL', f'{BLOG_URL}/{BLOG_AUTHORS_DIR}')
+BLOG_CATEGORIES_URL = getattr(settings, 'BLOG_CATEGORIES_URL', f'{BLOG_URL}/{BLOG_CATEGORIES_DIR}')
+BLOG_PAGES_URL = getattr(settings, 'BLOG_PAGES_URL', f'{BLOG_URL}/{BLOG_PAGES_DIR}')
+BLOG_POSTS_URL = getattr(settings, 'BLOG_POSTS_URL', f'{BLOG_URL}/{BLOG_POSTS_DIR}')
+BLOG_TAGS_URL = getattr(settings, 'BLOG_TAGS_URL', f'{BLOG_URL}/{BLOG_TAGS_DIR}')
+
+
 # Templates
 BLOG_ARCHIVE_TEMPLATE = getattr(settings, 'BLOG_ARCHIVE_TEMPLATE', 'archive.html')
 BLOG_MONTH_DETAIL_TEMPLATE = getattr(settings, 'BLOG_MONTH_DETAIL_TEMPLATE', 'month_detail.html')
