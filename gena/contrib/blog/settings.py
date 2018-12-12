@@ -183,6 +183,11 @@ else:
     )
 
 
+INITIAL_JOBS = (
+    {'job': 'gena.jobs.clear_dst_dir'},
+)
+
+
 FINAL_JOBS = settings.FINAL_JOBS + (
     {
         'job': 'gena.contrib.blog.jobs.build_main_page',
