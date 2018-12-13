@@ -10,11 +10,13 @@ DST_DIR = 'dist'
 DEBUG = False
 
 
-# List of additional settings modules
-EXTRA_SETTINGS = ()
+# EXTRA_SETTINGS is a list of additional settings modules.
+# For example:
+# EXTRA_SETTINGS = ['gena.contrib.blog.settings']
+EXTRA_SETTINGS = []
 
 
-# TEMPLATE_DIRS contains a list of the paths to the templates
+# TEMPLATE_DIRS contains a list of the paths to the templates.
 TEMPLATE_DIRS = ['templates']
 
 
@@ -37,7 +39,7 @@ DEFAULT_PRIORITY = 100
 # JOBS
 # Chains of callable objects, which are called one by one before and after the file processing.
 # For example:
-# FINAL_JOBS = (
+# FINAL_JOBS = [
 #     ...
 #     {
 #         'job': 'gena.jobs.generate_file_from_template',
@@ -46,13 +48,13 @@ DEFAULT_PRIORITY = 100
 #         },
 #     },
 #     ...
-# )
+# ]
 
 # Initial jobs are called before the file processing.
-INITIAL_JOBS = ()
+INITIAL_JOBS = []
 
 # Final jobs are called after the file processing.
-FINAL_JOBS = ()
+FINAL_JOBS = []
 
 
 # See possible options http://jinja.pocoo.org/docs/api/#jinja2.Environment
@@ -76,5 +78,5 @@ EXTERNAL_PROCESSOR = {
     'check': True,
 }
 
-# Modify the logging system. Add a logger configurator. Do a bit of optimization
+
 LOGGER_CONFIGURATOR = 'gena.log.config'

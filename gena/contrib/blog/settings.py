@@ -183,56 +183,56 @@ else:
     )
 
 
-INITIAL_JOBS = (
+INITIAL_JOBS = [
     {'job': 'gena.jobs.clear_dst_dir'},
-)
+]
 
 
-FINAL_JOBS = settings.FINAL_JOBS + (
+FINAL_JOBS = settings.FINAL_JOBS + [
     {
         'job': 'gena.contrib.blog.jobs.build_main_page',
         'options': {
             'template_engine': _template_engine,
         },
     },
-)
+]
 
 if getattr(settings, 'BLOG_ARCHIVE', True):
-    FINAL_JOBS += (
+    FINAL_JOBS += [
         {
             'job': 'gena.contrib.blog.jobs.build_archive',
             'options': {
                 'template_engine': _template_engine,
             },
         },
-    )
+    ]
 
 if getattr(settings, 'BLOG_AUTHORS', True):
-    FINAL_JOBS += (
+    FINAL_JOBS += [
         {
             'job': 'gena.contrib.blog.jobs.build_authors',
             'options': {
                 'template_engine': _template_engine,
             },
         },
-    )
+    ]
 
 if getattr(settings, 'BLOG_CATEGORIES', True):
-    FINAL_JOBS += (
+    FINAL_JOBS += [
         {
             'job': 'gena.contrib.blog.jobs.build_categories',
             'options': {
                 'template_engine': _template_engine,
             },
         },
-    )
+    ]
 
 if getattr(settings, 'BLOG_TAGS', True):
-    FINAL_JOBS += (
+    FINAL_JOBS += [
         {
             'job': 'gena.contrib.blog.jobs.build_tags',
             'options': {
                 'template_engine': _template_engine,
             },
         },
-    )
+    ]
