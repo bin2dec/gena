@@ -94,6 +94,9 @@ class FileRunner:
                 except IndexError:
                     break
 
+    def is_path_applicable(self, path):
+        return bool(self._get_rule(path))
+
     def run(self):
         tasks = self._get_tasks()
         if not tasks:
