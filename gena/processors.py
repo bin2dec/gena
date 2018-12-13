@@ -477,9 +477,6 @@ class TemplateProcessor(TextProcessor):
         ...
     )
 
-    The processor uses settings.TEMPLATE_DIRS to find templates. TEMPLATE_DIRS can be a string or a list of strings
-    if multiple locations are wanted.
-
     The default template engine is Jinja2.
     """
 

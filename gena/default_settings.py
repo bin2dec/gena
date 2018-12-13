@@ -14,12 +14,8 @@ DEBUG = False
 EXTRA_SETTINGS = ()
 
 
-# TEMPLATE_DIRS contains the path to the templates as string, or if multiple locations are wanted a list of them.
-# For example:
-# TEMPLATE_DIRS = '/path/to/templates'
-# or
-# TEMPLATE_DIRS = ['/path/to/templates', '/other/path']
-TEMPLATE_DIRS = 'templates'
+# TEMPLATE_DIRS contains a list of the paths to the templates
+TEMPLATE_DIRS = ['templates']
 
 
 CACHE_DIR = ''
