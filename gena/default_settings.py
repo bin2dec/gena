@@ -80,3 +80,7 @@ EXTERNAL_PROCESSOR = {
 
 
 LOGGER_CONFIGURATOR = 'gena.log.config'
+
+
+# A minimal interval between two runs of the file processing
+RERUN_INTERVAL = 1  # sec

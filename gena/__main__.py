@@ -9,8 +9,12 @@ from argparse import ArgumentParser
 from http.server import HTTPServer, SimpleHTTPRequestHandler
 from time import time
 
+from watchdog.events import FileSystemEventHandler
+from watchdog.observers import Observer
+
 from gena import __version__
 from gena import utils
+from gena.context import context
 from gena.settings import settings
 
 
@@ -39,6 +43,37 @@ class HTTPRequestHandler(SimpleHTTPRequestHandler):
         """Logs an accepted (successful) request."""
         if self.request_logging:
             super().log_request(code, size)
+
+
+class SourceFileSystemEventHandler(FileSystemEventHandler):
+    def __init__(self, runner, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.runner = runner
+        self.last_run = 0
+
+    def on_any_event(self, event):
+        if not event.is_directory and \
+                self.runner.is_path_applicable(event.src_path) and \
+                time() - self.last_run > settings.RERUN_INTERVAL:
+
+            context.clear()
+            self.runner.run()
+            self.last_run = time()
+
+
+class TemplateFileSystemEventHandler(FileSystemEventHandler):
+    def __init__(self, runner, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.runner = runner
+        self.last_run = 0
+
+    def on_modified(self, event):
+        if not event.is_directory and \
+                time() - self.last_run > settings.RERUN_INTERVAL:
+
+            context.clear()
+            self.runner.run()
+            self.last_run = time()
 
 
 def _build(args):
@@ -81,6 +116,17 @@ def _run(args):
         runner = runner()
         runner.run()
 
+        if args.watch:
+            source_file_handler = SourceFileSystemEventHandler(runner)
+            template_file_handler = TemplateFileSystemEventHandler(runner)
+            observer = Observer()
+            observer.schedule(source_file_handler, settings.SRC_DIR, recursive=True)
+            for template_dir in settings.TEMPLATE_DIRS:
+                observer.schedule(template_file_handler, template_dir, recursive=True)
+            observer.start()
+        else:
+            observer = None
+
         if not args.log_level == logging.CRITICAL:
             print(f'Starting an HTTP server at http://{args.address}:{args.port}/\n'
                   f'Press Ctrl-C to stop the server')
@@ -91,6 +137,10 @@ def _run(args):
             except KeyboardInterrupt:
                 if not args.log_level == logging.CRITICAL:
                     print('Stopping the HTTP server')
+                if observer:
+                    observer.stop()
+                    observer.join()
+
     except Exception as exception:
         logger.critical(exception)
 
@@ -201,6 +251,12 @@ def main():
         default=8000,
         help='the listening port (default: 8000)',
         type=int,
+    )
+
+    run.add_argument(
+        '-w', '--watch',
+        action='store_true',
+        help='monitor the working directories recursively for changes and rerun the file processing if needed',
     )
 
     run.set_defaults(func=_run)
