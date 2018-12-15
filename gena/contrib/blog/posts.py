@@ -84,6 +84,7 @@ class BlogPost:
     category: BlogCategory
     contents: str
     date: datetime
+    modified: datetime
     slug: str
     status: BlogStatus
     tags: Sequence[BlogTag]
@@ -117,6 +118,7 @@ class BlogPost:
             category=category,
             contents=file.contents,
             date=file.meta.date[0],
+            modified=file.meta.modified[0],
             slug=file.meta.slug[0],
             status=status,
             tags=tags,
