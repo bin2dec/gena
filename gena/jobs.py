@@ -9,6 +9,7 @@ from shutil import rmtree
 from typing import Iterable
 
 from gena import utils
+from gena.exceptions import JobError
 from gena.settings import settings
 from gena.utils import map_as_kwargs
 
@@ -44,7 +45,10 @@ def do_jobs(jobs: Iterable):
         options = job.get('options', {})
         if debug:
             logger.debug('Doing the %s(%s) job', obj.__name__, map_as_kwargs(options))
-        obj(**options)
+        try:
+            obj(**options)
+        except JobError as e:
+            logger.critical(f'The %s job has been aborted! %s', e.job.__name__, e.message)
 
 
 def do_initial_jobs():

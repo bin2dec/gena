@@ -2,15 +2,23 @@
 
 from __future__ import annotations
 
-from typing import Optional
+from typing import Callable, Optional
 
 from gena.files import FileLike
 from gena.processors import Processor
 
 
 __all__ = (
+    'JobError',
     'StopProcessing',
 )
+
+
+class JobError(Exception):
+    def __init__(self, message: str = '', job: Optional[Callable] = None, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.message = message
+        self.job = job
 
 
 class StopProcessing(Exception):
