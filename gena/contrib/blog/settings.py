@@ -1,9 +1,14 @@
 """Blog extension settings."""
 
+import logging
+
 from gena.contrib.blog.shortcuts import *
 from gena.settings import settings
 from gena.shortcuts import *
 from gena.templating import JinjaTemplateEngine
+
+
+logger = logging.getLogger(__name__)
 
 
 # Assets dirs
@@ -22,7 +27,7 @@ BLOG_TAGS_DIR = getattr(settings, 'BLOG_TAGS_DIR', 'tags')
 
 
 # URLs
-BLOG_URL = getattr(settings, 'BLOG_URL', '')
+BLOG_URL = getattr(settings, 'BLOG_URL', '')  # should be the full URL, including the protocol (e.g. http, https)
 
 BLOG_CSS_URL = getattr(settings, 'BLOG_CSS_URL', f'{BLOG_URL}/{BLOG_CSS_ASSETS_DIR}')
 BLOG_IMAGES_URL = getattr(settings, 'BLOG_IMAGES_URL', f'{BLOG_URL}/{BLOG_IMAGES_ASSETS_DIR}')
@@ -58,6 +63,7 @@ BLOG_TAG_LIST_TEMPLATE = getattr(settings, 'BLOG_TAG_LIST_TEMPLATE', 'tag_list.h
 # Context
 BLOG_CONTEXT_PREFIX = getattr(settings, 'BLOG_CONTEXT_SECTION', 'blog_')
 BLOG_CONTEXT_POSTS = getattr(settings, 'BLOG_CONTEXT_POSTS', f'{BLOG_CONTEXT_PREFIX}posts')
+BLOG_CONTEXT_SITEMAP = getattr(settings, 'BLOG_CONTEXT_SITEMAP', f'{BLOG_CONTEXT_PREFIX}sitemap')
 
 
 BLOG_TEASER_REGEXP = r'<!--\s*more\s*-->'
@@ -65,6 +71,14 @@ BLOG_TEASER_REGEXP = r'<!--\s*more\s*-->'
 
 # How many posts are displayed per page. When BLOG_POSTS_PER_PAGE=0, all posts are displayed
 BLOG_POSTS_PER_PAGE = getattr(settings, 'BLOG_POSTS_PER_PAGE', 5)
+
+
+BLOG_SITEMAP = getattr(settings, 'BLOG_SITEMAP', True)
+
+if BLOG_SITEMAP and not BLOG_URL:
+    logger.warning('The BLOG_URL setting is needed to create a proper "sitemap.xml" but it\'s empty. '
+                   'So either disable the sitemap creating (BLOG_SITEMAP=False) or fill BLOG_URL')
+    BLOG_SITEMAP = False
 
 
 _template_engine = JinjaTemplateEngine()
@@ -94,6 +108,7 @@ RULES = settings.RULES + [
             meta_slug(),
             template(BLOG_PAGE_TEMPLATE, _template_engine),
             save(path=f'{settings.DST_DIR}/{BLOG_PAGES_DIR}/{{file.meta.slug}}/index.html'),
+            sitemap(f'{BLOG_PAGES_URL}/{{file.meta.slug}}') if BLOG_SITEMAP else None,
         ),
     },
 
@@ -235,4 +250,10 @@ if getattr(settings, 'BLOG_TAGS', True):
                 'template_engine': _template_engine,
             },
         },
+    ]
+
+# The build_sitemap job should be the last final job
+if BLOG_SITEMAP:
+    FINAL_JOBS += [
+        {'job': 'gena.contrib.blog.jobs.build_sitemap'},
     ]

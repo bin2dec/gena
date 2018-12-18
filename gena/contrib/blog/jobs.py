@@ -7,8 +7,11 @@ import logging
 from collections import defaultdict
 from typing import Mapping, Optional, Sequence
 
+from lxml import etree
+
 from gena.context import context
-from gena.files import File
+from gena.exceptions import JobError
+from gena.files import File, FileType
 from gena.settings import settings
 from gena.templating import JinjaTemplateEngine, TemplateEngine
 from gena.utils import UserDict
@@ -19,6 +22,7 @@ __all__ = (
     'build_authors',
     'build_categories',
     'build_main_page',
+    'build_sitemap',
     'build_tags',
 )
 
@@ -178,6 +182,28 @@ def build_main_page(template_engine: Optional[TemplateEngine] = None) -> None:
     else:
         save_posts(posts, directory=settings.DST_DIR, template=settings.BLOG_MAIN_PAGE_TEMPLATE,
                    template_engine=template_engine)
+
+
+def build_sitemap() -> None:
+    """Create sitemap.xml."""
+
+    if not settings.BLOG_SITEMAP:
+        return
+
+    try:
+        entries = context[settings.BLOG_CONTEXT_SITEMAP]
+    except KeyError:
+        raise JobError('No sitemap entries are found to build "sitemap.xml"', build_sitemap)
+
+    urlset = etree.Element('urlset', {'xmlns': 'http://www.sitemaps.org/schemas/sitemap/0.9'})
+    for entry in entries:
+        url = etree.SubElement(urlset, 'url')
+        loc = etree.SubElement(url, 'loc')
+        loc.text = entry.loc
+
+    sitemap = File(settings.DST_DIR, 'sitemap.xml', type=FileType.BINARY)
+    sitemap.contents = etree.tostring(urlset, encoding='utf-8', xml_declaration=True)
+    sitemap.save()
 
 
 def build_tags(template_engine: Optional[TemplateEngine] = None) -> None:
