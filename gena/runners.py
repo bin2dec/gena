@@ -41,6 +41,8 @@ class FileRunner:
 
             new_processors = []
             for processor in rule['processors']:
+                if processor is None:
+                    continue
                 new_processor = utils.import_attr(processor['processor'])
                 new_processor = new_processor(**processor.get('options', {}))
                 new_processors.append(new_processor.process)
