@@ -94,7 +94,7 @@ def build_archive(template_engine: Optional[TemplateEngine] = None) -> None:
             years[year] = UserDict(
                 months=UserDict(),
                 posts=[post],
-                url=f'/{settings.BLOG_ARCHIVE_DIR}/{year}/',
+                url=f'{settings.BLOG_ARCHIVE_URL}/{year}',
             )
 
         months = years[year]['months']
@@ -104,7 +104,7 @@ def build_archive(template_engine: Optional[TemplateEngine] = None) -> None:
         except KeyError:
             months[month] = UserDict(
                 posts=[post],
-                url=f'/{settings.BLOG_ARCHIVE_DIR}/{year}/{month}/',
+                url=f'{settings.BLOG_ARCHIVE_URL}/{year}/{month}',
             )
 
     archive = File(settings.DST_DIR, settings.BLOG_ARCHIVE_DIR, 'index.html')
