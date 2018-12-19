@@ -78,9 +78,8 @@ def build_archive(template_engine: Optional[TemplateEngine] = None) -> None:
 
     try:
         posts = context[settings.BLOG_CONTEXT_POSTS]
-    except AttributeError:
-        logger.warning('No blog posts are found to build the post archive')
-        return
+    except KeyError:
+        raise JobError('No blog posts are found to build the post archive')
 
     if template_engine is None:
         template_engine = JinjaTemplateEngine()
@@ -128,9 +127,8 @@ def build_authors(template_engine: Optional[TemplateEngine] = None) -> None:
 
     try:
         posts = context[settings.BLOG_CONTEXT_POSTS]
-    except AttributeError:
-        logger.warning('No blog posts are found to build the author pages')
-        return
+    except KeyError:
+        raise JobError('No blog posts are found to build the author pages')
 
     if template_engine is None:
         template_engine = JinjaTemplateEngine()
@@ -154,9 +152,8 @@ def build_categories(template_engine: Optional[TemplateEngine] = None) -> None:
 
     try:
         posts = context[settings.BLOG_CONTEXT_POSTS]
-    except AttributeError:
-        logger.warning('No blog posts are found to build the category pages')
-        return
+    except KeyError:
+        raise JobError('No blog posts are found to build the category pages')
 
     categories = defaultdict(list)
     for post in posts:
@@ -178,8 +175,8 @@ def build_main_page(template_engine: Optional[TemplateEngine] = None) -> None:
 
     try:
         posts = context[settings.BLOG_CONTEXT_POSTS]
-    except AttributeError:
-        logger.warning('No blog posts are found to build the main page')
+    except KeyError:
+        raise JobError('No blog posts are found to build the main page')
     else:
         save_posts(posts, directory=settings.DST_DIR, template=settings.BLOG_MAIN_PAGE_TEMPLATE,
                    template_engine=template_engine)
@@ -212,9 +209,8 @@ def build_tags(template_engine: Optional[TemplateEngine] = None) -> None:
 
     try:
         posts = context[settings.BLOG_CONTEXT_POSTS]
-    except AttributeError:
-        logger.warning('No blog posts are found to build the tag pages')
-        return
+    except KeyError:
+        raise JobError('No blog posts are found to build the tag pages')
 
     if template_engine is None:
         template_engine = JinjaTemplateEngine()
