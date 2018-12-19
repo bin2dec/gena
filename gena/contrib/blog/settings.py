@@ -74,6 +74,10 @@ BLOG_TEASER_REGEXP = r'<!--\s*more\s*-->'
 BLOG_POSTS_PER_PAGE = getattr(settings, 'BLOG_POSTS_PER_PAGE', 5)
 
 
+BLOG_INDEX_FILE = 'index.html'
+BLOG_N_INDEX_FILE = 'index{}.html'
+
+
 BLOG_SITEMAP = getattr(settings, 'BLOG_SITEMAP', True)
 
 if BLOG_SITEMAP and not BLOG_URL:
@@ -108,7 +112,7 @@ RULES = settings.RULES + [
             meta_modified(),
             meta_slug(),
             template(BLOG_PAGE_TEMPLATE, _template_engine),
-            save(path=f'{settings.DST_DIR}/{BLOG_PAGES_DIR}/{{file.meta.slug}}/index.html'),
+            save(path=f'{settings.DST_DIR}/{BLOG_PAGES_DIR}/{{file.meta.slug}}/{BLOG_INDEX_FILE}'),
             sitemap(f'{BLOG_PAGES_URL}/{{file.meta.slug}}') if BLOG_SITEMAP else None,
         ),
     },

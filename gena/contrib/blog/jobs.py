@@ -58,15 +58,16 @@ def save_posts(posts: Sequence, *, directory: str, template: str, template_engin
 
         if i == 1:  # the first page
             template_context['previous_page'] = None
-            file = File(directory, 'index.html')
+            file = File(directory, settings.BLOG_INDEX_FILE)
         else:
-            template_context['previous_page'] = 'index.html' if i == 2 else f'index{i-1}.html'
-            file = File(directory, f'index{i}.html')
+            template_context['previous_page'] = settings.BLOG_INDEX_FILE if i == 2 \
+                else settings.BLOG_N_INDEX_FILE.format(i-1)
+            file = File(directory, settings.BLOG_N_INDEX_FILE.format(i))
 
         if i == groups_num:  # the last page
             template_context['next_page'] = None
         else:
-            template_context['next_page'] = f'index{i+1}.html'
+            template_context['next_page'] = settings.BLOG_N_INDEX_FILE.format(i+1)
 
         file.contents = template_engine.render(template, template_context)
         file.save()
@@ -107,7 +108,7 @@ def build_archive(template_engine: Optional[TemplateEngine] = None) -> None:
                 url=f'{settings.BLOG_ARCHIVE_URL}/{year}/{month}',
             )
 
-    archive = File(settings.DST_DIR, settings.BLOG_ARCHIVE_DIR, 'index.html')
+    archive = File(settings.DST_DIR, settings.BLOG_ARCHIVE_DIR, settings.BLOG_INDEX_FILE)
     archive.contents = template_engine.render(settings.BLOG_ARCHIVE_TEMPLATE, {'years': years, **settings})
     archive.save()
 
@@ -139,7 +140,7 @@ def build_authors(template_engine: Optional[TemplateEngine] = None) -> None:
         for author in post.authors:
             authors[author].append(post)
 
-    author_list = File(settings.DST_DIR, settings.BLOG_AUTHORS_DIR, 'index.html')
+    author_list = File(settings.DST_DIR, settings.BLOG_AUTHORS_DIR, settings.BLOG_INDEX_FILE)
     author_list.contents = template_engine.render(settings.BLOG_AUTHOR_LIST_TEMPLATE, {'authors': authors, **settings})
     author_list.save()
 
@@ -162,7 +163,7 @@ def build_categories(template_engine: Optional[TemplateEngine] = None) -> None:
         if post.category:
             categories[post.category].append(post)
 
-    category_list = File(settings.DST_DIR, settings.BLOG_CATEGORIES_DIR, 'index.html')
+    category_list = File(settings.DST_DIR, settings.BLOG_CATEGORIES_DIR, settings.BLOG_INDEX_FILE)
     category_list.contents = template_engine.render(settings.BLOG_CATEGORY_LIST_TEMPLATE,
                                                     {'categories': categories, **settings})
     category_list.save()
@@ -223,7 +224,7 @@ def build_tags(template_engine: Optional[TemplateEngine] = None) -> None:
         for tag in post.tags:
             tags[tag].append(post)
 
-    tag_list = File(settings.DST_DIR, settings.BLOG_TAGS_DIR, 'index.html')
+    tag_list = File(settings.DST_DIR, settings.BLOG_TAGS_DIR, settings.BLOG_INDEX_FILE)
     tag_list.contents = template_engine.render(settings.BLOG_TAG_LIST_TEMPLATE, {'tags': tags, **settings})
     tag_list.save()
 
