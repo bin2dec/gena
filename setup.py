@@ -6,6 +6,7 @@ from setuptools import find_packages, setup
 
 REQUIREMENTS = [
     'jinja2 >= 2.10',
+    'lxml >= 4.2.5',
     'markdown >= 2.6.11',
     'python-dateutil >= 2.7.3',
     'python-slugify >= 1.2.6',
@@ -15,9 +16,6 @@ REQUIREMENTS = [
 EXTRAS = {
     'minifiers': [
         'htmlmin >= 0.1.12',
-    ],
-    'blog': [
-        'lxml >= 4.2.5',
     ],
 }
 
