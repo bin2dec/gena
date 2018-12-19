@@ -79,7 +79,7 @@ def build_archive(template_engine: Optional[TemplateEngine] = None) -> None:
     try:
         posts = context[settings.BLOG_CONTEXT_POSTS]
     except AttributeError:
-        logger.warning('no blog posts are found to build the post archive')
+        logger.warning('No blog posts are found to build the post archive')
         return
 
     if template_engine is None:
@@ -129,7 +129,7 @@ def build_authors(template_engine: Optional[TemplateEngine] = None) -> None:
     try:
         posts = context[settings.BLOG_CONTEXT_POSTS]
     except AttributeError:
-        logger.warning('no blog posts are found to build the author pages')
+        logger.warning('No blog posts are found to build the author pages')
         return
 
     if template_engine is None:
@@ -155,7 +155,7 @@ def build_categories(template_engine: Optional[TemplateEngine] = None) -> None:
     try:
         posts = context[settings.BLOG_CONTEXT_POSTS]
     except AttributeError:
-        logger.warning('no blog posts are found to build the category pages')
+        logger.warning('No blog posts are found to build the category pages')
         return
 
     categories = defaultdict(list)
@@ -179,7 +179,7 @@ def build_main_page(template_engine: Optional[TemplateEngine] = None) -> None:
     try:
         posts = context[settings.BLOG_CONTEXT_POSTS]
     except AttributeError:
-        logger.warning('no blog posts are found to build the main page')
+        logger.warning('No blog posts are found to build the main page')
     else:
         save_posts(posts, directory=settings.DST_DIR, template=settings.BLOG_MAIN_PAGE_TEMPLATE,
                    template_engine=template_engine)
@@ -213,7 +213,7 @@ def build_tags(template_engine: Optional[TemplateEngine] = None) -> None:
     try:
         posts = context[settings.BLOG_CONTEXT_POSTS]
     except AttributeError:
-        logger.warning('no blog posts are found to build the tag pages')
+        logger.warning('No blog posts are found to build the tag pages')
         return
 
     if template_engine is None:
