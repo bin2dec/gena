@@ -114,7 +114,7 @@ RULES = settings.RULES + [
             meta_modified(),
             meta_slug(),
             template(BLOG_PAGE_TEMPLATE, _template_engine),
-            sitemap(f'{BLOG_PAGES_URL}/{{file.meta.slug}}') if BLOG_SITEMAP else None,
+            sitemap(f'{BLOG_PAGES_URL}/{{file.meta.slug}}/') if BLOG_SITEMAP else None,
             save(path=f'{settings.DST_DIR}/{BLOG_PAGES_DIR}/{{file.meta.slug}}/{BLOG_INDEX_FILE}'),
         ),
     },

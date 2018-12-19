@@ -95,7 +95,7 @@ def build_archive(template_engine: Optional[TemplateEngine] = None) -> None:
             years[year] = UserDict(
                 months=UserDict(),
                 posts=[post],
-                url=f'{settings.BLOG_ARCHIVE_URL}/{year}',
+                url=f'{settings.BLOG_ARCHIVE_URL}/{year}/',
             )
 
         months = years[year]['months']
@@ -105,14 +105,14 @@ def build_archive(template_engine: Optional[TemplateEngine] = None) -> None:
         except KeyError:
             months[month] = UserDict(
                 posts=[post],
-                url=f'{settings.BLOG_ARCHIVE_URL}/{year}/{month}',
+                url=f'{settings.BLOG_ARCHIVE_URL}/{year}/{month}/',
             )
 
     archive = File(settings.DST_DIR, settings.BLOG_ARCHIVE_DIR, settings.BLOG_INDEX_FILE)
     archive.contents = template_engine.render(settings.BLOG_ARCHIVE_TEMPLATE, {'years': years, **settings})
     archive.save()
 
-    add_sitemap_entry_to_context(settings.BLOG_ARCHIVE_URL)
+    add_sitemap_entry_to_context(f'{settings.BLOG_ARCHIVE_URL}/')
 
     for year, y_data in years.items():
         save_posts(y_data['posts'], directory=f'{settings.DST_DIR}/{settings.BLOG_ARCHIVE_DIR}/{year}',
@@ -147,12 +147,12 @@ def build_authors(template_engine: Optional[TemplateEngine] = None) -> None:
     author_list.contents = template_engine.render(settings.BLOG_AUTHOR_LIST_TEMPLATE, {'authors': authors, **settings})
     author_list.save()
 
-    add_sitemap_entry_to_context(settings.BLOG_AUTHORS_URL)
+    add_sitemap_entry_to_context(f'{settings.BLOG_AUTHORS_URL}/')
 
     for author, posts in authors.items():
         save_posts(posts, directory=f'{settings.DST_DIR}/{settings.BLOG_AUTHORS_DIR}/{author.slug}',
                    template=settings.BLOG_AUTHOR_DETAIL_TEMPLATE, template_engine=template_engine)
-        add_sitemap_entry_to_context(f'{settings.BLOG_AUTHORS_URL}/{author.slug}')
+        add_sitemap_entry_to_context(f'{settings.BLOG_AUTHORS_URL}/{author.slug}/')
 
 
 def build_categories(template_engine: Optional[TemplateEngine] = None) -> None:
@@ -173,12 +173,12 @@ def build_categories(template_engine: Optional[TemplateEngine] = None) -> None:
                                                     {'categories': categories, **settings})
     category_list.save()
 
-    add_sitemap_entry_to_context(settings.BLOG_CATEGORIES_URL)
+    add_sitemap_entry_to_context(f'{settings.BLOG_CATEGORIES_URL}/')
 
     for category, posts in categories.items():
         save_posts(posts, directory=f'{settings.DST_DIR}/{settings.BLOG_CATEGORIES_DIR}/{category.slug}',
                    template=settings.BLOG_CATEGORY_DETAIL_TEMPLATE, template_engine=template_engine)
-        add_sitemap_entry_to_context(f'{settings.BLOG_CATEGORIES_URL}/{category.slug}')
+        add_sitemap_entry_to_context(f'{settings.BLOG_CATEGORIES_URL}/{category.slug}/')
 
 
 def build_main_page(template_engine: Optional[TemplateEngine] = None) -> None:
@@ -191,7 +191,7 @@ def build_main_page(template_engine: Optional[TemplateEngine] = None) -> None:
     else:
         save_posts(posts, directory=settings.DST_DIR, template=settings.BLOG_MAIN_PAGE_TEMPLATE,
                    template_engine=template_engine)
-        add_sitemap_entry_to_context(settings.BLOG_URL)
+        add_sitemap_entry_to_context(f'{settings.BLOG_URL}/')
 
 
 def build_sitemap() -> None:
@@ -236,9 +236,9 @@ def build_tags(template_engine: Optional[TemplateEngine] = None) -> None:
     tag_list.contents = template_engine.render(settings.BLOG_TAG_LIST_TEMPLATE, {'tags': tags, **settings})
     tag_list.save()
 
-    add_sitemap_entry_to_context(settings.BLOG_TAGS_URL)
+    add_sitemap_entry_to_context(f'{settings.BLOG_TAGS_URL}/')
 
     for tag, posts in tags.items():
         save_posts(posts, directory=f'{settings.DST_DIR}/{settings.BLOG_TAGS_DIR}/{tag.slug}',
                    template=settings.BLOG_TAG_DETAIL_TEMPLATE, template_engine=template_engine)
-        add_sitemap_entry_to_context(f'{settings.BLOG_TAGS_URL}/{tag.slug}')
+        add_sitemap_entry_to_context(f'{settings.BLOG_TAGS_URL}/{tag.slug}/')
