@@ -77,7 +77,7 @@ def build_archive(template_engine: Optional[TemplateEngine] = None) -> None:
     """Create a post archive."""
 
     try:
-        posts = context.blog_posts
+        posts = context[settings.BLOG_CONTEXT_POSTS]
     except AttributeError:
         logger.warning('no blog posts are found to build the post archive')
         return
@@ -127,7 +127,7 @@ def build_authors(template_engine: Optional[TemplateEngine] = None) -> None:
     """Create author pages."""
 
     try:
-        posts = context.blog_posts
+        posts = context[settings.BLOG_CONTEXT_POSTS]
     except AttributeError:
         logger.warning('no blog posts are found to build the author pages')
         return
@@ -153,7 +153,7 @@ def build_categories(template_engine: Optional[TemplateEngine] = None) -> None:
     """Create category pages."""
 
     try:
-        posts = context.blog_posts
+        posts = context[settings.BLOG_CONTEXT_POSTS]
     except AttributeError:
         logger.warning('no blog posts are found to build the category pages')
         return
@@ -177,7 +177,7 @@ def build_main_page(template_engine: Optional[TemplateEngine] = None) -> None:
     """Create a blog main page."""
 
     try:
-        posts = context.blog_posts
+        posts = context[settings.BLOG_CONTEXT_POSTS]
     except AttributeError:
         logger.warning('no blog posts are found to build the main page')
     else:
@@ -211,7 +211,7 @@ def build_tags(template_engine: Optional[TemplateEngine] = None) -> None:
     """Create tag pages."""
 
     try:
-        posts = context.blog_posts
+        posts = context[settings.BLOG_CONTEXT_POSTS]
     except AttributeError:
         logger.warning('no blog posts are found to build the tag pages')
         return
