@@ -16,22 +16,22 @@ from gena.settings import settings
 
 
 __all__ = (
-    'BlogAuthor',
-    'BlogCategory',
     'BlogPost',
-    'BlogStatus',
-    'BlogTag',
+    'BlogPostAuthor',
+    'BlogPostCategory',
+    'BlogPostStatus',
+    'BlogPostTag',
 )
 
 
-class BlogStatus(Enum):
+class BlogPostStatus(Enum):
     DRAFT = 'draft'
     PRIVATE = 'private'
     PUBLIC = 'public'
 
 
 @dataclass(unsafe_hash=True)
-class BlogAuthor:
+class BlogPostAuthor:
     name: str
 
     def __str__(self) -> str:
@@ -47,7 +47,7 @@ class BlogAuthor:
 
 
 @dataclass(unsafe_hash=True)
-class BlogCategory:
+class BlogPostCategory:
     name: str
 
     def __str__(self) -> str:
@@ -63,7 +63,7 @@ class BlogCategory:
 
 
 @dataclass(unsafe_hash=True)
-class BlogTag:
+class BlogPostTag:
     name: str
 
     def __str__(self) -> str:
@@ -80,14 +80,14 @@ class BlogTag:
 
 @dataclass()
 class BlogPost:
-    authors: Sequence[BlogAuthor]
-    category: BlogCategory
+    authors: Sequence[BlogPostAuthor]
+    category: BlogPostCategory
     contents: str
     date: datetime
     modified: datetime
     slug: str
-    status: BlogStatus
-    tags: Sequence[BlogTag]
+    status: BlogPostStatus
+    tags: Sequence[BlogPostTag]
     title: str
 
     @property
@@ -105,13 +105,13 @@ class BlogPost:
 
     @staticmethod
     def from_file(file: FileLike) -> BlogPost:
-        authors = [BlogAuthor(name=author) for author in file.meta.get('authors', ())]
-        category = BlogCategory(name=str(file.meta.get('category', '')))
+        authors = [BlogPostAuthor(name=author) for author in file.meta.get('authors', ())]
+        category = BlogPostCategory(name=str(file.meta.get('category', '')))
         if 'status' in file.meta:
-            status = BlogStatus(file.meta.status[0].lower())
+            status = BlogPostStatus(file.meta.status[0].lower())
         else:
-            status = BlogStatus.PUBLIC
-        tags = [BlogTag(name=tag) for tag in file.meta.get('tags', ())]
+            status = BlogPostStatus.PUBLIC
+        tags = [BlogPostTag(name=tag) for tag in file.meta.get('tags', ())]
 
         post = BlogPost(
             authors=authors,

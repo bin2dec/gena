@@ -5,7 +5,7 @@ from __future__ import annotations
 from typing import Optional
 
 from gena.context import context
-from gena.contrib.blog.posts import BlogPost, BlogStatus
+from gena.contrib.blog.posts import BlogPost, BlogPostStatus
 from gena.contrib.blog.sitemap import SitemapEntry
 from gena.exceptions import StopProcessing
 from gena.files import FileLike
@@ -30,9 +30,9 @@ class BlogPostProcessor(TextProcessor):
 
         post = BlogPost.from_file(file)
 
-        if post.status == BlogStatus.DRAFT:
+        if post.status == BlogPostStatus.DRAFT:
             raise StopProcessing(f'The blog post "{post.title}" is a draft', processor=self, file=file)
-        elif post.status == BlogStatus.PUBLIC:
+        elif post.status == BlogPostStatus.PUBLIC:
             context.add_to_list(settings.BLOG_CONTEXT_POSTS, post)
             if settings.BLOG_SITEMAP:
                 sitemap_entry = SitemapEntry(loc=post.url)
