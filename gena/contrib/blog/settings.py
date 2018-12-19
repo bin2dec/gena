@@ -14,6 +14,7 @@ logger = logging.getLogger(__name__)
 # Assets dirs
 BLOG_ASSETS_ROOT = getattr(settings, 'BLOG_ASSETS_ROOT', 'assets')
 BLOG_CSS_ASSETS_DIR = getattr(settings, 'BLOG_CSS_ASSETS_DIR', f'{BLOG_ASSETS_ROOT}/css')
+BLOG_FONTS_ASSETS_DIR = getattr(settings, 'BLOG_FONTS_ASSETS_DIR', f'{BLOG_ASSETS_ROOT}/fonts')
 BLOG_IMAGES_ASSETS_DIR = getattr(settings, 'BLOG_IMAGES_ASSETS_DIR', f'{BLOG_ASSETS_ROOT}/images')
 BLOG_JS_ASSETS_DIR = getattr(settings, 'BLOG_JS_ASSETS_DIR', f'{BLOG_ASSETS_ROOT}/js')
 BLOG_SASS_ASSETS_DIR = getattr(settings, 'BLOG_SASS_ASSETS_DIR', f'{BLOG_ASSETS_ROOT}/sass')
@@ -30,6 +31,7 @@ BLOG_TAGS_DIR = getattr(settings, 'BLOG_TAGS_DIR', 'tags')
 BLOG_URL = getattr(settings, 'BLOG_URL', '')  # should be the full URL, including the protocol (e.g. http, https)
 
 BLOG_CSS_URL = getattr(settings, 'BLOG_CSS_URL', f'{BLOG_URL}/{BLOG_CSS_ASSETS_DIR}')
+BLOG_FONTS_URL = getattr(settings, 'BLOG_FONTS_URL', f'{BLOG_URL}/{BLOG_FONTS_ASSETS_DIR}')
 BLOG_IMAGES_URL = getattr(settings, 'BLOG_IMAGES_URL', f'{BLOG_URL}/{BLOG_IMAGES_ASSETS_DIR}')
 BLOG_JS_URL = getattr(settings, 'BLOG_JS_URL', f'{BLOG_URL}/{BLOG_JS_ASSETS_DIR}')
 
@@ -126,6 +128,13 @@ RULES = settings.RULES + [
             meta_slug(),
             blog_post(_template_engine),
             save(path=f'{settings.DST_DIR}/{BLOG_POSTS_DIR}/{{file.meta.slug}}/index.html'),
+        ),
+    },
+
+    {
+        'retest': fr'{BLOG_FONTS_ASSETS_DIR}/.*\.(eot|svg|ttf|woff\d)$',
+        'processors': (
+            save(path=f'{settings.DST_DIR}/{BLOG_FONTS_ASSETS_DIR}/{{file.path.name}}'),
         ),
     },
 
