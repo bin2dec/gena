@@ -6,7 +6,7 @@ from typing import Optional
 
 from gena.context import context
 from gena.contrib.blog.posts import BlogPost, BlogPostStatus
-from gena.contrib.blog.sitemap import SitemapEntry
+from gena.contrib.blog.sitemap import add_sitemap_entry_to_context
 from gena.exceptions import StopProcessing
 from gena.files import FileLike
 from gena.processors import Processor, TextProcessor
@@ -34,9 +34,7 @@ class BlogPostProcessor(TextProcessor):
             raise StopProcessing(f'The blog post "{post.title}" is a draft', processor=self, file=file)
         elif post.status == BlogPostStatus.PUBLIC:
             context.add_to_list(settings.BLOG_CONTEXT_POSTS, post)
-            if settings.BLOG_SITEMAP:
-                sitemap_entry = SitemapEntry(loc=post.url)
-                context.add_to_list(settings.BLOG_CONTEXT_SITEMAP, sitemap_entry)
+            add_sitemap_entry_to_context(post.url)
 
         file.contents = self.template_engine.render(settings.BLOG_POST_TEMPLATE, {'post': post, **settings})
 
@@ -50,9 +48,5 @@ class SitemapProcessor(Processor):
 
     def process(self, file: FileLike) -> FileLike:
         file = super().process(file)
-
-        if settings.BLOG_SITEMAP:
-            sitemap_entry = SitemapEntry(loc=self.loc.format(file=file))
-            context.add_to_list(settings.BLOG_CONTEXT_SITEMAP, sitemap_entry)
-
+        add_sitemap_entry_to_context(self.loc.format(file=file))
         return file
