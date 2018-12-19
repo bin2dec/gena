@@ -128,6 +128,13 @@ RULES = settings.RULES + [
             save(path=f'{settings.DST_DIR}/{BLOG_POSTS_DIR}/{{file.meta.slug}}/index.html'),
         ),
     },
+
+    {
+        'test': 'robots.txt',
+        'processors': (
+            save(path=f'{settings.DST_DIR}/robots.txt'),
+        ),
+    },
 ]
 
 if getattr(settings, 'BLOG_CSS_MIN', False):
