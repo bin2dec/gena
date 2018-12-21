@@ -16,9 +16,6 @@ __all__ = (
 )
 
 
-LOC_SIZE = 2_048
-
-
 def add_sitemap_entry_to_context(loc: str, **kwargs) -> None:
     if settings.BLOG_SITEMAP:
         sitemap_entry = SitemapEntry(loc, **kwargs)
@@ -41,7 +38,7 @@ class SitemapEntry:
         path = saxutils.escape(path, {'\'': '&apos;', '"': '&quot;'})
         new_url = urllib.parse.urlunsplit((url.scheme, url.netloc, path, url.query, url.fragment))
 
-        if len(new_url) > LOC_SIZE:
-            raise ValueError(f'a sitemap URL must be less than {LOC_SIZE} characters')
+        if len(new_url) > settings.BLOG_SITEMAP_LOC_SIZE:
+            raise ValueError(f'a sitemap URL must be less than {settings.BLOG_SITEMAP_LOC_SIZE} characters')
 
         self._loc = new_url
