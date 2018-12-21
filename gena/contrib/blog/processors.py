@@ -34,7 +34,7 @@ class BlogPostProcessor(TextProcessor):
             raise StopProcessing(f'The blog post "{post.title}" is a draft', processor=self, file=file)
         elif post.status == BlogPostStatus.PUBLIC:
             context.add_to_list(settings.BLOG_CONTEXT_POSTS, post)
-            add_sitemap_entry_to_context(post.url)
+            add_sitemap_entry_to_context(post.url, lastmod=post.modified)
 
         file.contents = self.template_engine.render(settings.BLOG_POST_TEMPLATE, {'post': post, **settings})
 

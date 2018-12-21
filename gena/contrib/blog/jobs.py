@@ -208,8 +208,12 @@ def build_sitemap() -> None:
     urlset = etree.Element('urlset', {'xmlns': 'http://www.sitemaps.org/schemas/sitemap/0.9'})
     for entry in entries:
         url = etree.SubElement(urlset, 'url')
+
         loc = etree.SubElement(url, 'loc')
         loc.text = entry.loc
+
+        lastmod = etree.SubElement(url, 'lastmod')
+        lastmod.text = entry.lastmod.isoformat()
 
     sitemap = File(settings.DST_DIR, 'sitemap.xml', type=FileType.BINARY)
     sitemap.contents = etree.tostring(urlset, encoding='utf-8', xml_declaration=True)

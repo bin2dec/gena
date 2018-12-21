@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import urllib.parse
 
+from datetime import datetime
+from typing import Optional
 from xml.sax import saxutils
 
 from gena.context import context
@@ -24,8 +26,9 @@ def add_sitemap_entry_to_context(loc: str, **kwargs) -> None:
 
 
 class SitemapEntry:
-    def __init__(self, loc: str):
+    def __init__(self, loc: str, lastmod: Optional[datetime] = None):
         self.loc = loc
+        self.lastmod = datetime.now() if lastmod is None else lastmod
 
     @property
     def loc(self) -> str:
