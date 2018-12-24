@@ -218,6 +218,9 @@ def build_sitemap() -> None:
         changefreq = etree.SubElement(url, 'changefreq')
         changefreq.text = entry.changefreq
 
+        priority = etree.SubElement(url, 'priority')
+        priority.text = str(entry.priority)
+
     sitemap = File(settings.DST_DIR, 'sitemap.xml', type=FileType.BINARY)
     sitemap.contents = etree.tostring(urlset, encoding='utf-8', xml_declaration=True)
     sitemap.save()

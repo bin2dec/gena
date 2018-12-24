@@ -83,8 +83,10 @@ BLOG_N_INDEX_FILE = 'index{}.html'
 BLOG_SITEMAP = getattr(settings, 'BLOG_SITEMAP', True)
 
 BLOG_SITEMAP_LOC_SIZE = 2_048
+BLOG_SITEMAP_PRIORITY_RANGE = [0.0, 1.0]
 
 BLOG_SITEMAP_DEFAULT_CHANGEFREQ = 'monthly'
+BLOG_SITEMAP_DEFAULT_PRIORITY = 0.5
 
 if BLOG_SITEMAP and not BLOG_URL:
     logger.warning('The BLOG_URL setting is needed to create a proper "sitemap.xml" but it\'s empty. '

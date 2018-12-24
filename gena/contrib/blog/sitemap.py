@@ -23,10 +23,13 @@ def add_sitemap_entry_to_context(loc: str, **kwargs) -> None:
 
 
 class SitemapEntry:
-    def __init__(self, loc: str, lastmod: Optional[datetime] = None, changefreq: Optional[str] = None):
+    def __init__(self, loc: str, lastmod: Optional[datetime] = None, changefreq: Optional[str] = None,
+                 priority: Optional[float] = None):
+
         self.loc = loc
         self.lastmod = datetime.now() if lastmod is None else lastmod
         self.changefreq = changefreq or settings.BLOG_SITEMAP_DEFAULT_CHANGEFREQ
+        self.priority = priority or settings.BLOG_SITEMAP_DEFAULT_PRIORITY
 
     @property
     def loc(self) -> str:
@@ -43,3 +46,16 @@ class SitemapEntry:
             raise ValueError(f'a sitemap URL must be less than {settings.BLOG_SITEMAP_LOC_SIZE} characters')
 
         self._loc = new_url
+
+    @property
+    def priority(self) -> float:
+        return self._priority
+
+    @priority.setter
+    def priority(self, value: float) -> None:
+        if settings.BLOG_SITEMAP_PRIORITY_RANGE[0] <= value <= settings.BLOG_SITEMAP_PRIORITY_RANGE[1]:
+            self._priority = value
+        else:
+            raise ValueError(f'a sitemap priority must be within a range '
+                             f'from {settings.BLOG_SITEMAP_PRIORITY_RANGE[0]} '
+                             f'to {settings.BLOG_SITEMAP_PRIORITY_RANGE[1]}')
