@@ -23,9 +23,10 @@ def add_sitemap_entry_to_context(loc: str, **kwargs) -> None:
 
 
 class SitemapEntry:
-    def __init__(self, loc: str, lastmod: Optional[datetime] = None):
+    def __init__(self, loc: str, lastmod: Optional[datetime] = None, changefreq: Optional[str] = None):
         self.loc = loc
         self.lastmod = datetime.now() if lastmod is None else lastmod
+        self.changefreq = changefreq or settings.BLOG_SITEMAP_DEFAULT_CHANGEFREQ
 
     @property
     def loc(self) -> str:

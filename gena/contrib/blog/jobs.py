@@ -215,6 +215,9 @@ def build_sitemap() -> None:
         lastmod = etree.SubElement(url, 'lastmod')
         lastmod.text = entry.lastmod.isoformat()
 
+        changefreq = etree.SubElement(url, 'changefreq')
+        changefreq.text = entry.changefreq
+
     sitemap = File(settings.DST_DIR, 'sitemap.xml', type=FileType.BINARY)
     sitemap.contents = etree.tostring(urlset, encoding='utf-8', xml_declaration=True)
     sitemap.save()

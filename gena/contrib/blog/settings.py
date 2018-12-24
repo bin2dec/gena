@@ -84,6 +84,8 @@ BLOG_SITEMAP = getattr(settings, 'BLOG_SITEMAP', True)
 
 BLOG_SITEMAP_LOC_SIZE = 2_048
 
+BLOG_SITEMAP_DEFAULT_CHANGEFREQ = 'monthly'
+
 if BLOG_SITEMAP and not BLOG_URL:
     logger.warning('The BLOG_URL setting is needed to create a proper "sitemap.xml" but it\'s empty. '
                    'So either disable the sitemap creating (BLOG_SITEMAP=False) or fill BLOG_URL')
