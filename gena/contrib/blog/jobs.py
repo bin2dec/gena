@@ -205,7 +205,7 @@ def build_sitemap() -> None:
     except KeyError:
         raise JobError('No sitemap entries are found to build "sitemap.xml"', build_sitemap)
 
-    urlset = etree.Element('urlset', {'xmlns': 'http://www.sitemaps.org/schemas/sitemap/0.9'})
+    urlset = etree.Element('urlset', {'xmlns': settings.BLOG_SITEMAP_SCHEMA})
     for entry in entries:
         url = etree.SubElement(urlset, 'url')
 

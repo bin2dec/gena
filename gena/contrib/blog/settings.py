@@ -82,6 +82,8 @@ BLOG_N_INDEX_FILE = 'index{}.html'
 
 BLOG_SITEMAP = getattr(settings, 'BLOG_SITEMAP', True)
 
+BLOG_SITEMAP_SCHEMA = 'http://www.sitemaps.org/schemas/sitemap/0.9'
+
 BLOG_SITEMAP_LOC_SIZE = 2_048
 BLOG_SITEMAP_PRIORITY_RANGE = [0.0, 1.0]
 
