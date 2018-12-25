@@ -24,7 +24,7 @@ def add_sitemap_entry_to_context(loc: str, **kwargs) -> None:
 
 class SitemapEntry:
     def __init__(self, loc: str, lastmod: Optional[datetime] = None, changefreq: Optional[str] = None,
-                 priority: Optional[float] = None):
+                 priority: Optional[float] = None, *args, **kwargs):
 
         self.loc = loc
         self.lastmod = datetime.now() if lastmod is None else lastmod

@@ -88,6 +88,8 @@ BLOG_SITEMAP_PRIORITY_RANGE = [0.0, 1.0]
 BLOG_SITEMAP_DEFAULT_CHANGEFREQ = 'monthly'
 BLOG_SITEMAP_DEFAULT_PRIORITY = 0.5
 
+BLOG_SITEMAP_META_PREFIX = 'sitemap-'
+
 if BLOG_SITEMAP and not BLOG_URL:
     logger.warning('The BLOG_URL setting is needed to create a proper "sitemap.xml" but it\'s empty. '
                    'So either disable the sitemap creating (BLOG_SITEMAP=False) or fill BLOG_URL')

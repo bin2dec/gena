@@ -34,7 +34,13 @@ class BlogPostProcessor(TextProcessor):
             raise StopProcessing(f'The blog post "{post.title}" is a draft', processor=self, file=file)
         elif post.status == BlogPostStatus.PUBLIC:
             context.add_to_list(settings.BLOG_CONTEXT_POSTS, post)
-            add_sitemap_entry_to_context(post.url, lastmod=post.modified)
+
+            start_pos = len(settings.BLOG_SITEMAP_META_PREFIX)
+            optional_tags = {k[start_pos:]: v[0] for k, v in file.meta.items()
+                             if k.startswith(settings.BLOG_SITEMAP_META_PREFIX)}  # looking for "sitemap-*" metas
+            optional_tags = {'lastmod': post.modified, **optional_tags}
+
+            add_sitemap_entry_to_context(post.url, **optional_tags)
 
         file.contents = self.template_engine.render(settings.BLOG_POST_TEMPLATE, {'post': post, **settings})
 
@@ -48,5 +54,8 @@ class SitemapProcessor(Processor):
 
     def process(self, file: FileLike) -> FileLike:
         file = super().process(file)
-        add_sitemap_entry_to_context(self.loc.format(file=file))
+        start_pos = len(settings.BLOG_SITEMAP_META_PREFIX)
+        optional_tags = {k[start_pos:]: v[0] for k, v in file.meta.items()
+                         if k.startswith(settings.BLOG_SITEMAP_META_PREFIX)}  # looking for "sitemap-*" metas
+        add_sitemap_entry_to_context(self.loc.format(file=file), **optional_tags)
         return file
