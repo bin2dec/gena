@@ -27,7 +27,7 @@ class SitemapEntry:
                  priority: Optional[float] = None, *args, **kwargs):
 
         self.loc = loc
-        self.lastmod = datetime.now() if lastmod is None else lastmod
+        self.lastmod = lastmod or datetime.now()
         self.changefreq = changefreq or settings.BLOG_SITEMAP_DEFAULT_CHANGEFREQ
         self.priority = priority or settings.BLOG_SITEMAP_DEFAULT_PRIORITY
 
