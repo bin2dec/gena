@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import gzip
 import logging
 import os
 import subprocess
@@ -24,6 +25,8 @@ __all__ = (
     'FileMetaProcessor',
     'FileNameProcessor',
     'GroupProcessor',
+    'GunzipProcessor',
+    'GzipProcessor',
     'MarkdownProcessor',
     'Processor',
     'SavingProcessor',
@@ -342,6 +345,24 @@ class GroupProcessor(Processor):
     def process(self, file: FileLike) -> FileLike:
         file = super().process(file)
         context.add_to_list(self.name, file)
+        return file
+
+
+class GunzipProcessor(BinaryProcessor):
+    """Decompress the file contents."""
+
+    def process(self, file: FileLike) -> FileLike:
+        file = super().process(file)
+        file.contents = gzip.decompress(file.contents)
+        return file
+
+
+class GzipProcessor(BinaryProcessor):
+    """Compress the file contents."""
+
+    def process(self, file: FileLike) -> FileLike:
+        file = super().process(file)
+        file.contents = gzip.compress(file.contents, compresslevel=settings.GZIP_COMPRESS_LEVEL)
         return file
 
 

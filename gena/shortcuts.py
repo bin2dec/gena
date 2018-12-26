@@ -49,6 +49,8 @@ __all__ = (
     'cssmin',
     'filename',
     'group',
+    'gunzip',
+    'gzip',
     'markdown',
     'meta_date',
     'meta_modified',
@@ -100,6 +102,14 @@ def group(name):
             'name': name,
         },
     }
+
+
+def gunzip():
+    return {'processor': 'gena.processors.GunzipProcessor'}
+
+
+def gzip():
+    return {'processor': 'gena.processors.GzipProcessor'}
 
 
 def markdown():
