@@ -80,7 +80,7 @@ BLOG_INDEX_FILE = getattr(settings, 'BLOG_INDEX_FILE', 'index.html')
 BLOG_N_INDEX_FILE = getattr(settings, 'BLOG_N_INDEX_FILE', 'index{}.html')
 
 
-BLOG_SITEMAP = getattr(settings, 'BLOG_SITEMAP', True)
+BLOG_SITEMAP = getattr(settings, 'BLOG_SITEMAP', False)
 
 BLOG_SITEMAP_SCHEMA = getattr(settings, 'BLOG_SITEMAP_SCHEMA', 'http://www.sitemaps.org/schemas/sitemap/0.9')
 
