@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import gzip
 import logging
 
 from collections import defaultdict
@@ -225,6 +226,8 @@ def build_sitemap() -> None:
         sitemap_file.contents = etree.tostring(sitemapindex, encoding='utf-8', xml_declaration=True)
         if len(sitemap_file.contents) > settings.BLOG_SITEMAP_FILE_SIZE:
             raise JobError(f'The sitemap file is too big (> {settings.BLOG_SITEMAP_FILE_SIZE} bytes)')
+        if settings.BLOG_SITEMAP_GZIP:
+            sitemap_file.contents = gzip.compress(sitemap_file.contents, compresslevel=settings.GZIP_COMPRESS_LEVEL)
         sitemap_file.save()
     else:
         groups = [entries]
@@ -253,6 +256,8 @@ def build_sitemap() -> None:
         sitemap_file.contents = etree.tostring(urlset, encoding='utf-8', xml_declaration=True)
         if len(sitemap_file.contents) > settings.BLOG_SITEMAP_FILE_SIZE:
             raise JobError(f'The sitemap file is too big (> {settings.BLOG_SITEMAP_FILE_SIZE} bytes)')
+        if settings.BLOG_SITEMAP_GZIP:
+            sitemap_file.contents = gzip.compress(sitemap_file.contents, compresslevel=settings.GZIP_COMPRESS_LEVEL)
         sitemap_file.save()
 
 

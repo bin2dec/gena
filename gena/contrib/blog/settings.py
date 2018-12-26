@@ -100,6 +100,8 @@ BLOG_SITEMAP_DEFAULT_PRIORITY = getattr(settings, 'BLOG_SITEMAP_DEFAULT_PRIORITY
 
 BLOG_SITEMAP_META_PREFIX = getattr(settings, 'BLOG_SITEMAP_META_PREFIX', 'sitemap-')
 
+BLOG_SITEMAP_GZIP = getattr(settings, 'BLOG_SITEMAP_GZIP', False)
+
 if BLOG_SITEMAP and not BLOG_URL:
     logger.warning('The BLOG_URL setting is needed to create a proper "sitemap.xml" but it\'s empty. '
                    'So either disable the sitemap creating (BLOG_SITEMAP=False) or fill BLOG_URL')
