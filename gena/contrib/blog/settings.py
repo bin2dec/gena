@@ -91,6 +91,8 @@ BLOG_SITEMAP_SIZE = getattr(settings, 'BLOG_SITEMAP_SIZE', 50_000)  # records
 BLOG_SITEMAP_FILE_SIZE = getattr(settings, 'BLOG_SITEMAP_FILE_SIZE', 1_048_576)  # bytes
 
 BLOG_SITEMAP_LOC_SIZE = getattr(settings, 'BLOG_SITEMAP_LOC_SIZE', 2_048)  # characters
+BLOG_SITEMAP_CHANGEFREQ_LIST = getattr(settings, 'BLOG_SITEMAP_CHANGEFREQ_LIST', ['always', 'hourly', 'daily', 'weekly',
+                                                                                  'monthly', 'yearly', 'never'])
 BLOG_SITEMAP_PRIORITY_RANGE = getattr(settings, 'BLOG_SITEMAP_PRIORITY_RANGE', [0.0, 1.0])
 
 BLOG_SITEMAP_DEFAULT_CHANGEFREQ = getattr(settings, 'BLOG_SITEMAP_DEFAULT_CHANGEFREQ', 'monthly')

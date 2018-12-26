@@ -48,6 +48,17 @@ class SitemapEntry:
         self._loc = new_url
 
     @property
+    def changefreq(self) -> str:
+        return self._changefreq
+
+    @changefreq.setter
+    def changefreq(self, value: str) -> None:
+        if value in settings.BLOG_SITEMAP_CHANGEFREQ_LIST:
+            self._changefreq = value
+        else:
+            raise ValueError(f'"{value}" is an invalid value for sitemap changefreq')
+
+    @property
     def priority(self) -> float:
         return self._priority
 
