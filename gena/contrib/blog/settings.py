@@ -69,20 +69,20 @@ BLOG_CONTEXT_POSTS = getattr(settings, 'BLOG_CONTEXT_POSTS', f'{BLOG_CONTEXT_PRE
 BLOG_CONTEXT_SITEMAP = getattr(settings, 'BLOG_CONTEXT_SITEMAP', f'{BLOG_CONTEXT_PREFIX}sitemap')
 
 
-BLOG_TEASER_REGEXP = r'<!--\s*more\s*-->'
+BLOG_TEASER_REGEXP = getattr(settings, 'BLOG_TEASER_REGEXP', r'<!--\s*more\s*-->')
 
 
 # How many posts are displayed per page. When BLOG_POSTS_PER_PAGE=0, all posts are displayed
 BLOG_POSTS_PER_PAGE = getattr(settings, 'BLOG_POSTS_PER_PAGE', 5)
 
 
-BLOG_INDEX_FILE = 'index.html'
-BLOG_N_INDEX_FILE = 'index{}.html'
+BLOG_INDEX_FILE = getattr(settings, 'BLOG_INDEX_FILE', 'index.html')
+BLOG_N_INDEX_FILE = getattr(settings, 'BLOG_N_INDEX_FILE', 'index{}.html')
 
 
 BLOG_SITEMAP = getattr(settings, 'BLOG_SITEMAP', True)
 
-BLOG_SITEMAP_SCHEMA = 'http://www.sitemaps.org/schemas/sitemap/0.9'
+BLOG_SITEMAP_SCHEMA = getattr(settings, 'BLOG_SITEMAP_SCHEMA', 'http://www.sitemaps.org/schemas/sitemap/0.9')
 
 BLOG_SITEMAP_FILENAME = getattr(settings, 'BLOG_SITEMAP_FILENAME', 'sitemap.xml')
 BLOG_N_SITEMAP_FILENAME = getattr(settings, 'BLOG_N_SITEMAP_FILENAME', 'sitemap{}.xml')
@@ -90,13 +90,13 @@ BLOG_N_SITEMAP_FILENAME = getattr(settings, 'BLOG_N_SITEMAP_FILENAME', 'sitemap{
 BLOG_SITEMAP_SIZE = getattr(settings, 'BLOG_SITEMAP_SIZE', 50_000)  # records
 BLOG_SITEMAP_FILE_SIZE = getattr(settings, 'BLOG_SITEMAP_FILE_SIZE', 1_048_576)  # bytes
 
-BLOG_SITEMAP_LOC_SIZE = 2_048
-BLOG_SITEMAP_PRIORITY_RANGE = [0.0, 1.0]
+BLOG_SITEMAP_LOC_SIZE = getattr(settings, 'BLOG_SITEMAP_LOC_SIZE', 2_048)  # characters
+BLOG_SITEMAP_PRIORITY_RANGE = getattr(settings, 'BLOG_SITEMAP_PRIORITY_RANGE', [0.0, 1.0])
 
-BLOG_SITEMAP_DEFAULT_CHANGEFREQ = 'monthly'
-BLOG_SITEMAP_DEFAULT_PRIORITY = 0.5
+BLOG_SITEMAP_DEFAULT_CHANGEFREQ = getattr(settings, 'BLOG_SITEMAP_DEFAULT_CHANGEFREQ', 'monthly')
+BLOG_SITEMAP_DEFAULT_PRIORITY = getattr(settings, 'BLOG_SITEMAP_DEFAULT_PRIORITY', 0.5)
 
-BLOG_SITEMAP_META_PREFIX = 'sitemap-'
+BLOG_SITEMAP_META_PREFIX = getattr(settings, 'BLOG_SITEMAP_META_PREFIX', 'sitemap-')
 
 if BLOG_SITEMAP and not BLOG_URL:
     logger.warning('The BLOG_URL setting is needed to create a proper "sitemap.xml" but it\'s empty. '
