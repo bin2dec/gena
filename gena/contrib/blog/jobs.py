@@ -10,7 +10,7 @@ from typing import Mapping, Optional, Sequence
 from lxml import etree
 
 from gena.context import context
-from gena.contrib.blog.sitemap import add_sitemap_entry_to_context
+from gena.contrib.blog.sitemap import add_sitemap_entry_to_context, SitemapEntry
 from gena.exceptions import JobError
 from gena.files import File, FileType
 from gena.settings import settings
@@ -205,25 +205,55 @@ def build_sitemap() -> None:
     except KeyError:
         raise JobError('No sitemap entries are found to build "sitemap.xml"', build_sitemap)
 
-    urlset = etree.Element('urlset', {'xmlns': settings.BLOG_SITEMAP_SCHEMA})
-    for entry in entries:
-        url = etree.SubElement(urlset, 'url')
+    if settings.BLOG_SITEMAP_SIZE and len(entries) > settings.BLOG_SITEMAP_SIZE:
+        groups = [entries[i:i+settings.BLOG_SITEMAP_SIZE] for i in range(0, len(entries), settings.BLOG_SITEMAP_SIZE)]
+        filename = settings.BLOG_N_SITEMAP_FILENAME
 
-        loc = etree.SubElement(url, 'loc')
-        loc.text = entry.loc
+        # Build a sitemap index
+        sitemapindex = etree.Element('sitemapindex', {'xmlns': settings.BLOG_SITEMAP_SCHEMA})
 
-        lastmod = etree.SubElement(url, 'lastmod')
-        lastmod.text = entry.lastmod.isoformat()
+        for i in range(1, len(groups) + 1):
+            entry = SitemapEntry(f'{settings.BLOG_URL}/{settings.BLOG_N_SITEMAP_FILENAME.format(i)}')
 
-        changefreq = etree.SubElement(url, 'changefreq')
-        changefreq.text = entry.changefreq
+            sitemap = etree.SubElement(sitemapindex, 'sitemap')
+            loc = etree.SubElement(sitemap, 'loc')
+            loc.text = entry.loc
+            lastmod = etree.SubElement(sitemap, 'lastmod')
+            lastmod.text = entry.lastmod.isoformat()
 
-        priority = etree.SubElement(url, 'priority')
-        priority.text = str(entry.priority)
+        sitemap_file = File(f'{settings.DST_DIR}/{settings.BLOG_SITEMAP_FILENAME}', type=FileType.BINARY)
+        sitemap_file.contents = etree.tostring(sitemapindex, encoding='utf-8', xml_declaration=True)
+        if len(sitemap_file.contents) > settings.BLOG_SITEMAP_FILE_SIZE:
+            raise JobError(f'The sitemap file is too big (> {settings.BLOG_SITEMAP_FILE_SIZE} bytes)')
+        sitemap_file.save()
+    else:
+        groups = [entries]
+        filename = settings.BLOG_SITEMAP_FILENAME
 
-    sitemap = File(settings.DST_DIR, 'sitemap.xml', type=FileType.BINARY)
-    sitemap.contents = etree.tostring(urlset, encoding='utf-8', xml_declaration=True)
-    sitemap.save()
+    # Build a sitemap or multiple sitemaps
+    for i, group in enumerate(groups, start=1):
+        urlset = etree.Element('urlset', {'xmlns': settings.BLOG_SITEMAP_SCHEMA})
+
+        for entry in group:  # an each group contains BLOG_SITEMAP_SIZE-entries
+            url = etree.SubElement(urlset, 'url')
+
+            loc = etree.SubElement(url, 'loc')
+            loc.text = entry.loc
+
+            lastmod = etree.SubElement(url, 'lastmod')
+            lastmod.text = entry.lastmod.isoformat()
+
+            changefreq = etree.SubElement(url, 'changefreq')
+            changefreq.text = entry.changefreq
+
+            priority = etree.SubElement(url, 'priority')
+            priority.text = str(entry.priority)
+
+        sitemap_file = File(f'{settings.DST_DIR}/{filename.format(i)}', type=FileType.BINARY)
+        sitemap_file.contents = etree.tostring(urlset, encoding='utf-8', xml_declaration=True)
+        if len(sitemap_file.contents) > settings.BLOG_SITEMAP_FILE_SIZE:
+            raise JobError(f'The sitemap file is too big (> {settings.BLOG_SITEMAP_FILE_SIZE} bytes)')
+        sitemap_file.save()
 
 
 def build_tags(template_engine: Optional[TemplateEngine] = None) -> None:

@@ -84,6 +84,12 @@ BLOG_SITEMAP = getattr(settings, 'BLOG_SITEMAP', True)
 
 BLOG_SITEMAP_SCHEMA = 'http://www.sitemaps.org/schemas/sitemap/0.9'
 
+BLOG_SITEMAP_FILENAME = getattr(settings, 'BLOG_SITEMAP_FILENAME', 'sitemap.xml')
+BLOG_N_SITEMAP_FILENAME = getattr(settings, 'BLOG_N_SITEMAP_FILENAME', 'sitemap{}.xml')
+
+BLOG_SITEMAP_SIZE = getattr(settings, 'BLOG_SITEMAP_SIZE', 50_000)  # records
+BLOG_SITEMAP_FILE_SIZE = getattr(settings, 'BLOG_SITEMAP_FILE_SIZE', 1_048_576)  # bytes
+
 BLOG_SITEMAP_LOC_SIZE = 2_048
 BLOG_SITEMAP_PRIORITY_RANGE = [0.0, 1.0]
 
