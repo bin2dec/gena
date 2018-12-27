@@ -7,9 +7,9 @@ from setuptools import find_packages, setup
 REQUIREMENTS = [
     'jinja2 >= 2.10',
     'lxml >= 4.2.5',
-    'markdown >= 2.6.11',
-    'python-dateutil >= 2.7.3',
-    'python-slugify >= 1.2.6',
+    'markdown >= 3.0.1',
+    'python-dateutil >= 2.7.5',
+    'python-slugify >= 2.0.0',
     'watchdog >= 0.9.0',
 ]
 
