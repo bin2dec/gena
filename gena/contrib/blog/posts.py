@@ -2,12 +2,12 @@ from __future__ import annotations
 
 import re
 
-import lxml.html
-
 from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum
 from typing import Sequence
+
+import lxml.html
 
 from slugify import slugify
 
