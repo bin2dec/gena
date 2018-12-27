@@ -46,15 +46,20 @@ from gena import utils
 
 __all__ = (
     'bundle',
+    'cssmin',
     'filename',
     'group',
+    'gunzip',
+    'gzip',
     'markdown',
     'meta_date',
     'meta_modified',
     'meta_slug',
+    'sass',
     'save',
     'stdout',
     'template',
+    'uglifyjs',
 )
 
 
@@ -63,6 +68,20 @@ def bundle(name):
         'processor': 'gena.processors.BundleProcessor',
         'options': {
             'name': name,
+        },
+    }
+
+
+def cssmin(args=None):
+    """You need to install cssmin to use this shortcut: https://github.com/jbleuzen/node-cssmin#installation."""
+
+    if args is None:
+        args = ('cssmin',)
+
+    return {
+        'processor': 'gena.processors.ExternalProcessor',
+        'options': {
+            'command': args,
         },
     }
 
@@ -83,6 +102,14 @@ def group(name):
             'name': name,
         },
     }
+
+
+def gunzip():
+    return {'processor': 'gena.processors.GunzipProcessor'}
+
+
+def gzip():
+    return {'processor': 'gena.processors.GzipProcessor'}
 
 
 def markdown():
@@ -122,6 +149,20 @@ def meta_slug():
     }
 
 
+def sass(args=None):
+    """You need to install Sass to use this shortcut: http://sass-lang.com/install."""
+
+    if args is None:
+        args = ('sass', '--stdin', '-s', 'compressed')
+
+    return {
+        'processor': 'gena.processors.ExternalProcessor',
+        'options': {
+            'command': args,
+        },
+    }
+
+
 def save(append=False, path=''):
     return {
         'processor': 'gena.processors.SavingProcessor',
@@ -142,5 +183,19 @@ def template(name, engine=None):
         'options': {
             'template': name,
             'engine': engine,
+        },
+    }
+
+
+def uglifyjs(args=None):
+    """You need to install UglifyJS to use this shortcut: https://github.com/mishoo/UglifyJS2#install."""
+
+    if args is None:
+        args = ('uglifyjs', '-c', '-m')
+
+    return {
+        'processor': 'gena.processors.ExternalProcessor',
+        'options': {
+            'command': args,
         },
     }

@@ -5,11 +5,10 @@ import logging
 import os
 import re
 
-from typing import Iterable
-
 from gena import utils
+from gena.exceptions import StopProcessing
+from gena.jobs import do_final_jobs, do_initial_jobs
 from gena.settings import settings
-from gena.utils import map_as_kwargs
 
 
 __all__ = (
@@ -18,41 +17,6 @@ __all__ = (
 
 
 logger = logging.getLogger(__name__)
-
-
-def do_jobs(jobs: Iterable):
-    """Do jobs from the given list.
-
-    A job is a special callable object that can be called before or after the file processing.
-    An example of a valid job list (can be declared in your settings):
-
-    INITIAL_JOBS = (
-        {'job': 'gena.jobs.clear_dst_dir'},
-    )
-    """
-
-    debug = logger.isEnabledFor(logging.DEBUG)
-
-    for job in jobs:
-        obj = job['job']
-        if not callable(obj):
-            obj = utils.import_attr(obj)
-        options = job.get('options', {})
-        if debug:
-            logger.debug('Doing the %s(%s) job', obj.__name__, map_as_kwargs(options))
-        obj(**options)
-
-
-def do_initial_jobs():
-    """Initial jobs are called before the file processing."""
-    logger.debug('Doing the initial jobs')
-    do_jobs(settings.INITIAL_JOBS)
-
-
-def do_final_jobs():
-    """Final jobs are called after the file processing."""
-    logger.debug('Doing the final jobs')
-    do_jobs(settings.FINAL_JOBS)
 
 
 class FileRunner:
@@ -77,6 +41,8 @@ class FileRunner:
 
             new_processors = []
             for processor in rule['processors']:
+                if processor is None:
+                    continue
                 new_processor = utils.import_attr(processor['processor'])
                 new_processor = new_processor(**processor.get('options', {}))
                 new_processors.append(new_processor.process)
@@ -105,6 +71,9 @@ class FileRunner:
                 return rule
 
     def _get_tasks(self):
+        if not self._rules:
+            return
+
         counter = itertools.count()  # the counter is needed in situations when priorities are equal
         queue = []
 
@@ -127,19 +96,27 @@ class FileRunner:
                 except IndexError:
                     break
 
+    def is_path_applicable(self, path):
+        return bool(self._get_rule(path))
+
     def run(self):
-        if not self._rules:
-            return 0
+        tasks = self._get_tasks()
+        if not tasks:
+            return []
 
         do_initial_jobs()
 
-        file_counter = 0
-        for file, processors in self._get_tasks():
+        files = []
+        for file, processors in tasks:
             logger.info('Processing "%s"', file.path)
             for processor in processors:
-                file = processor(file)
-            file_counter += 1
+                try:
+                    file = processor(file)
+                except StopProcessing as e:
+                    logger.debug('Stop processing "%s". %s', e.file, e.message)
+                    break
+            files.append(file)
 
         do_final_jobs()
 
-        return file_counter
+        return files

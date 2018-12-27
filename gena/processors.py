@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+import gzip
 import logging
+import os
 import subprocess
 
 from abc import ABC, abstractmethod
@@ -23,6 +25,8 @@ __all__ = (
     'FileMetaProcessor',
     'FileNameProcessor',
     'GroupProcessor',
+    'GunzipProcessor',
+    'GzipProcessor',
     'MarkdownProcessor',
     'Processor',
     'SavingProcessor',
@@ -174,18 +178,25 @@ class ExternalProcessor(Processor):
     Here we used third-party minifier called UglifyJS (http://lisperator.net/uglifyjs/) to compress these files.
     """
 
-    def __init__(self, *, command: Sequence[str], **kwargs) -> None:
+    def __init__(self, *, command: Sequence[str], chdir: Optional[str] = None, **kwargs) -> None:
         super().__init__(**kwargs)
         self.command = command
+        self.chdir = chdir
 
     def process(self, file: FileLike) -> FileLike:
         file = super().process(file)
+        curdir = os.getcwd()
+        if self.chdir is None:
+            os.chdir(file.path.directory)
+        else:
+            os.chdir(self.chdir)
         output = subprocess.run(self.command,
                                 input=file.contents,
                                 shell=False,
                                 stdout=subprocess.PIPE,
                                 text=file.is_text() or None,
                                 **settings.EXTERNAL_PROCESSOR)
+        os.chdir(curdir)
         file.contents = output.stdout
         return file
 
@@ -329,11 +340,29 @@ class GroupProcessor(Processor):
 
     def __init__(self, *, name: str, **kwargs) -> None:
         super().__init__(**kwargs)
-        self.group = context.add_item(name, [])
+        self.name = name
 
     def process(self, file: FileLike) -> FileLike:
         file = super().process(file)
-        self.group.append(file)
+        context.add_to_list(self.name, file)
+        return file
+
+
+class GunzipProcessor(BinaryProcessor):
+    """Decompress the file contents."""
+
+    def process(self, file: FileLike) -> FileLike:
+        file = super().process(file)
+        file.contents = gzip.decompress(file.contents)
+        return file
+
+
+class GzipProcessor(BinaryProcessor):
+    """Compress the file contents."""
+
+    def process(self, file: FileLike) -> FileLike:
+        file = super().process(file)
+        file.contents = gzip.compress(file.contents, compresslevel=settings.GZIP_COMPRESS_LEVEL)
         return file
 
 
@@ -468,9 +497,6 @@ class TemplateProcessor(TextProcessor):
         },
         ...
     )
-
-    The processor uses settings.TEMPLATE_DIRS to find templates. TEMPLATE_DIRS can be a string or a list of strings
-    if multiple locations are wanted.
 
     The default template engine is Jinja2.
     """

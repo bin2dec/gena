@@ -10,6 +10,7 @@ markdown = "*"
 python-dateutil = "*"
 python-slugify = "*"
 lxml = "*"
+watchdog = "*"
 
 [dev-packages]
 mypy = "*"

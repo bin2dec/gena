@@ -2,62 +2,60 @@
 
 from __future__ import annotations
 
-import re
-
-from dataclasses import dataclass
 from typing import Optional
 
-import lxml.html
-
 from gena.context import context
-from gena.files import FileLike, FileMetaValue
-from gena.processors import TextProcessor
+from gena.contrib.blog.posts import BlogPost, BlogPostStatus
+from gena.contrib.blog.sitemap import add_sitemap_entry_to_context
+from gena.exceptions import StopProcessing
+from gena.files import FileLike
+from gena.processors import Processor, TextProcessor
 from gena.settings import settings
+from gena.templating import JinjaTemplateEngine, TemplateEngine
 
 
 __all__ = (
     'BlogPostProcessor',
+    'SitemapProcessor',
 )
 
 
-@dataclass()
-class Post:
-    author: FileMetaValue
-    date: FileMetaValue
-    teaser: str
-    title: FileMetaValue
-    url: str
-    contents: Optional[str] = None
-
-
 class BlogPostProcessor(TextProcessor):
-    contents = False
-
-    def __init__(self, **kwargs) -> None:
+    def __init__(self, template_engine: Optional[TemplateEngine] = None, **kwargs) -> None:
         super().__init__(**kwargs)
-        self._posts = context.add_item(settings.BLOG_CONTEXT_POSTS, [])
-        self._teaser_regexp = re.compile(settings.BLOG_TEASER_REGEXP)
+        self.template_engine = template_engine or JinjaTemplateEngine()
 
     def process(self, file: FileLike) -> FileLike:
         file = super().process(file)
 
-        body = lxml.html.fragment_fromstring(file.contents, 'body')
-        body = lxml.html.tostring(body, encoding='unicode')
-        teaser = self._teaser_regexp.split(body, maxsplit=1)[0]
-        teaser = lxml.html.fromstring(teaser)
-        teaser = lxml.html.tostring(teaser, encoding='unicode')
+        post = BlogPost.from_file(file)
 
-        post = Post(
-            author=file.meta.author,
-            date=file.meta.date,
-            teaser=teaser,
-            title=file.meta.title,
-            url=f'{settings.BLOG_POSTS_DIR}/{file.meta.slug}/',
-        )
+        if post.status == BlogPostStatus.DRAFT:
+            raise StopProcessing(f'The blog post "{post.title}" is a draft', processor=self, file=file)
+        elif post.status == BlogPostStatus.PUBLIC:
+            context.add_to_list(settings.BLOG_CONTEXT_POSTS, post)
 
-        if self.contents:
-            post.contents = file.contents
+            start_pos = len(settings.BLOG_SITEMAP_META_PREFIX)
+            optional_tags = {k[start_pos:]: v[0] for k, v in file.meta.items()
+                             if k.startswith(settings.BLOG_SITEMAP_META_PREFIX)}  # looking for "sitemap-*" metas
+            optional_tags = {'lastmod': post.modified, **optional_tags}
 
-        self._posts.append(post)
+            add_sitemap_entry_to_context(post.url, **optional_tags)
 
+        file.contents = self.template_engine.render(settings.BLOG_POST_TEMPLATE, {'post': post, **settings})
+
+        return file
+
+
+class SitemapProcessor(Processor):
+    def __init__(self, loc: str, **kwargs) -> None:
+        super().__init__(**kwargs)
+        self.loc = loc
+
+    def process(self, file: FileLike) -> FileLike:
+        file = super().process(file)
+        start_pos = len(settings.BLOG_SITEMAP_META_PREFIX)
+        optional_tags = {k[start_pos:]: v[0] for k, v in file.meta.items()
+                         if k.startswith(settings.BLOG_SITEMAP_META_PREFIX)}  # looking for "sitemap-*" metas
+        add_sitemap_entry_to_context(self.loc.format(file=file), **optional_tags)
         return file

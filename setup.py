@@ -6,17 +6,16 @@ from setuptools import find_packages, setup
 
 REQUIREMENTS = [
     'jinja2 >= 2.10',
-    'markdown >= 2.6.11',
-    'python-dateutil >= 2.7.3',
-    'python-slugify >= 1.2.6',
+    'lxml >= 4.2.5',
+    'markdown >= 3.0.1',
+    'python-dateutil >= 2.7.5',
+    'python-slugify >= 2.0.0',
+    'watchdog >= 0.9.0',
 ]
 
 EXTRAS = {
     'minifiers': [
         'htmlmin >= 0.1.12',
-    ],
-    'blog': [
-        'lxml >= 4.2.5',
     ],
 }
 
@@ -46,7 +45,7 @@ setup(
     version=get_version(),
     description='A universal static site generator.',
     long_description=get_long_description(),
-    author='Dmitriy Pakhomov',
+    author='Dmitry Pakhomov',
     author_email='d_pakhomoff@gmail.com',
     license='AGPLv3',
     url='https://gitlab.com/dec0der/gena',

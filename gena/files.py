@@ -55,6 +55,10 @@ class FileMeta(UserDict):
 
 
 class FilePathLike(os.PathLike):
+    @abstractmethod
+    def __eq__(self, other: Any) -> bool:
+        pass
+
     @property
     @abstractmethod
     def basename(self) -> str:
@@ -106,7 +110,7 @@ class FilePathLike(os.PathLike):
         pass
 
     @abstractmethod
-    def copy(self) -> FilePath:
+    def copy(self) -> FilePathLike:
         pass
 
 
@@ -233,6 +237,10 @@ class FilePath(FilePathLike):
 
 
 class FileLike(ABC):
+    @abstractmethod
+    def __eq__(self, other: Any) -> bool:
+        pass
+
     @property
     @abstractmethod
     def contents(self) -> FileContents:
@@ -264,6 +272,10 @@ class FileLike(ABC):
         pass
 
     @abstractmethod
+    def copy(self) -> File:
+        pass
+
+    @abstractmethod
     def is_binary(self) -> bool:
         pass
 
@@ -288,6 +300,11 @@ class File(FileLike):
 
         for key, value in kwargs.items():
             setattr(self, key, value)
+
+    def __eq__(self, other: Any) -> bool:
+        if isinstance(other, File):
+            return self.path == other.path
+        return False
 
     def __repr__(self, *args, **kwargs):
         return f'{self.__class__.__name__}({self._path.path!r}, type={self._type})'
@@ -347,6 +364,9 @@ class File(FileLike):
                 else:
                     raise TypeError('unknown or not acceptable type')
             self._type = type_
+
+    def copy(self) -> File:
+        return self.__class__(self.path)
 
     def is_binary(self) -> bool:
         return self._type is FileType.BINARY

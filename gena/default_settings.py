@@ -10,16 +10,14 @@ DST_DIR = 'dist'
 DEBUG = False
 
 
-# List of additional settings modules
-EXTRA_SETTINGS = ()
-
-
-# TEMPLATE_DIRS contains the path to the templates as string, or if multiple locations are wanted a list of them.
+# EXTRA_SETTINGS is a list of additional settings modules.
 # For example:
-# TEMPLATE_DIRS = '/path/to/templates'
-# or
-# TEMPLATE_DIRS = ['/path/to/templates', '/other/path']
-TEMPLATE_DIRS = 'templates'
+# EXTRA_SETTINGS = ['gena.contrib.blog.settings']
+EXTRA_SETTINGS = []
+
+
+# TEMPLATE_DIRS contains a list of the paths to the templates.
+TEMPLATE_DIRS = ['templates']
 
 
 CACHE_DIR = ''
@@ -41,7 +39,7 @@ DEFAULT_PRIORITY = 100
 # JOBS
 # Chains of callable objects, which are called one by one before and after the file processing.
 # For example:
-# FINAL_JOBS = (
+# FINAL_JOBS = [
 #     ...
 #     {
 #         'job': 'gena.jobs.generate_file_from_template',
@@ -50,13 +48,13 @@ DEFAULT_PRIORITY = 100
 #         },
 #     },
 #     ...
-# )
+# ]
 
 # Initial jobs are called before the file processing.
-INITIAL_JOBS = ()
+INITIAL_JOBS = []
 
 # Final jobs are called after the file processing.
-FINAL_JOBS = ()
+FINAL_JOBS = []
 
 
 # See possible options http://jinja.pocoo.org/docs/api/#jinja2.Environment
@@ -72,7 +70,7 @@ MARKDOWN_OPTIONS = {
 
 
 # RULES is a list of rules to create processing tasks.
-RULES = ()
+RULES = []
 
 
 # See https://docs.python.org/3.7/library/subprocess.html#subprocess.run
@@ -80,5 +78,15 @@ EXTERNAL_PROCESSOR = {
     'check': True,
 }
 
-# Modify the logging system. Add a logger configurator. Do a bit of optimization
+
 LOGGER_CONFIGURATOR = 'gena.log.config'
+
+
+# A minimal interval between two runs of the file processing
+RERUN_INTERVAL = 1  # sec
+
+
+# A gzip compression level. It's is an integer from 0 to 9 controlling the level of compression;
+# 1 is fastest and produces the least compression, and 9 is slowest and produces the most compression.
+# 0 is no compression
+GZIP_COMPRESS_LEVEL = 9
