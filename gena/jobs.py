@@ -75,6 +75,9 @@ def clear_dst_dir() -> None:
     Now, before the file processing, your directory will be thoroughly cleaned up!
     """
 
+    if not os.path.exists(settings.DST_DIR):
+        return
+
     with os.scandir(settings.DST_DIR) as scandir:
         for file in scandir:
             if file.is_file():
