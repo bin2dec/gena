@@ -56,7 +56,7 @@ def save_posts(posts: Sequence, *, directory: str, template: str, template_engin
     # Create a page for each blog post group (index.html...indexN.html).
     # Save this page into a given directory
     for i, group in enumerate(groups, start=1):
-        template_context = {'posts': group, **extra_context, **settings}
+        template_context = {'context': context, 'posts': group, **extra_context, **settings}
 
         if i == 1:  # the first page
             template_context['previous_page'] = None
@@ -110,7 +110,14 @@ def build_archive(template_engine: Optional[TemplateEngine] = None) -> None:
             )
 
     archive = File(settings.DST_DIR, settings.BLOG_ARCHIVE_DIR, settings.BLOG_INDEX_FILE)
-    archive.contents = template_engine.render(settings.BLOG_ARCHIVE_TEMPLATE, {'years': years, **settings})
+    archive.contents = template_engine.render(
+        settings.BLOG_ARCHIVE_TEMPLATE,
+        {
+            'context': context,
+            'years': years,
+            **settings,
+        }
+    )
     archive.save()
 
     add_sitemap_entry_to_context(f'{settings.BLOG_ARCHIVE_URL}/')
@@ -145,7 +152,14 @@ def build_authors(template_engine: Optional[TemplateEngine] = None) -> None:
             authors[author].append(post)
 
     author_list = File(settings.DST_DIR, settings.BLOG_AUTHORS_DIR, settings.BLOG_INDEX_FILE)
-    author_list.contents = template_engine.render(settings.BLOG_AUTHOR_LIST_TEMPLATE, {'authors': authors, **settings})
+    author_list.contents = template_engine.render(
+        settings.BLOG_AUTHOR_LIST_TEMPLATE,
+        {
+            'context': context,
+            'authors': authors,
+            **settings,
+        }
+    )
     author_list.save()
 
     add_sitemap_entry_to_context(f'{settings.BLOG_AUTHORS_URL}/')
@@ -170,8 +184,14 @@ def build_categories(template_engine: Optional[TemplateEngine] = None) -> None:
             categories[post.category].append(post)
 
     category_list = File(settings.DST_DIR, settings.BLOG_CATEGORIES_DIR, settings.BLOG_INDEX_FILE)
-    category_list.contents = template_engine.render(settings.BLOG_CATEGORY_LIST_TEMPLATE,
-                                                    {'categories': categories, **settings})
+    category_list.contents = template_engine.render(
+        settings.BLOG_CATEGORY_LIST_TEMPLATE,
+        {
+            'categories': categories,
+            'context': context,
+            **settings,
+        }
+    )
     category_list.save()
 
     add_sitemap_entry_to_context(f'{settings.BLOG_CATEGORIES_URL}/')
@@ -278,7 +298,14 @@ def build_tags(template_engine: Optional[TemplateEngine] = None) -> None:
             tags[tag].append(post)
 
     tag_list = File(settings.DST_DIR, settings.BLOG_TAGS_DIR, settings.BLOG_INDEX_FILE)
-    tag_list.contents = template_engine.render(settings.BLOG_TAG_LIST_TEMPLATE, {'tags': tags, **settings})
+    tag_list.contents = template_engine.render(
+        settings.BLOG_TAG_LIST_TEMPLATE,
+        {
+            'context': context,
+            'tags': tags,
+            **settings,
+        }
+    )
     tag_list.save()
 
     add_sitemap_entry_to_context(f'{settings.BLOG_TAGS_URL}/')

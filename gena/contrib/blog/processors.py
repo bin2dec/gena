@@ -42,7 +42,14 @@ class BlogPostProcessor(TextProcessor):
 
             add_sitemap_entry_to_context(post.url, **optional_tags)
 
-        file.contents = self.template_engine.render(settings.BLOG_POST_TEMPLATE, {'post': post, **settings})
+        file.contents = self.template_engine.render(
+            settings.BLOG_POST_TEMPLATE,
+            {
+                'context': context,
+                'post': post,
+                **settings,
+            }
+        )
 
         return file
 
