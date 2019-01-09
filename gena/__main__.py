@@ -85,21 +85,13 @@ def _build(args):
     if args.dst is not None:
         settings.DST_DIR = args.dst
 
-    try:
-        runner = utils.import_attr(settings.RUNNER)
-        start_time = time()
-        runner = runner()
-        files = runner.run()
-    except Exception as exception:
-        logger.critical(exception)
+    runner = utils.import_attr(settings.RUNNER)
+    start_time = time()
+    runner = runner()
+    files = runner.run()
 
-        if settings.DEBUG:
-            raise
-        else:
-            sys.exit(1)
-    else:
-        if not args.log_level == logging.CRITICAL:
-            print(f'Finished in {time() - start_time:.2f} sec. with {len(files)} file(s) processed')
+    if not args.log_level == logging.CRITICAL:
+        print(f'Finished in {time() - start_time:.2f} sec. with {len(files)} file(s) processed')
 
 
 def _run(args):
@@ -111,43 +103,34 @@ def _run(args):
     if args.dst is not None:
         settings.DST_DIR = args.dst
 
-    try:
-        runner = utils.import_attr(settings.RUNNER)
-        runner = runner()
-        runner.run()
+    runner = utils.import_attr(settings.RUNNER)
+    runner = runner()
+    runner.run()
 
-        if args.watch:
-            source_file_handler = SourceFileSystemEventHandler(runner)
-            template_file_handler = TemplateFileSystemEventHandler(runner)
-            observer = Observer()
-            observer.schedule(source_file_handler, settings.SRC_DIR, recursive=True)
-            for template_dir in settings.TEMPLATE_DIRS:
-                observer.schedule(template_file_handler, template_dir, recursive=True)
-            observer.start()
-        else:
-            observer = None
+    if args.watch:
+        source_file_handler = SourceFileSystemEventHandler(runner)
+        template_file_handler = TemplateFileSystemEventHandler(runner)
+        observer = Observer()
+        observer.schedule(source_file_handler, settings.SRC_DIR, recursive=True)
+        for template_dir in settings.TEMPLATE_DIRS:
+            observer.schedule(template_file_handler, template_dir, recursive=True)
+        observer.start()
+    else:
+        observer = None
 
-        if not args.log_level == logging.CRITICAL:
-            print(f'Starting an HTTP server at http://{args.address}:{args.port}/\n'
-                  f'Press Ctrl-C to stop the server')
+    if not args.log_level == logging.CRITICAL:
+        print(f'Starting an HTTP server at http://{args.address}:{args.port}/\n'
+              f'Press Ctrl-C to stop the server')
 
-        with HTTPServer((args.address, args.port), HTTPRequestHandler) as httpd:
-            try:
-                httpd.serve_forever()
-            except KeyboardInterrupt:
-                if not args.log_level == logging.CRITICAL:
-                    print('Stopping the HTTP server')
-                if observer:
-                    observer.stop()
-                    observer.join()
-
-    except Exception as exception:
-        logger.critical(exception)
-
-        if settings.DEBUG:
-            raise
-        else:
-            sys.exit(1)
+    with HTTPServer((args.address, args.port), HTTPRequestHandler) as httpd:
+        try:
+            httpd.serve_forever()
+        except KeyboardInterrupt:
+            if not args.log_level == logging.CRITICAL:
+                print('Stopping the HTTP server')
+            if observer:
+                observer.stop()
+                observer.join()
 
 
 def main():
@@ -261,26 +244,34 @@ def main():
 
     run.set_defaults(func=_run)
 
-    args = parser.parse_args()
+    try:
+        args = parser.parse_args()
 
-    if args.settings and os.path.exists(args.settings):
-        settings.load_from_file(args.settings)
+        if args.settings and os.path.exists(args.settings):
+            settings.load_from_file(args.settings)
 
-    if args.log_level == logging.DEBUG:
-        settings.DEBUG = True
+        if args.log_level == logging.DEBUG:
+            settings.DEBUG = True
 
-    log_config = utils.import_attr(settings.LOGGER_CONFIGURATOR)
-    log_config(args.log_level)
+        log_config = utils.import_attr(settings.LOGGER_CONFIGURATOR)
+        log_config(args.log_level)
 
-    if logger.isEnabledFor(logging.DEBUG):
-        logger.debug('GenA %s', __version__)
-        logger.debug('Python %s on %s', sysconfig.get_python_version(), sysconfig.get_platform())
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug('GenA %s', __version__)
+            logger.debug('Python %s on %s', sysconfig.get_python_version(), sysconfig.get_platform())
 
-    for extra_settings in settings.EXTRA_SETTINGS:
-        logger.debug('Loading extra settings from "%s"', extra_settings)
-        settings.load_from_module(extra_settings)
+        for extra_settings in settings.EXTRA_SETTINGS:
+            logger.debug('Loading extra settings from "%s"', extra_settings)
+            settings.load_from_module(extra_settings)
 
-    args.func(args)
+        args.func(args)
+    except Exception as exception:
+        logger.critical(exception)
+
+        if settings.DEBUG:
+            raise
+        else:
+            sys.exit(1)
 
 
 if __name__ == '__main__':
