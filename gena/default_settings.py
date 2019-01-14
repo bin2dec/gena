@@ -64,7 +64,7 @@ JINJA_OPTIONS = {}
 # See possible options https://python-markdown.github.io/reference/#markdown
 # See the list of built-in extensions https://python-markdown.github.io/extensions/
 MARKDOWN_OPTIONS = {
-    'extensions': ['markdown.extensions.meta'],
+    'extensions': ['gena.md:SettingsExtension', 'markdown.extensions.meta'],
     'output_format': 'html5',
 }
 
