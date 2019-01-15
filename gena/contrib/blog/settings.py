@@ -127,21 +127,21 @@ _template_engine = JinjaTemplateEngine()
 
 RULES = settings.RULES + [
     {
-        'retest': r'favicon\.(gif|ico|jpe?g|png|svg)$',
+        'retest': r'/favicon\.(gif|ico|jpe?g|png|svg)$',
         'processors': (
             save(path=f'{settings.DST_DIR}/favicon.ico'),
         ),
     },
 
     {
-        'retest': fr'{BLOG_IMAGES_ASSETS}/.*\.(bmp|gif|ico|jpe?g|png|svg|tiff?)$',
+        'retest': fr'/{BLOG_IMAGES_ASSETS}/.*\.(bmp|gif|ico|jpe?g|png|svg|tiff?)$',
         'processors': (
             save(path=f'{BLOG_IMAGES_ASSETS_DIR}/{{file.path.name}}'),
         ),
     },
 
     {
-        'test': f'{BLOG_PAGES}/*.md',
+        'test': f'/{BLOG_PAGES}/*.md',
         'processors': (
             markdown(),
             meta_date(),
@@ -154,7 +154,7 @@ RULES = settings.RULES + [
     },
 
     {
-        'test': f'{BLOG_POSTS}/*.md',
+        'test': f'/{BLOG_POSTS}/*.md',
         'processors': (
             markdown(),
             meta_date(),
@@ -166,14 +166,14 @@ RULES = settings.RULES + [
     },
 
     {
-        'retest': fr'{BLOG_FONTS_ASSETS}/.*\.(eot|svg|ttf|woff\d)$',
+        'retest': fr'/{BLOG_FONTS_ASSETS}/.*\.(eot|svg|ttf|woff\d)$',
         'processors': (
             save(path=f'{BLOG_FONTS_ASSETS_DIR}/{{file.path.name}}'),
         ),
     },
 
     {
-        'test': 'robots.txt',
+        'test': '/robots.txt',
         'processors': (
             save(path=f'{settings.DST_DIR}/robots.txt'),
         ),
@@ -183,14 +183,14 @@ RULES = settings.RULES + [
 if getattr(settings, 'BLOG_CSS_MIN', False):
     RULES += [
         {
-            'test': f'{BLOG_CSS_ASSETS}/*.min.css',
+            'test': f'/{BLOG_CSS_ASSETS}/*.min.css',
             'processors': (
                 save(path=f'{BLOG_CSS_ASSETS_DIR}/{{file.path.name}}'),
             ),
         },
 
         {
-            'test': f'{BLOG_CSS_ASSETS}/*.css',
+            'test': f'/{BLOG_CSS_ASSETS}/*.css',
             'processors': (
                 cssmin(),
                 save(path=f'{BLOG_CSS_ASSETS_DIR}/{{file.path.basename}}.min{{file.path.extension}}'),
@@ -198,7 +198,7 @@ if getattr(settings, 'BLOG_CSS_MIN', False):
         },
 
         {
-            'retest': fr'{BLOG_SASS_ASSETS}/(.*/)?[^_][^/]*\.(sass|scss)*$',
+            'retest': fr'/{BLOG_SASS_ASSETS}/(.*/)?[^_][^/]*\.(sass|scss)*$',
             'processors': (
                 sass(),
                 save(path=f'{BLOG_CSS_ASSETS_DIR}/{{file.path.basename}}.min.css'),
@@ -208,14 +208,14 @@ if getattr(settings, 'BLOG_CSS_MIN', False):
 else:
     RULES += [
         {
-            'test': f'{BLOG_CSS_ASSETS}/*.css',
+            'test': f'/{BLOG_CSS_ASSETS}/*.css',
             'processors': (
                 save(path=f'{BLOG_CSS_ASSETS_DIR}/{{file.path.name}}'),
             ),
         },
 
         {
-            'retest': fr'{BLOG_SASS_ASSETS}/(.*/)?[^_][^/]*\.(sass|scss)*$',
+            'retest': fr'/{BLOG_SASS_ASSETS}/(.*/)?[^_][^/]*\.(sass|scss)*$',
             'processors': (
                 sass(args=('sass', '--stdin')),
                 save(path=f'{BLOG_CSS_ASSETS_DIR}/{{file.path.basename}}.css'),
@@ -226,14 +226,14 @@ else:
 if getattr(settings, 'BLOG_JS_MIN', False):
     RULES += [
         {
-            'test': f'{BLOG_JS_ASSETS}/*.min.js',
+            'test': f'/{BLOG_JS_ASSETS}/*.min.js',
             'processors': (
                 save(path=f'{BLOG_JS_ASSETS_DIR}/{{file.path.name}}'),
             ),
         },
 
         {
-            'test': f'{BLOG_JS_ASSETS}/*.js',
+            'test': f'/{BLOG_JS_ASSETS}/*.js',
             'processors': (
                 uglifyjs(),
                 save(path=f'{BLOG_JS_ASSETS_DIR}/{{file.path.basename}}.min{{file.path.extension}}'),
@@ -243,7 +243,7 @@ if getattr(settings, 'BLOG_JS_MIN', False):
 else:
     RULES.append(
         {
-            'test': f'{BLOG_JS_ASSETS}/*.js',
+            'test': f'/{BLOG_JS_ASSETS}/*.js',
             'processors': (
                 save(path=f'{BLOG_JS_ASSETS_DIR}/{{file.path.name}}'),
             ),
