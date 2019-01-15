@@ -109,7 +109,7 @@ def build_archive(template_engine: Optional[TemplateEngine] = None) -> None:
                 url=f'{settings.BLOG_ARCHIVE_URL}/{year}/{month}/',
             )
 
-    archive = File(settings.DST_DIR, settings.BLOG_ARCHIVE_DIR, settings.BLOG_INDEX_FILE)
+    archive = File(settings.BLOG_ARCHIVE_DIR, settings.BLOG_INDEX_FILE)
     archive.contents = template_engine.render(
         settings.BLOG_ARCHIVE_TEMPLATE,
         {
@@ -123,13 +123,13 @@ def build_archive(template_engine: Optional[TemplateEngine] = None) -> None:
     add_sitemap_entry_to_context(f'{settings.BLOG_ARCHIVE_URL}/')
 
     for year, y_data in years.items():
-        save_posts(y_data['posts'], directory=f'{settings.DST_DIR}/{settings.BLOG_ARCHIVE_DIR}/{year}',
+        save_posts(y_data['posts'], directory=f'{settings.BLOG_ARCHIVE_DIR}/{year}',
                    template=settings.BLOG_YEAR_DETAIL_TEMPLATE, template_engine=template_engine,
                    extra_context={'year': year})
         add_sitemap_entry_to_context(y_data['url'])
 
         for month, m_data in y_data['months'].items():
-            save_posts(m_data['posts'], directory=f'{settings.DST_DIR}/{settings.BLOG_ARCHIVE_DIR}/{year}/{month}',
+            save_posts(m_data['posts'], directory=f'{settings.BLOG_ARCHIVE_DIR}/{year}/{month}',
                        template=settings.BLOG_MONTH_DETAIL_TEMPLATE, template_engine=template_engine,
                        extra_context={'year': year, 'month': month})
             add_sitemap_entry_to_context(m_data['url'])
@@ -151,7 +151,7 @@ def build_authors(template_engine: Optional[TemplateEngine] = None) -> None:
         for author in post.authors:
             authors[author].append(post)
 
-    author_list = File(settings.DST_DIR, settings.BLOG_AUTHORS_DIR, settings.BLOG_INDEX_FILE)
+    author_list = File(settings.BLOG_AUTHORS_DIR, settings.BLOG_INDEX_FILE)
     author_list.contents = template_engine.render(
         settings.BLOG_AUTHOR_LIST_TEMPLATE,
         {
@@ -165,7 +165,7 @@ def build_authors(template_engine: Optional[TemplateEngine] = None) -> None:
     add_sitemap_entry_to_context(f'{settings.BLOG_AUTHORS_URL}/')
 
     for author, posts in authors.items():
-        save_posts(posts, directory=f'{settings.DST_DIR}/{settings.BLOG_AUTHORS_DIR}/{author.slug}',
+        save_posts(posts, directory=f'{settings.BLOG_AUTHORS_DIR}/{author.slug}',
                    template=settings.BLOG_AUTHOR_DETAIL_TEMPLATE, template_engine=template_engine)
         add_sitemap_entry_to_context(f'{settings.BLOG_AUTHORS_URL}/{author.slug}/')
 
@@ -183,7 +183,7 @@ def build_categories(template_engine: Optional[TemplateEngine] = None) -> None:
         if post.category:
             categories[post.category].append(post)
 
-    category_list = File(settings.DST_DIR, settings.BLOG_CATEGORIES_DIR, settings.BLOG_INDEX_FILE)
+    category_list = File(settings.BLOG_CATEGORIES_DIR, settings.BLOG_INDEX_FILE)
     category_list.contents = template_engine.render(
         settings.BLOG_CATEGORY_LIST_TEMPLATE,
         {
@@ -197,7 +197,7 @@ def build_categories(template_engine: Optional[TemplateEngine] = None) -> None:
     add_sitemap_entry_to_context(f'{settings.BLOG_CATEGORIES_URL}/')
 
     for category, posts in categories.items():
-        save_posts(posts, directory=f'{settings.DST_DIR}/{settings.BLOG_CATEGORIES_DIR}/{category.slug}',
+        save_posts(posts, directory=f'{settings.BLOG_CATEGORIES_DIR}/{category.slug}',
                    template=settings.BLOG_CATEGORY_DETAIL_TEMPLATE, template_engine=template_engine)
         add_sitemap_entry_to_context(f'{settings.BLOG_CATEGORIES_URL}/{category.slug}/')
 
@@ -242,7 +242,7 @@ def build_sitemap() -> None:
             lastmod = etree.SubElement(sitemap, 'lastmod')
             lastmod.text = entry.lastmod.isoformat()
 
-        sitemap_file = File(f'{settings.DST_DIR}/{settings.BLOG_SITEMAP_FILENAME}', type=FileType.BINARY)
+        sitemap_file = File(f'{settings.BLOG_SITEMAP_FILENAME}', type=FileType.BINARY)
         sitemap_file.contents = etree.tostring(sitemapindex, encoding='utf-8', xml_declaration=True)
         if len(sitemap_file.contents) > settings.BLOG_SITEMAP_FILE_SIZE:
             raise JobError(f'The sitemap file is too big (> {settings.BLOG_SITEMAP_FILE_SIZE} bytes)')
@@ -297,7 +297,7 @@ def build_tags(template_engine: Optional[TemplateEngine] = None) -> None:
         for tag in post.tags:
             tags[tag].append(post)
 
-    tag_list = File(settings.DST_DIR, settings.BLOG_TAGS_DIR, settings.BLOG_INDEX_FILE)
+    tag_list = File(settings.BLOG_TAGS_DIR, settings.BLOG_INDEX_FILE)
     tag_list.contents = template_engine.render(
         settings.BLOG_TAG_LIST_TEMPLATE,
         {
@@ -311,6 +311,6 @@ def build_tags(template_engine: Optional[TemplateEngine] = None) -> None:
     add_sitemap_entry_to_context(f'{settings.BLOG_TAGS_URL}/')
 
     for tag, posts in tags.items():
-        save_posts(posts, directory=f'{settings.DST_DIR}/{settings.BLOG_TAGS_DIR}/{tag.slug}',
+        save_posts(posts, directory=f'{settings.BLOG_TAGS_DIR}/{tag.slug}',
                    template=settings.BLOG_TAG_DETAIL_TEMPLATE, template_engine=template_engine)
         add_sitemap_entry_to_context(f'{settings.BLOG_TAGS_URL}/{tag.slug}/')

@@ -11,36 +11,50 @@ from gena.templating import JinjaTemplateEngine
 logger = logging.getLogger(__name__)
 
 
-# Assets dirs
-BLOG_ASSETS_ROOT = getattr(settings, 'BLOG_ASSETS_ROOT', 'assets')
-BLOG_CSS_ASSETS_DIR = getattr(settings, 'BLOG_CSS_ASSETS_DIR', f'{BLOG_ASSETS_ROOT}/css')
-BLOG_FONTS_ASSETS_DIR = getattr(settings, 'BLOG_FONTS_ASSETS_DIR', f'{BLOG_ASSETS_ROOT}/fonts')
-BLOG_IMAGES_ASSETS_DIR = getattr(settings, 'BLOG_IMAGES_ASSETS_DIR', f'{BLOG_ASSETS_ROOT}/images')
-BLOG_JS_ASSETS_DIR = getattr(settings, 'BLOG_JS_ASSETS_DIR', f'{BLOG_ASSETS_ROOT}/js')
-BLOG_SASS_ASSETS_DIR = getattr(settings, 'BLOG_SASS_ASSETS_DIR', f'{BLOG_ASSETS_ROOT}/sass')
+BLOG_ASSETS = getattr(settings, 'BLOG_ASSETS', 'assets')
+BLOG_CSS_ASSETS = getattr(settings, 'BLOG_CSS_ASSETS', f'{BLOG_ASSETS}/css')
+BLOG_FONTS_ASSETS = getattr(settings, 'BLOG_FONTS_ASSETS', f'{BLOG_ASSETS}/fonts')
+BLOG_IMAGES_ASSETS = getattr(settings, 'BLOG_IMAGES_ASSETS', f'{BLOG_ASSETS}/images')
+BLOG_JS_ASSETS = getattr(settings, 'BLOG_JS_ASSETS', f'{BLOG_ASSETS}/js')
+BLOG_SASS_ASSETS = getattr(settings, 'BLOG_SASS_ASSETS', f'{BLOG_ASSETS}/sass')
 
-BLOG_ARCHIVE_DIR = getattr(settings, 'BLOG_ARCHIVE_DIR', 'archive')
-BLOG_AUTHORS_DIR = getattr(settings, 'BLOG_AUTHORS_DIR', 'authors')
-BLOG_CATEGORIES_DIR = getattr(settings, 'BLOG_CATEGORIES_DIR', 'categories')
-BLOG_PAGES_DIR = getattr(settings, 'BLOG_PAGES_DIR', 'pages')
-BLOG_POSTS_DIR = getattr(settings, 'BLOG_POSTS_DIR', 'posts')
-BLOG_TAGS_DIR = getattr(settings, 'BLOG_TAGS_DIR', 'tags')
+BLOG_ARCHIVE = getattr(settings, 'BLOG_ARCHIVE', 'archive')
+BLOG_AUTHORS = getattr(settings, 'BLOG_AUTHORS', 'authors')
+BLOG_CATEGORIES = getattr(settings, 'BLOG_CATEGORIES', 'categories')
+BLOG_PAGES = getattr(settings, 'BLOG_PAGES', 'pages')
+BLOG_POSTS = getattr(settings, 'BLOG_POSTS', 'posts')
+BLOG_TAGS = getattr(settings, 'BLOG_TAGS', 'tags')
+
+
+# Assets dirs
+BLOG_CSS_ASSETS_DIR = getattr(settings, 'BLOG_CSS_ASSETS_DIR', f'{settings.DST_DIR}/{BLOG_CSS_ASSETS}')
+BLOG_FONTS_ASSETS_DIR = getattr(settings, 'BLOG_FONTS_ASSETS_DIR', f'{settings.DST_DIR}/{BLOG_FONTS_ASSETS}')
+BLOG_IMAGES_ASSETS_DIR = getattr(settings, 'BLOG_IMAGES_ASSETS_DIR', f'{settings.DST_DIR}/{BLOG_IMAGES_ASSETS}')
+BLOG_JS_ASSETS_DIR = getattr(settings, 'BLOG_JS_ASSETS_DIR', f'{settings.DST_DIR}/{BLOG_JS_ASSETS}')
+BLOG_SASS_ASSETS_DIR = getattr(settings, 'BLOG_SASS_ASSETS_DIR', f'{settings.DST_DIR}/{BLOG_SASS_ASSETS}')
+
+BLOG_ARCHIVE_DIR = getattr(settings, 'BLOG_ARCHIVE_DIR', f'{settings.DST_DIR}/{BLOG_ARCHIVE}')
+BLOG_AUTHORS_DIR = getattr(settings, 'BLOG_AUTHORS_DIR', f'{settings.DST_DIR}/{BLOG_AUTHORS}')
+BLOG_CATEGORIES_DIR = getattr(settings, 'BLOG_CATEGORIES_DIR', f'{settings.DST_DIR}/{BLOG_CATEGORIES}')
+BLOG_PAGES_DIR = getattr(settings, 'BLOG_PAGES_DIR', f'{settings.DST_DIR}/{BLOG_PAGES}')
+BLOG_POSTS_DIR = getattr(settings, 'BLOG_POSTS_DIR', f'{settings.DST_DIR}/{BLOG_POSTS}')
+BLOG_TAGS_DIR = getattr(settings, 'BLOG_TAGS_DIR', f'{settings.DST_DIR}/{BLOG_TAGS}')
 
 
 # URLs
 BLOG_URL = getattr(settings, 'BLOG_URL', '')  # should be the full URL, including the protocol (e.g. http, https)
 
-BLOG_CSS_URL = getattr(settings, 'BLOG_CSS_URL', f'{BLOG_URL}/{BLOG_CSS_ASSETS_DIR}')
-BLOG_FONTS_URL = getattr(settings, 'BLOG_FONTS_URL', f'{BLOG_URL}/{BLOG_FONTS_ASSETS_DIR}')
-BLOG_IMAGES_URL = getattr(settings, 'BLOG_IMAGES_URL', f'{BLOG_URL}/{BLOG_IMAGES_ASSETS_DIR}')
-BLOG_JS_URL = getattr(settings, 'BLOG_JS_URL', f'{BLOG_URL}/{BLOG_JS_ASSETS_DIR}')
+BLOG_CSS_URL = getattr(settings, 'BLOG_CSS_URL', f'{BLOG_URL}/{BLOG_CSS_ASSETS}')
+BLOG_FONTS_URL = getattr(settings, 'BLOG_FONTS_URL', f'{BLOG_URL}/{BLOG_FONTS_ASSETS}')
+BLOG_IMAGES_URL = getattr(settings, 'BLOG_IMAGES_URL', f'{BLOG_URL}/{BLOG_IMAGES_ASSETS}')
+BLOG_JS_URL = getattr(settings, 'BLOG_JS_URL', f'{BLOG_URL}/{BLOG_JS_ASSETS}')
 
-BLOG_ARCHIVE_URL = getattr(settings, 'BLOG_ARCHIVE_URL', f'{BLOG_URL}/{BLOG_ARCHIVE_DIR}')
-BLOG_AUTHORS_URL = getattr(settings, 'BLOG_AUTHORS_URL', f'{BLOG_URL}/{BLOG_AUTHORS_DIR}')
-BLOG_CATEGORIES_URL = getattr(settings, 'BLOG_CATEGORIES_URL', f'{BLOG_URL}/{BLOG_CATEGORIES_DIR}')
-BLOG_PAGES_URL = getattr(settings, 'BLOG_PAGES_URL', f'{BLOG_URL}/{BLOG_PAGES_DIR}')
-BLOG_POSTS_URL = getattr(settings, 'BLOG_POSTS_URL', f'{BLOG_URL}/{BLOG_POSTS_DIR}')
-BLOG_TAGS_URL = getattr(settings, 'BLOG_TAGS_URL', f'{BLOG_URL}/{BLOG_TAGS_DIR}')
+BLOG_ARCHIVE_URL = getattr(settings, 'BLOG_ARCHIVE_URL', f'{BLOG_URL}/{BLOG_ARCHIVE}')
+BLOG_AUTHORS_URL = getattr(settings, 'BLOG_AUTHORS_URL', f'{BLOG_URL}/{BLOG_AUTHORS}')
+BLOG_CATEGORIES_URL = getattr(settings, 'BLOG_CATEGORIES_URL', f'{BLOG_URL}/{BLOG_CATEGORIES}')
+BLOG_PAGES_URL = getattr(settings, 'BLOG_PAGES_URL', f'{BLOG_URL}/{BLOG_PAGES}')
+BLOG_POSTS_URL = getattr(settings, 'BLOG_POSTS_URL', f'{BLOG_URL}/{BLOG_POSTS}')
+BLOG_TAGS_URL = getattr(settings, 'BLOG_TAGS_URL', f'{BLOG_URL}/{BLOG_TAGS}')
 
 
 # Templates
@@ -120,14 +134,14 @@ RULES = settings.RULES + [
     },
 
     {
-        'retest': fr'{BLOG_IMAGES_ASSETS_DIR}/.*\.(bmp|gif|ico|jpe?g|png|svg|tiff?)$',
+        'retest': fr'{BLOG_IMAGES_ASSETS}/.*\.(bmp|gif|ico|jpe?g|png|svg|tiff?)$',
         'processors': (
-            save(path=f'{settings.DST_DIR}/{BLOG_IMAGES_ASSETS_DIR}/{{file.path.name}}'),
+            save(path=f'{BLOG_IMAGES_ASSETS_DIR}/{{file.path.name}}'),
         ),
     },
 
     {
-        'test': f'{BLOG_PAGES_DIR}/*.md',
+        'test': f'{BLOG_PAGES}/*.md',
         'processors': (
             markdown(),
             meta_date(),
@@ -135,26 +149,26 @@ RULES = settings.RULES + [
             meta_slug(),
             template(BLOG_PAGE_TEMPLATE, _template_engine),
             sitemap(f'{BLOG_PAGES_URL}/{{file.meta.slug}}/') if BLOG_SITEMAP else None,
-            save(path=f'{settings.DST_DIR}/{BLOG_PAGES_DIR}/{{file.meta.slug}}/{BLOG_INDEX_FILE}'),
+            save(path=f'{BLOG_PAGES_DIR}/{{file.meta.slug}}/{BLOG_INDEX_FILE}'),
         ),
     },
 
     {
-        'test': f'{BLOG_POSTS_DIR}/*.md',
+        'test': f'{BLOG_POSTS}/*.md',
         'processors': (
             markdown(),
             meta_date(),
             meta_modified(),
             meta_slug(),
             blog_post(_template_engine),
-            save(path=f'{settings.DST_DIR}/{BLOG_POSTS_DIR}/{{file.meta.slug}}/index.html'),
+            save(path=f'{BLOG_POSTS_DIR}/{{file.meta.slug}}/index.html'),
         ),
     },
 
     {
-        'retest': fr'{BLOG_FONTS_ASSETS_DIR}/.*\.(eot|svg|ttf|woff\d)$',
+        'retest': fr'{BLOG_FONTS_ASSETS}/.*\.(eot|svg|ttf|woff\d)$',
         'processors': (
-            save(path=f'{settings.DST_DIR}/{BLOG_FONTS_ASSETS_DIR}/{{file.path.name}}'),
+            save(path=f'{BLOG_FONTS_ASSETS_DIR}/{{file.path.name}}'),
         ),
     },
 
@@ -169,43 +183,42 @@ RULES = settings.RULES + [
 if getattr(settings, 'BLOG_CSS_MIN', False):
     RULES += [
         {
-            'test': f'{BLOG_CSS_ASSETS_DIR}/*.min.css',
+            'test': f'{BLOG_CSS_ASSETS}/*.min.css',
             'processors': (
-                save(path=f'{settings.DST_DIR}/{BLOG_CSS_ASSETS_DIR}/{{file.path.name}}'),
+                save(path=f'{BLOG_CSS_ASSETS_DIR}/{{file.path.name}}'),
             ),
         },
 
         {
-            'test': f'{BLOG_CSS_ASSETS_DIR}/*.css',
+            'test': f'{BLOG_CSS_ASSETS}/*.css',
             'processors': (
                 cssmin(),
-                save(path=f'{settings.DST_DIR}/{BLOG_CSS_ASSETS_DIR}/'
-                          f'{{file.path.basename}}.min{{file.path.extension}}'),
+                save(path=f'{BLOG_CSS_ASSETS_DIR}/{{file.path.basename}}.min{{file.path.extension}}'),
             ),
         },
 
         {
-            'retest': fr'{BLOG_SASS_ASSETS_DIR}/(.*/)?[^_][^/]*\.(sass|scss)*$',
+            'retest': fr'{BLOG_SASS_ASSETS}/(.*/)?[^_][^/]*\.(sass|scss)*$',
             'processors': (
                 sass(),
-                save(path=f'{settings.DST_DIR}/{BLOG_CSS_ASSETS_DIR}/{{file.path.basename}}.min.css'),
+                save(path=f'{BLOG_CSS_ASSETS_DIR}/{{file.path.basename}}.min.css'),
             ),
         },
     ]
 else:
     RULES += [
         {
-            'test': f'{BLOG_CSS_ASSETS_DIR}/*.css',
+            'test': f'{BLOG_CSS_ASSETS}/*.css',
             'processors': (
-                save(path=f'{settings.DST_DIR}/{BLOG_CSS_ASSETS_DIR}/{{file.path.name}}'),
+                save(path=f'{BLOG_CSS_ASSETS_DIR}/{{file.path.name}}'),
             ),
         },
 
         {
-            'retest': fr'{BLOG_SASS_ASSETS_DIR}/(.*/)?[^_][^/]*\.(sass|scss)*$',
+            'retest': fr'{BLOG_SASS_ASSETS}/(.*/)?[^_][^/]*\.(sass|scss)*$',
             'processors': (
                 sass(args=('sass', '--stdin')),
-                save(path=f'{settings.DST_DIR}/{BLOG_CSS_ASSETS_DIR}/{{file.path.basename}}.css'),
+                save(path=f'{BLOG_CSS_ASSETS_DIR}/{{file.path.basename}}.css'),
             ),
         },
     ]
@@ -213,27 +226,26 @@ else:
 if getattr(settings, 'BLOG_JS_MIN', False):
     RULES += [
         {
-            'test': f'{BLOG_JS_ASSETS_DIR}/*.min.js',
+            'test': f'{BLOG_JS_ASSETS}/*.min.js',
             'processors': (
-                save(path=f'{settings.DST_DIR}/{BLOG_JS_ASSETS_DIR}/{{file.path.name}}'),
+                save(path=f'{BLOG_JS_ASSETS_DIR}/{{file.path.name}}'),
             ),
         },
 
         {
-            'test': f'{BLOG_JS_ASSETS_DIR}/*.js',
+            'test': f'{BLOG_JS_ASSETS}/*.js',
             'processors': (
                 uglifyjs(),
-                save(path=f'{settings.DST_DIR}/{BLOG_JS_ASSETS_DIR}/'
-                          f'{{file.path.basename}}.min{{file.path.extension}}'),
+                save(path=f'{BLOG_JS_ASSETS_DIR}/{{file.path.basename}}.min{{file.path.extension}}'),
             ),
         },
     ]
 else:
     RULES.append(
         {
-            'test': f'{BLOG_JS_ASSETS_DIR}/*.js',
+            'test': f'{BLOG_JS_ASSETS}/*.js',
             'processors': (
-                save(path=f'{settings.DST_DIR}/{BLOG_JS_ASSETS_DIR}/{{file.path.name}}'),
+                save(path=f'{BLOG_JS_ASSETS_DIR}/{{file.path.name}}'),
             ),
         },
     )
