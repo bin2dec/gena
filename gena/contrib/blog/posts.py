@@ -84,6 +84,7 @@ class BlogPost:
     category: BlogPostCategory
     contents: str
     date: datetime
+    description: str
     modified: datetime
     slug: str
     status: BlogPostStatus
@@ -118,6 +119,7 @@ class BlogPost:
             category=category,
             contents=file.contents,
             date=file.meta.date[0],
+            description=str(file.meta.get('description', '')),
             modified=file.meta.modified[0],
             slug=file.meta.slug[0],
             status=status,
