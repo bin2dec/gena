@@ -5,7 +5,7 @@ import re
 from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum
-from typing import Sequence
+from typing import Any, Sequence
 
 import lxml.html
 
@@ -66,6 +66,21 @@ class BlogPostCategory:
 class BlogPostTag:
     name: str
 
+    def __eq__(self, other: Any) -> bool:
+        if isinstance(other, BlogPostTag):
+            return self.name == other.name
+        return False
+
+    def __gt__(self, other: Any) -> bool:
+        if isinstance(other, BlogPostTag):
+            return self.name > other.name
+        return False
+
+    def __lt__(self, other: Any) -> bool:
+        if isinstance(other, BlogPostTag):
+            return self.name < other.name
+        return False
+
     def __str__(self) -> str:
         return self.name
 
@@ -113,6 +128,7 @@ class BlogPost:
         else:
             status = BlogPostStatus.PUBLIC
         tags = [BlogPostTag(name=tag) for tag in file.meta.get('tags', ())]
+        tags.sort()
 
         post = BlogPost(
             authors=authors,

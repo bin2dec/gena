@@ -296,6 +296,7 @@ def build_tags(template_engine: Optional[TemplateEngine] = None) -> None:
     for post in posts:
         for tag in post.tags:
             tags[tag].append(post)
+    tags = dict(sorted(tags.items()))
 
     tag_list = File(settings.BLOG_TAGS_DIR, settings.BLOG_INDEX_FILE)
     tag_list.contents = template_engine.render(
