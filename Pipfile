@@ -6,10 +6,10 @@ name = "pypi"
 [packages]
 htmlmin = "*"
 jinja2 = "*"
+lxml = "*"
 markdown = "*"
 python-dateutil = "*"
 python-slugify = "*"
-lxml = "*"
 watchdog = "*"
 
 [dev-packages]
