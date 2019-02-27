@@ -33,7 +33,7 @@ logger = logging.getLogger(__name__)
 
 
 def save_posts(posts: Sequence, *, directory: str, template: str, template_engine: Optional[TemplateEngine] = None,
-               extra_context: Optional[Mapping] = None):
+               extra_context: Optional[Mapping] = None, pagination: bool = True):
     """Save a blog post list."""
 
     if template_engine is None:
@@ -46,9 +46,9 @@ def save_posts(posts: Sequence, *, directory: str, template: str, template_engin
     posts = sorted(posts, key=lambda post: post.date, reverse=True)
 
     # Split blog posts up into groups depending on BLOG_POSTS_PER_PAGE
-    if settings.BLOG_POSTS_PER_PAGE:
+    if pagination and settings.BLOG_POSTS_PER_PAGE:
         groups = [posts[i:i+settings.BLOG_POSTS_PER_PAGE] for i in range(0, len(posts), settings.BLOG_POSTS_PER_PAGE)]
-    else:  # BLOG_POSTS_PER_PAGE = 0
+    else:
         groups = [posts]
 
     groups_num = len(groups)
