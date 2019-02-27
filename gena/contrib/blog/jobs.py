@@ -59,17 +59,17 @@ def save_posts(posts: Sequence, *, directory: str, template: str, template_engin
         template_context = {'context': context, 'posts': group, **extra_context, **settings}
 
         if i == 1:  # the first page
-            template_context['previous_page'] = None
+            template_context['next_page'] = None
             file = File(directory, settings.BLOG_INDEX_FILE)
         else:
-            template_context['previous_page'] = settings.BLOG_INDEX_FILE if i == 2 \
+            template_context['next_page'] = settings.BLOG_INDEX_FILE if i == 2 \
                 else settings.BLOG_N_INDEX_FILE.format(i-1)
             file = File(directory, settings.BLOG_N_INDEX_FILE.format(i))
 
         if i == groups_num:  # the last page
-            template_context['next_page'] = None
+            template_context['previous_page'] = None
         else:
-            template_context['next_page'] = settings.BLOG_N_INDEX_FILE.format(i+1)
+            template_context['previous_page'] = settings.BLOG_N_INDEX_FILE.format(i+1)
 
         file.contents = template_engine.render(template, template_context)
         file.save()
