@@ -2,9 +2,9 @@
 
 import logging
 
-from gena.contrib.blog.shortcuts import *
+from gena.contrib.blog.shortcuts import blog_post, sitemap
 from gena.settings import settings
-from gena.shortcuts import *
+from gena.shortcuts import cssmin, markdown, meta_date, meta_modified, meta_slug, sass, save, template, uglifyjs
 from gena.templating import JinjaTemplateEngine
 
 
@@ -123,7 +123,7 @@ if BLOG_SITEMAP and not BLOG_URL:
     BLOG_SITEMAP = False
 
 
-_template_engine = JinjaTemplateEngine()
+TEMPLATE_ENGINE = JinjaTemplateEngine()
 
 
 RULES = settings.RULES + [
@@ -148,7 +148,7 @@ RULES = settings.RULES + [
             meta_date(),
             meta_modified(),
             meta_slug(),
-            template(BLOG_PAGE_TEMPLATE, _template_engine),
+            template(BLOG_PAGE_TEMPLATE, TEMPLATE_ENGINE),
             sitemap(f'{BLOG_PAGES_URL}/{{file.meta.slug}}/') if BLOG_SITEMAP else None,
             save(path=f'{BLOG_PAGES_DIR}/{{file.meta.slug}}/{BLOG_INDEX_FILE}'),
         ),
@@ -161,7 +161,7 @@ RULES = settings.RULES + [
             meta_date(),
             meta_modified(),
             meta_slug(),
-            blog_post(_template_engine),
+            blog_post(TEMPLATE_ENGINE),
             save(path=f'{BLOG_POSTS_DIR}/{{file.meta.slug}}/index.html'),
         ),
     },
@@ -261,7 +261,7 @@ FINAL_JOBS = settings.FINAL_JOBS + [
     {
         'job': 'gena.contrib.blog.jobs.build_main_page',
         'options': {
-            'template_engine': _template_engine,
+            'template_engine': TEMPLATE_ENGINE,
         },
     },
 ]
@@ -271,7 +271,7 @@ if getattr(settings, 'BLOG_ARCHIVE', True):
         {
             'job': 'gena.contrib.blog.jobs.build_archive',
             'options': {
-                'template_engine': _template_engine,
+                'template_engine': TEMPLATE_ENGINE,
             },
         },
     ]
@@ -281,7 +281,7 @@ if getattr(settings, 'BLOG_AUTHORS', True):
         {
             'job': 'gena.contrib.blog.jobs.build_authors',
             'options': {
-                'template_engine': _template_engine,
+                'template_engine': TEMPLATE_ENGINE,
             },
         },
     ]
@@ -291,7 +291,7 @@ if getattr(settings, 'BLOG_CATEGORIES', True):
         {
             'job': 'gena.contrib.blog.jobs.build_categories',
             'options': {
-                'template_engine': _template_engine,
+                'template_engine': TEMPLATE_ENGINE,
             },
         },
     ]
@@ -301,7 +301,7 @@ if getattr(settings, 'BLOG_TAGS', True):
         {
             'job': 'gena.contrib.blog.jobs.build_tags',
             'options': {
-                'template_engine': _template_engine,
+                'template_engine': TEMPLATE_ENGINE,
             },
         },
     ]
