@@ -33,8 +33,8 @@ logger = logging.getLogger(__name__)
 
 
 def save_posts(posts: Sequence, *, directory: str, template: str, template_engine: Optional[TemplateEngine] = None,
-               extra_context: Optional[Mapping] = None, pagination: bool = True):
-    """Save a blog post list."""
+               extra_context: Optional[Mapping] = None, sort: bool = True, pagination: bool = True):
+    """Save a blog post list to a file or files."""
 
     if template_engine is None:
         template_engine = JinjaTemplateEngine()
@@ -42,8 +42,9 @@ def save_posts(posts: Sequence, *, directory: str, template: str, template_engin
     if extra_context is None:
         extra_context = {}
 
-    # Sort posts by creation date
-    posts = sorted(posts, key=lambda post: post.date, reverse=True)
+    # Sort blog posts by creation date (newest to oldest)
+    if sort:
+        posts.sort(key=lambda post: post.date, reverse=True)
 
     # Split blog posts up into groups depending on BLOG_POSTS_PER_PAGE
     if pagination and settings.BLOG_POSTS_PER_PAGE:
