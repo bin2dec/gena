@@ -162,7 +162,7 @@ RULES = settings.RULES + [
             meta_modified(),
             meta_slug(),
             blog_post(TEMPLATE_ENGINE),
-            save(path=f'{BLOG_POSTS_DIR}/{{file.meta.slug}}/index.html'),
+            # save(path=f'{BLOG_POSTS_DIR}/{{file.meta.slug}}/index.html'),  # disabled because of the build_posts job
         ),
     },
 
@@ -260,6 +260,13 @@ INITIAL_JOBS = [
 FINAL_JOBS = settings.FINAL_JOBS + [
     {
         'job': 'gena.contrib.blog.jobs.build_main_page',
+        'options': {
+            'template_engine': TEMPLATE_ENGINE,
+        },
+    },
+
+    {
+        'job': 'gena.contrib.blog.jobs.build_posts',
         'options': {
             'template_engine': TEMPLATE_ENGINE,
         },

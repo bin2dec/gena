@@ -24,6 +24,7 @@ __all__ = (
     'build_authors',
     'build_categories',
     'build_main_page',
+    'build_posts',
     'build_sitemap',
     'build_tags',
 )
@@ -214,6 +215,35 @@ def build_main_page(template_engine: Optional[TemplateEngine] = None) -> None:
         save_posts(posts, directory=settings.DST_DIR, template=settings.BLOG_MAIN_PAGE_TEMPLATE,
                    template_engine=template_engine)
         add_sitemap_entry_to_context(f'{settings.BLOG_URL}/')
+
+
+def build_posts(template_engine: Optional[TemplateEngine] = None) -> None:
+    """Create blog post pages."""
+
+    try:
+        posts = context[settings.BLOG_CONTEXT_POSTS]
+    except KeyError:
+        raise JobError('No blog posts are found to build the post pages')
+
+    posts.sort(key=lambda post: post.date, reverse=True)
+
+    for i, post in enumerate(posts):
+        try:
+            previous_post = posts[i+1]
+        except IndexError:
+            previous_post = None
+
+        next_post = posts[i-1] if i > 0 else None
+
+        save_posts(
+            posts,
+            directory=f'{settings.BLOG_POSTS_DIR}/{post.slug}',
+            template=settings.BLOG_POST_TEMPLATE,
+            template_engine=template_engine,
+            extra_context={'post': post, 'previous_post': previous_post, 'next_post': next_post},
+            sort=False,
+            pagination=False,
+        )
 
 
 def build_sitemap() -> None:
