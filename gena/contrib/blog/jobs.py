@@ -228,22 +228,25 @@ def build_posts(template_engine: Optional[TemplateEngine] = None) -> None:
     posts.sort(key=lambda post: post.date, reverse=True)
 
     for i, post in enumerate(posts):
+        next_post = posts[i-1] if i > 0 else None
+
         try:
             previous_post = posts[i+1]
         except IndexError:
             previous_post = None
 
-        next_post = posts[i-1] if i > 0 else None
-
-        save_posts(
-            posts,
-            directory=f'{settings.BLOG_POSTS_DIR}/{post.slug}',
-            template=settings.BLOG_POST_TEMPLATE,
-            template_engine=template_engine,
-            extra_context={'post': post, 'previous_post': previous_post, 'next_post': next_post},
-            sort=False,
-            pagination=False,
+        file = File(settings.BLOG_POSTS_DIR, post.slug, settings.BLOG_INDEX_FILE)
+        file.contents = template_engine.render(
+            settings.BLOG_POST_TEMPLATE,
+            {
+                'context': context,
+                'next_post': next_post,
+                'post': post,
+                'previous_post': previous_post,
+                **settings,
+            },
         )
+        file.save()
 
 
 def build_sitemap() -> None:
