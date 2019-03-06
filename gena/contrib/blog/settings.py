@@ -80,6 +80,8 @@ BLOG_TAG_LIST_TEMPLATE = getattr(settings, 'BLOG_TAG_LIST_TEMPLATE', 'tag_list.h
 
 # Context
 BLOG_CONTEXT_PREFIX = getattr(settings, 'BLOG_CONTEXT_SECTION', 'blog_')
+
+BLOG_CONTEXT_DRAFTS = getattr(settings, 'BLOG_CONTEXT_DRAFTS', f'{BLOG_CONTEXT_PREFIX}drafts')
 BLOG_CONTEXT_POSTS = getattr(settings, 'BLOG_CONTEXT_POSTS', f'{BLOG_CONTEXT_PREFIX}posts')
 BLOG_CONTEXT_SITEMAP = getattr(settings, 'BLOG_CONTEXT_SITEMAP', f'{BLOG_CONTEXT_PREFIX}sitemap')
 
@@ -93,6 +95,10 @@ BLOG_POSTS_PER_PAGE = getattr(settings, 'BLOG_POSTS_PER_PAGE', 5)
 
 BLOG_INDEX_FILE = getattr(settings, 'BLOG_INDEX_FILE', 'index.html')
 BLOG_N_INDEX_FILE = getattr(settings, 'BLOG_N_INDEX_FILE', 'index{}.html')
+
+
+# When BLOG_DRAFT_OMISSION=True, BlogPostProcessor omits all draft posts
+BLOG_DRAFT_OMISSION = getattr(settings, 'BLOG_DRAFT_OMISSION', False)
 
 
 BLOG_SITEMAP = getattr(settings, 'BLOG_SITEMAP', False)

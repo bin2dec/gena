@@ -220,9 +220,8 @@ def build_main_page(template_engine: Optional[TemplateEngine] = None) -> None:
 def build_posts(template_engine: Optional[TemplateEngine] = None) -> None:
     """Create blog post pages."""
 
-    try:
-        posts = context[settings.BLOG_CONTEXT_POSTS]
-    except KeyError:
+    posts = context.get(settings.BLOG_CONTEXT_DRAFTS, []) + context.get(settings.BLOG_CONTEXT_POSTS, [])
+    if not posts:
         raise JobError('No blog posts are found to build the post pages')
 
     posts.sort(key=lambda post: post.date, reverse=True)

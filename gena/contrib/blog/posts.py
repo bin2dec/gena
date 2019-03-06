@@ -4,7 +4,6 @@ import re
 
 from dataclasses import dataclass
 from datetime import datetime
-from enum import Enum
 from typing import Any, Sequence
 
 import lxml.html
@@ -19,15 +18,8 @@ __all__ = (
     'BlogPost',
     'BlogPostAuthor',
     'BlogPostCategory',
-    'BlogPostStatus',
     'BlogPostTag',
 )
-
-
-class BlogPostStatus(Enum):
-    DRAFT = 'draft'
-    PRIVATE = 'private'
-    PUBLIC = 'public'
 
 
 @dataclass(unsafe_hash=True)
@@ -100,9 +92,9 @@ class BlogPost:
     contents: str
     date: datetime
     description: str
+    draft: bool
     modified: datetime
     slug: str
-    status: BlogPostStatus
     tags: Sequence[BlogPostTag]
     title: str
 
@@ -123,10 +115,7 @@ class BlogPost:
     def from_file(file: FileLike) -> BlogPost:
         authors = [BlogPostAuthor(name=author) for author in file.meta.get('authors', ())]
         category = BlogPostCategory(name=str(file.meta.get('category', '')))
-        if 'status' in file.meta:
-            status = BlogPostStatus(file.meta.status[0].lower())
-        else:
-            status = BlogPostStatus.PUBLIC
+        draft = str(file.meta.get('status', '')).lower() == 'draft'
         tags = [BlogPostTag(name=tag) for tag in file.meta.get('tags', ())]
         tags.sort()
 
@@ -136,9 +125,9 @@ class BlogPost:
             contents=file.contents,
             date=file.meta.date[0],
             description=str(file.meta.get('description', '')),
+            draft=draft,
             modified=file.meta.modified[0],
             slug=file.meta.slug[0],
-            status=status,
             tags=tags,
             title=file.meta.title[0],
         )
