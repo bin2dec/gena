@@ -53,6 +53,10 @@ class FileMeta(UserDict):
             return self.data[name]
         raise AttributeError(name)
 
+    def get_first(self, key: str, default: Any = '') -> Any:
+        """Return the first item of self[key] (FileMetaValue) or default."""
+        return self.get(key, [default])[0]
+
 
 class FilePathLike(os.PathLike):
     @abstractmethod

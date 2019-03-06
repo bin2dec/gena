@@ -114,8 +114,8 @@ class BlogPost:
     @staticmethod
     def from_file(file: FileLike) -> BlogPost:
         authors = [BlogPostAuthor(name=author) for author in file.meta.get('authors', ())]
-        category = BlogPostCategory(name=str(file.meta.get('category', '')))
-        draft = str(file.meta.get('status', '')).lower() == 'draft'
+        category = BlogPostCategory(name=file.meta.get_first('category'))
+        draft = file.meta.get_first('status').lower() == 'draft'
         tags = [BlogPostTag(name=tag) for tag in file.meta.get('tags', ())]
         tags.sort()
 
@@ -123,13 +123,13 @@ class BlogPost:
             authors=authors,
             category=category,
             contents=file.contents,
-            date=file.meta.date[0],
-            description=str(file.meta.get('description', '')),
+            date=file.meta.get_first('date'),
+            description=file.meta.get_first('description'),
             draft=draft,
-            modified=file.meta.modified[0],
-            slug=file.meta.slug[0],
+            modified=file.meta.get_first('modified'),
+            slug=file.meta.get_first('slug'),
             tags=tags,
-            title=file.meta.title[0],
+            title=file.meta.get_first('title'),
         )
 
         return post
