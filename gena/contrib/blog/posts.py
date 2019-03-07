@@ -10,7 +10,7 @@ import lxml.html
 
 from slugify import slugify
 
-from gena.files import FileLike
+from gena.files import FileLike, FileMeta
 from gena.settings import settings
 
 
@@ -93,6 +93,7 @@ class BlogPost:
     date: datetime
     description: str
     draft: bool
+    meta: FileMeta
     modified: datetime
     slug: str
     tags: Sequence[BlogPostTag]
@@ -126,6 +127,7 @@ class BlogPost:
             date=file.meta.get_first('date'),
             description=file.meta.get_first('description'),
             draft=draft,
+            meta=file.meta,
             modified=file.meta.get_first('modified'),
             slug=file.meta.get_first('slug'),
             tags=tags,
