@@ -143,7 +143,7 @@ def meta_slug():
         'options': {
             'key': 'slug',
             'callback': slugify,
-            'default': lambda file: file.meta.title,
+            'default': lambda file: file.meta.get('title'),
             'skip_if_exists': True,
         },
     }
