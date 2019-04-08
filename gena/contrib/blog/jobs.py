@@ -153,8 +153,8 @@ def build_authors(template_engine: Optional[TemplateEngine] = None) -> None:
         for author in post.authors:
             authors[author].append(post)
 
-    author_list = File(settings.BLOG_AUTHORS_DIR, settings.BLOG_INDEX_FILE)
-    author_list.contents = template_engine.render(
+    index_page = File(settings.BLOG_AUTHORS_DIR, settings.BLOG_INDEX_FILE)
+    index_page.contents = template_engine.render(
         settings.BLOG_AUTHOR_LIST_TEMPLATE,
         {
             'context': context,
@@ -162,7 +162,7 @@ def build_authors(template_engine: Optional[TemplateEngine] = None) -> None:
             **settings,
         }
     )
-    author_list.save()
+    index_page.save()
 
     add_sitemap_entry_to_context(f'{settings.BLOG_AUTHORS_URL}/')
 
@@ -185,8 +185,8 @@ def build_categories(template_engine: Optional[TemplateEngine] = None) -> None:
         if post.category:
             categories[post.category].append(post)
 
-    category_list = File(settings.BLOG_CATEGORIES_DIR, settings.BLOG_INDEX_FILE)
-    category_list.contents = template_engine.render(
+    index_page = File(settings.BLOG_CATEGORIES_DIR, settings.BLOG_INDEX_FILE)
+    index_page.contents = template_engine.render(
         settings.BLOG_CATEGORY_LIST_TEMPLATE,
         {
             'categories': categories,
@@ -194,7 +194,7 @@ def build_categories(template_engine: Optional[TemplateEngine] = None) -> None:
             **settings,
         }
     )
-    category_list.save()
+    index_page.save()
 
     add_sitemap_entry_to_context(f'{settings.BLOG_CATEGORIES_URL}/')
 
@@ -331,8 +331,8 @@ def build_tags(template_engine: Optional[TemplateEngine] = None) -> None:
             tags[tag].append(post)
     tags = dict(sorted(tags.items()))
 
-    tag_list = File(settings.BLOG_TAGS_DIR, settings.BLOG_INDEX_FILE)
-    tag_list.contents = template_engine.render(
+    index_page = File(settings.BLOG_TAGS_DIR, settings.BLOG_INDEX_FILE)
+    index_page.contents = template_engine.render(
         settings.BLOG_TAG_LIST_TEMPLATE,
         {
             'context': context,
@@ -340,7 +340,7 @@ def build_tags(template_engine: Optional[TemplateEngine] = None) -> None:
             **settings,
         }
     )
-    tag_list.save()
+    index_page.save()
 
     add_sitemap_entry_to_context(f'{settings.BLOG_TAGS_URL}/')
 
