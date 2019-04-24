@@ -1,10 +1,7 @@
 """Markdown extensions."""
 
-import re
-
 from markdown.extensions import Extension
 from markdown.inlinepatterns import InlineProcessor
-from markdown.preprocessors import Preprocessor
 from slugify import slugify
 
 from gena.settings import settings
@@ -12,7 +9,7 @@ from gena.settings import settings
 
 __all__ = (
     'SettingsExtension',
-    'SlugsExtension',
+    'SlugExtension',
 )
 
 
@@ -30,23 +27,15 @@ class SettingsExtension(Extension):
         md.inlinePatterns.register(SettingsInlineProcessor(r'(::\s*([A-Z0-9_]+?)\s*::)'), 'gena_settings', 200)
 
 
-class SlugsPreprocessor(Preprocessor):
-    def __init__(self, *args, **kwargs):
-        pattern = kwargs.pop('pattern', r'(<!\s*(.+?)\s*!>)')
-        self.pattern = re.compile(pattern)
-        self.default = kwargs.pop('default', '')
-        super().__init__(*args, **kwargs)
+class SlugInlineProcessor(InlineProcessor):
+    """The processor for SlugsExtension."""
 
-    def _replace(self, match):
-        return slugify(match.group(2))
-
-    def run(self, lines):
-        new_lines = []
-        for line in lines:
-            new_lines.append(self.pattern.sub(self._replace, line))
-        return new_lines
+    def handleMatch(self, m, data):
+        return slugify(m.group(2)), m.start(0), m.end(0)
 
 
-class SlugsExtension(Extension):
+class SlugExtension(Extension):
+    """Slugify all $$ STRING $$."""
+
     def extendMarkdown(self, md):
-        md.preprocessors.register(SlugsPreprocessor(md), 'gena_slugs', 10)
+        md.inlinePatterns.register(SlugInlineProcessor(r'(\$\$\s*(.+?)\s*\$\$)'), 'gena_slugs', 210)
