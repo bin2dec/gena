@@ -3,6 +3,7 @@
 import re
 
 from markdown.extensions import Extension
+from markdown.inlinepatterns import InlineProcessor
 from markdown.preprocessors import Preprocessor
 from slugify import slugify
 
@@ -15,28 +16,18 @@ __all__ = (
 )
 
 
-class SettingsPreprocessor(Preprocessor):
-    def __init__(self, *args, **kwargs):
-        pattern = kwargs.pop('pattern', r'({{\s*([A-Z0-9_]+)\s*}})')
-        self.pattern = re.compile(pattern)
-        self.default = kwargs.pop('default', '')
-        super().__init__(*args, **kwargs)
+class SettingsInlineProcessor(InlineProcessor):
+    """The processor for SettingsExtension."""
 
-    def _replace(self, match):
-        return settings.get(match.group(2), self.default)
-
-    def run(self, lines):
-        new_lines = []
-        for line in lines:
-            new_lines.append(self.pattern.sub(self._replace, line))
-        return new_lines
+    def handleMatch(self, m, data):
+        return settings.get(m.group(2), ''), m.start(0), m.end(0)
 
 
 class SettingsExtension(Extension):
-    """Replace all {{ SETTING }} with an appropriate setting."""
+    """Replace all ::KEY:: with appropriate values from the settings dictionary."""
 
     def extendMarkdown(self, md):
-        md.preprocessors.register(SettingsPreprocessor(md), 'gena_settings', 10)
+        md.inlinePatterns.register(SettingsInlineProcessor(r'(::\s*([A-Z0-9_]+?)\s*::)'), 'gena_settings', 200)
 
 
 class SlugsPreprocessor(Preprocessor):
