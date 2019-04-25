@@ -15,13 +15,27 @@ __all__ = (
 )
 
 
+POST_LINK_RE = r'(\[\[\s*(?P<title>.+?)\s*(?:#\s*(?P<anchor>.+?)\s*)?\]\])'
+
+SETTINGS_RE = r'(::\s*([A-Z0-9_]+?)\s*::)'
+
+SLUG_RE = r'(\(\(\s*(.+?)\s*\)\))'
+
+
 class PostLinkInlineProcessor(InlineProcessor):
     """The processor for PostLinkExtension."""
 
     def handleMatch(self, m, data):
+        title = m.group('title')
+        anchor = m.group('anchor')
+
+        href = f'{settings.BLOG_POSTS_URL}/{slugify(title)}'
+        if anchor:
+            href += f'/#{anchor}'
+
         a = etree.Element('a')
-        a.text = m.group(2)
-        a.set('href', f'{settings.BLOG_POSTS_URL}/{slugify(m.group(2))}')
+        a.text = title
+        a.set('href', href)
 
         return a, m.start(0), m.end(0)
 
@@ -34,7 +48,7 @@ class PostLinkExtension(Extension):
     """
 
     def extendMarkdown(self, md):
-        md.inlinePatterns.register(PostLinkInlineProcessor(r'(\[\[\s*(.+?)\s*\]\])'), 'gena_post_links', 200)
+        md.inlinePatterns.register(PostLinkInlineProcessor(POST_LINK_RE), 'gena_post_links', 200)
 
 
 class SettingsInlineProcessor(InlineProcessor):
@@ -48,7 +62,7 @@ class SettingsExtension(Extension):
     """Replace all ::KEY:: with appropriate values from the settings dictionary."""
 
     def extendMarkdown(self, md):
-        md.inlinePatterns.register(SettingsInlineProcessor(r'(::\s*([A-Z0-9_]+?)\s*::)'), 'gena_settings', 200)
+        md.inlinePatterns.register(SettingsInlineProcessor(SETTINGS_RE), 'gena_settings', 200)
 
 
 class SlugInlineProcessor(InlineProcessor):
@@ -62,4 +76,4 @@ class SlugExtension(Extension):
     """Slugify all ((STRING))."""
 
     def extendMarkdown(self, md):
-        md.inlinePatterns.register(SlugInlineProcessor(r'(\(\(\s*(.+?)\s*\)\))'), 'gena_slugs', 210)
+        md.inlinePatterns.register(SlugInlineProcessor(SLUG_RE), 'gena_slugs', 210)
