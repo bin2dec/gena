@@ -59,7 +59,7 @@ class SlugInlineProcessor(InlineProcessor):
 
 
 class SlugExtension(Extension):
-    """Slugify all $$ STRING $$."""
+    """Slugify all ((STRING))."""
 
     def extendMarkdown(self, md):
-        md.inlinePatterns.register(SlugInlineProcessor(r'(\$\$\s*(.+?)\s*\$\$)'), 'gena_slugs', 210)
+        md.inlinePatterns.register(SlugInlineProcessor(r'(\(\(\s*(.+?)\s*\)\))'), 'gena_slugs', 210)
