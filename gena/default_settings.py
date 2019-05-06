@@ -97,3 +97,8 @@ GZIP_COMPRESS_LEVEL = 9
 # Visit directories pointed to by symlinks, on systems that support them.
 # It's primarily used by FileRunner.
 FOLLOW_SYMLINKS = False
+
+
+# An additional list of directory paths that will be monitored.
+# By default, only SRC_DIR and TEMPLATE_DIRS are monitored.
+WATCHDOG_DIRS = []

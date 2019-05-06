@@ -112,6 +112,8 @@ def _run(args):
         template_file_handler = TemplateFileSystemEventHandler(runner)
         observer = Observer()
         observer.schedule(source_file_handler, settings.SRC_DIR, recursive=True)
+        for extra_dir in settings.WATCHDOG_DIRS:
+            observer.schedule(source_file_handler, extra_dir, recursive=True)
         for template_dir in settings.TEMPLATE_DIRS:
             observer.schedule(template_file_handler, template_dir, recursive=True)
         observer.start()
