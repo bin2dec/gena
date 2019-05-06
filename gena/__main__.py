@@ -253,7 +253,7 @@ def main():
         if args.log_level == logging.DEBUG:
             settings.DEBUG = True
 
-        log_config = utils.import_attr(settings.LOGGER_CONFIGURATOR)
+        log_config = utils.import_attr(settings.LOG_CONFIG)
         log_config(args.log_level)
 
         if logger.isEnabledFor(logging.DEBUG):

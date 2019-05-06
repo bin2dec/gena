@@ -80,7 +80,8 @@ EXTERNAL_PROCESSOR = {
 }
 
 
-LOGGER_CONFIGURATOR = 'gena.log.config'
+# A logging configuration function
+LOG_CONFIG = 'gena.log.config'
 
 
 # A minimal interval between two runs of the file processing.
