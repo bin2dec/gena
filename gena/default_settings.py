@@ -73,6 +73,7 @@ MARKDOWN_OPTIONS = {
 RULES = []
 
 
+# A dictionary of subprocess.run() arguments. It's primarily used by ExternalProcessor.
 # See https://docs.python.org/3.7/library/subprocess.html#subprocess.run
 EXTERNAL_PROCESSOR = {
     'check': True,
@@ -82,11 +83,16 @@ EXTERNAL_PROCESSOR = {
 LOGGER_CONFIGURATOR = 'gena.log.config'
 
 
-# A minimal interval between two runs of the file processing
+# A minimal interval between two runs of the file processing.
 RERUN_INTERVAL = 1  # sec
 
 
 # A gzip compression level. It's is an integer from 0 to 9 controlling the level of compression;
 # 1 is fastest and produces the least compression, and 9 is slowest and produces the most compression.
-# 0 is no compression
+# 0 is no compression.
 GZIP_COMPRESS_LEVEL = 9
+
+
+# Visit directories pointed to by symlinks, on systems that support them.
+# It's primarily used by FileRunner.
+FOLLOW_SYMLINKS = False

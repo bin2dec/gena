@@ -61,7 +61,7 @@ class FileRunner:
             self._rules.append(new_rule)
 
     def _get_paths(self):
-        for root, _, files in os.walk(settings.SRC_DIR):
+        for root, _, files in os.walk(settings.SRC_DIR, followlinks=settings.FOLLOW_SYMLINKS):
             for file in files:
                 yield os.path.join(root, file)
 
