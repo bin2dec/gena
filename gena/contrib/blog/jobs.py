@@ -257,7 +257,7 @@ def build_sitemap() -> None:
     try:
         entries = context[settings.BLOG_CONTEXT_SITEMAP]
     except KeyError:
-        raise JobError('No sitemap entries are found to build "sitemap.xml"', build_sitemap)
+        raise JobError('No sitemap entries are found to build "sitemap.xml"')
 
     if settings.BLOG_SITEMAP_SIZE and len(entries) > settings.BLOG_SITEMAP_SIZE:
         groups = [entries[i:i+settings.BLOG_SITEMAP_SIZE] for i in range(0, len(entries), settings.BLOG_SITEMAP_SIZE)]

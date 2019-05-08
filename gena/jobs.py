@@ -48,7 +48,7 @@ def do_jobs(jobs: Iterable):
         try:
             obj(**options)
         except JobError as e:
-            logger.critical('The %s job has been aborted! %s', e.job.__name__, e.message)
+            logger.critical('The %s job has been aborted! %s', obj.__name__, e.message)
 
 
 def do_initial_jobs():
