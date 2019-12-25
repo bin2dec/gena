@@ -3,15 +3,17 @@
 # The directory that contains source files.
 SRC_DIR = 'src'
 
+
 # The directory for processed files.
 DST_DIR = 'dist'
 
 
+# Turn on/off debugging.
 DEBUG = False
 
 
 # EXTRA_SETTINGS is a list of additional settings modules.
-# For example:
+# For example, if you want to use the blog extension, you should include its settings:
 # EXTRA_SETTINGS = ['gena.contrib.blog.settings']
 EXTRA_SETTINGS = []
 
@@ -20,15 +22,19 @@ EXTRA_SETTINGS = []
 TEMPLATE_DIRS = ['templates']
 
 
+# CACHE_DIR is used for storing cache files.
 CACHE_DIR = ''
 
 
+# A default language. The value is supposed to be an ISO 639-1 language code.
 LANG = 'en'
 
 
+# A default file runner.
 RUNNER = 'gena.runners.FileRunner'
 
 
+# A default file factory. The base factories are "gena.files.binary_file" and "gena.files.text_file".
 DEFAULT_FILE_FACTORY = 'gena.files.text_file'
 
 
@@ -61,8 +67,9 @@ FINAL_JOBS = []
 JINJA_OPTIONS = {}
 
 
+# Markdown options.
 # See possible options https://python-markdown.github.io/reference/#markdown
-# See the list of built-in extensions https://python-markdown.github.io/extensions/
+# and the built-in extensions https://python-markdown.github.io/extensions/
 MARKDOWN_OPTIONS = {
     'extensions': ['gena.md:SettingsExtension', 'markdown.extensions.meta'],
     'output_format': 'html5',
@@ -80,7 +87,7 @@ EXTERNAL_PROCESSOR = {
 }
 
 
-# A logging configuration function
+# A logging configuration function.
 LOG_CONFIG = 'gena.log.config'
 
 
@@ -88,7 +95,7 @@ LOG_CONFIG = 'gena.log.config'
 RERUN_INTERVAL = 1  # sec
 
 
-# A gzip compression level. It's is an integer from 0 to 9 controlling the level of compression;
+# A gzip compression level. It's an integer from 0 to 9 controlling the level of compression;
 # 1 is fastest and produces the least compression, and 9 is slowest and produces the most compression.
 # 0 is no compression.
 GZIP_COMPRESS_LEVEL = 9
