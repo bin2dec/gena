@@ -7,7 +7,7 @@ import re
 
 from gena import utils
 from gena.exceptions import StopProcessing
-from gena.jobs import do_final_jobs, do_initial_jobs
+from gena.jobs import run_final_jobs, run_initial_jobs
 from gena.settings import settings
 
 
@@ -104,7 +104,7 @@ class FileRunner:
         if not tasks:
             return []
 
-        do_initial_jobs()
+        run_initial_jobs()
 
         files = []
         for file, processors in tasks:
@@ -117,6 +117,6 @@ class FileRunner:
                     break
             files.append(file)
 
-        do_final_jobs()
+        run_final_jobs()
 
         return files

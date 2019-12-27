@@ -315,11 +315,9 @@ def main():
         args.func(args)
     except Exception as exception:
         logger.critical(exception)
-
         if settings.DEBUG:
             raise
-        else:
-            sys.exit(1)
+        sys.exit(1)
 
 
 if __name__ == '__main__':
