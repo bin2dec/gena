@@ -91,7 +91,7 @@ EXTERNAL_PROCESSOR = {
 LOG_CONFIG = 'gena.log.config'
 
 
-# A minimal interval between two runs of the file processing.
+# RERUN_INTERVAL is used to debounce run function calls.
 RERUN_INTERVAL = 1  # sec
 
 

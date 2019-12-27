@@ -4,13 +4,14 @@ import logging
 import os.path
 import sys
 import sysconfig
+import threading
 
 from argparse import ArgumentParser
 from http.server import HTTPServer, SimpleHTTPRequestHandler
 from time import time
 
-from watchdog.events import FileSystemEventHandler
-from watchdog.observers import Observer
+import watchdog.events
+import watchdog.observers
 
 from gena import __version__
 from gena import utils
@@ -45,35 +46,80 @@ class HTTPRequestHandler(SimpleHTTPRequestHandler):
             super().log_request(code, size)
 
 
-class SourceFileSystemEventHandler(FileSystemEventHandler):
+class Timer(threading.Thread):
+    """Call a function after a specified number of seconds."""
+
+    step = 1
+
+    def __init__(self, interval, function, args=None, kwargs=None):
+        super().__init__()
+        self._interval = self._ointerval = interval
+        self.function = function
+        self.args = args if args is not None else []
+        self.kwargs = kwargs if kwargs is not None else {}
+        self._finished = threading.Event()
+
+    @property
+    def interval(self):
+        """Return the timer interval."""
+        return self._ointerval
+
+    def cancel(self):
+        """Stop the timer if it hasn't finished yet."""
+        self._finished.set()
+
+    def reset(self, interval=None):
+        """Reset the timer interval."""
+        if interval is None:
+            self._interval = self._ointerval
+        else:
+            self._interval = self._ointerval = interval
+
+    def run(self):
+        while self._interval >= self.step and not self._finished.wait(self.step):
+            self._interval -= self.step
+
+        if not self._finished.is_set():  # if the timer wasn't canceled
+            self.function(*self.args, **self.kwargs)
+
+
+class FileSystemEventHandler(watchdog.events.FileSystemEventHandler):
+    """A base watchdog event handler."""
+
     def __init__(self, runner, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.runner = runner
-        self.last_run = 0
+        self._timer = None
 
-    def on_any_event(self, event):
-        if not event.is_directory and \
-                self.runner.is_path_applicable(event.src_path) and \
-                time() - self.last_run > settings.RERUN_INTERVAL:
+    def rerun(self):
+        """Rerun the file processing."""
 
+        def run():
+            self._timer = None
             context.clear()
             self.runner.run()
-            self.last_run = time()
+
+        if self._timer is None:
+            self._timer = Timer(settings.RERUN_INTERVAL, run)
+            self._timer.start()
+        else:
+            self._timer.reset()
+
+
+class SourceFileSystemEventHandler(FileSystemEventHandler):
+    """A watchdog event handler for source files."""
+
+    def on_any_event(self, event):
+        if not event.is_directory and self.runner.is_path_applicable(event.src_path):
+            self.rerun()
 
 
 class TemplateFileSystemEventHandler(FileSystemEventHandler):
-    def __init__(self, runner, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.runner = runner
-        self.last_run = 0
+    """A watchdog event handler for template files."""
 
     def on_modified(self, event):
-        if not event.is_directory and \
-                time() - self.last_run > settings.RERUN_INTERVAL:
-
-            context.clear()
-            self.runner.run()
-            self.last_run = time()
+        if not event.is_directory:
+            self.rerun()
 
 
 def _build(args):
@@ -110,7 +156,7 @@ def _run(args):
     if args.watch:
         source_file_handler = SourceFileSystemEventHandler(runner)
         template_file_handler = TemplateFileSystemEventHandler(runner)
-        observer = Observer()
+        observer = watchdog.observers.Observer()
         observer.schedule(source_file_handler, settings.SRC_DIR, recursive=True)
         for extra_dir in settings.WATCHDOG_DIRS:
             observer.schedule(source_file_handler, extra_dir, recursive=True)
