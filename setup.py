@@ -5,12 +5,12 @@ from setuptools import find_packages, setup
 
 
 REQUIREMENTS = [
-    'jinja2 >= 2.10',
-    'lxml >= 4.3.0',
-    'markdown >= 3.0.1',
-    'python-dateutil >= 2.7.5',
-    'python-slugify >= 2.0.1',
-    'watchdog >= 0.9.0',
+    'jinja2 >= 2.11.2',
+    'lxml >= 4.5.0',
+    'markdown >= 3.2.1',
+    'python-dateutil >= 2.8.1',
+    'python-slugify >= 4.0.0',
+    'watchdog >= 0.10.2',
 ]
 
 EXTRAS = {

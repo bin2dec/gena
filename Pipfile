@@ -17,9 +17,3 @@ flake8 = "*"
 mypy = "*"
 pylint = "*"
 pytest = "*"
-
-[requires]
-python_version = "3.7"
-
-[pipenv]
-keep_outdated = true
